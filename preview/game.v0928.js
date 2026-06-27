@@ -715,7 +715,7 @@ const LORE_SKIP_ANIMATION_STORAGE_KEY = "reverseGu.lore.skipAnimation";
 const RECORDING_MODE_STORAGE_KEY = "reverseGu.recordingMode.enabled";
 const TRIAL_MODE_STORAGE_KEY = "reverseGu.trial.mode";
 const TRIAL_SEED_STORAGE_KEY = "reverseGu.trial.seedDraft";
-const GAME_VERSION = "V0.9.2.7 移动端横屏舒适布局";
+const GAME_VERSION = "V0.9.2.8 移动端战斗 HUD 重构预览版";
 // TODO: 后续多幕路线扩展时继续抽象 finalNode / bossNode，避免固定四段流程继续扩散。
 const MAX_ROUTE_STEP = 4;
 const BOSS_ROUTE_STEP = 4;
@@ -1216,6 +1216,23 @@ function toggleMobileAudioPanel() {
   dom.mobileAudioToggle?.setAttribute("aria-expanded", String(willOpen));
 }
 
+let intentHome = null;
+// 战斗安全布局下把敌人意图框搬入中央舞台(.arena-panel)，离开时还原回原位。只移动节点、不改意图内容渲染。
+function syncIntentPlacement(combatSafe) {
+  const intent = document.getElementById("intentBox");
+  if (!intent) return;
+  const arena = document.querySelector(".arena-panel");
+  if (combatSafe && arena) {
+    if (intent.parentElement !== arena) {
+      if (!intentHome) intentHome = { parent: intent.parentElement, next: intent.nextElementSibling };
+      const endBtn = document.getElementById("endTurnButton");
+      arena.insertBefore(intent, endBtn || null);
+    }
+  } else if (intentHome && intent.parentElement !== intentHome.parent) {
+    intentHome.parent.insertBefore(intent, intentHome.next);
+  }
+}
+
 function updateMobileViewportState() {
   updateAppHeight();
   const portraitPrompt = isMobilePortraitPrompt();
@@ -1226,12 +1243,17 @@ function updateMobileViewportState() {
   const mapOpen = !!dom.mapScreen && !dom.mapScreen.classList.contains("hidden");
   // 战斗页安全布局：横屏手机 + 当前处于战斗（game 存在）。离开战斗 game 置空即自动移除。
   const combatSafe = landscapeSafe && !!game;
+  // 极矮横屏（如部分手机全屏横屏 innerHeight<=430）再压一档氛围装饰，纯展示
+  const compactLowHeight = landscapeSafe && window.innerHeight <= 430;
   const showLogButton = landscapePlay && inActiveRun && !mapOpen && !modalOpen;
   const showAudioButton = landscapePlay && !modalOpen;
   document.body.classList.toggle("mobile-portrait-lock", portraitPrompt);
   document.body.classList.toggle("mobile-landscape-play", landscapePlay);
   document.body.classList.toggle("mobile-landscape", landscapeSafe);
   document.body.classList.toggle("mobile-combat-safe", combatSafe);
+  document.body.classList.toggle("compact-low-height", combatSafe && compactLowHeight);
+  document.documentElement.classList.toggle("combat-lock-html", combatSafe);
+  syncIntentPlacement(combatSafe);
   dom.mobileOrientationOverlay?.classList.toggle("hidden", !portraitPrompt);
   dom.mobileLogButton?.classList.toggle("hidden", !showLogButton);
   dom.mobileAudioToggle?.classList.toggle("hidden", !showAudioButton);
@@ -1523,7 +1545,18 @@ function saveTrialSeedDraft(value) {
 function renderSettingsOverlay() {
   if (!dom.settingsOverlay) return;
   const audioState = window.AudioManager?.getState?.();
-  if (dom.settingsVersion) dom.settingsVersion.textContent = `当前版本：${GAME_VERSION}`;
+  if (dom.settingsVersion) {
+    const cls = document.body.classList;
+    dom.settingsVersion.textContent = [
+      `当前版本：${GAME_VERSION}`,
+      `build：${window.__NMG_BUILD__ ?? "-"}`,
+      `视口：${window.innerWidth}×${window.innerHeight}`,
+      `mobile-landscape：${cls.contains("mobile-landscape") ? "是" : "否"}`,
+      `mobile-combat-safe：${cls.contains("mobile-combat-safe") ? "是" : "否"}`,
+      `compact-low-height：${cls.contains("compact-low-height") ? "是" : "否"}`,
+      `音频：${audioState ? `${audioState.muted ? "静音" : "开"} 音量${audioState.volume}` : "未就绪"}`,
+    ].join(" · ");
+  }
   if (dom.settingsMusicToggle) dom.settingsMusicToggle.textContent = `音乐：${audioState?.muted ? "关" : "开"}`;
   if (dom.settingsVolume && audioState) dom.settingsVolume.value = String(audioState.volume);
   if (dom.settingsEffectToggle) dom.settingsEffectToggle.textContent = `战斗特效：${effectsEnabled ? "开" : "关"}`;
@@ -6071,7 +6104,9 @@ function render() {
   const hero = player.definition;
   const nodeLabel = runState.currentNode?.type === "elite" ? "精英" : runState.currentNode?.type === "boss" ? "Boss" : "战斗";
   dom.turnNumber.textContent = game.turn;
-  dom.floorEyebrow.textContent = `命途图 · 第 ${runState.floor} 段 · ${nodeLabel}`;
+  dom.floorEyebrow.textContent = isMobileLandscapeSafe()
+    ? `第${runState.floor}段 · ${nodeLabel}`
+    : `命途图 · 第 ${runState.floor} 段 · ${nodeLabel}`;
   dom.playerSideLabel.textContent = hero.role;
   dom.playerTitle.textContent = hero.name;
   dom.playerPortraitCaption.textContent = hero.caption;

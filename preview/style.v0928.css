@@ -6965,24 +6965,38 @@ body {
 }
 
 /* ============================================================
-   V0.9.2.6 手机横屏战斗安全布局（mobile-combat-safe）
-   仅在 body.mobile-combat-safe 时生效（横屏手机 + 战斗中），
-   桌面端与竖屏完全不受影响。用类选择器 + 文件末尾，覆盖旧横屏规则。
+   V0.9.2.8 手机横屏战斗 HUD 重构（mobile-combat-safe）
+   仅在 body.mobile-combat-safe 时生效（横屏手机 + 战斗中）。
+   三层 HUD：顶部信息条 / 中央舞台 / 底部手牌 Dock；
+   立绘卡 object-fit:cover 去黑、铭刻图标化、减边框、--app-height、防外层滚动。
+   全部选择器带 body.mobile-combat-safe 前缀，桌面/竖屏零影响。
    ============================================================ */
-/* 防止部分安卓浏览器自动放大正文字体，导致卡名被挤成单字 */
+/* 防止安卓浏览器自动放大正文字体，导致卡名被挤成单字 */
 html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 
-body.mobile-combat-safe,
+/* 1) 外层无滚动 + 用真实可视高度排版。
+      用 documentElement 加类锁高（兼容不支持 :has() 的国产/X5/微信内核），
+      同时保留 :has 作为支持环境下的双保险；100vh 在前作老内核回退。 */
+body.mobile-combat-safe {
+  overflow: hidden;
+  height: var(--app-height, 100vh);
+  height: var(--app-height, 100dvh);
+}
+html.combat-lock-html {
+  overflow: hidden;
+  height: var(--app-height, 100vh);
+  height: var(--app-height, 100dvh);
+}
 html:has(body.mobile-combat-safe) {
   overflow: hidden;
   height: var(--app-height, 100dvh);
 }
 
-/* 战斗主网格：顶部状态条 / 中部三栏 / 底部手牌 */
+/* 战斗主网格：顶部信息条 / 中部三栏 / 底部手牌 Dock */
 body.mobile-combat-safe .game-shell {
   display: grid;
-  grid-template-columns: clamp(104px, 20vw, 158px) minmax(0, 1fr) clamp(104px, 20vw, 158px);
-  grid-template-rows: auto minmax(0, 1fr) auto;
+  grid-template-columns: clamp(108px, 22vw, 150px) minmax(0, 1fr) clamp(108px, 22vw, 150px);
+  grid-template-rows: clamp(54px, 11dvh, 70px) minmax(0, 1fr) auto;
   grid-template-areas:
     "topbar topbar topbar"
     "player arena enemy"
@@ -6994,19 +7008,21 @@ body.mobile-combat-safe .game-shell {
   padding: 4px 6px;
   overflow: hidden;
 }
-body.mobile-combat-safe .topbar { grid-area: topbar; }
-body.mobile-combat-safe .player-panel { grid-area: player; }
-body.mobile-combat-safe .arena-panel { grid-area: arena; }
-body.mobile-combat-safe .enemy-panel { grid-area: enemy; }
-body.mobile-combat-safe .hand-panel { grid-area: hand; }
+body.mobile-combat-safe .topbar { grid-area: topbar; min-width: 0; min-height: 0; overflow: hidden; }
+body.mobile-combat-safe .player-panel { grid-area: player; min-width: 0; min-height: 0; overflow: hidden; }
+body.mobile-combat-safe .arena-panel { grid-area: arena; min-width: 0; min-height: 0; overflow: hidden; }
+body.mobile-combat-safe .enemy-panel { grid-area: enemy; min-width: 0; min-height: 0; overflow: hidden; }
+body.mobile-combat-safe .hand-panel { grid-area: hand; min-width: 0; min-height: 0; overflow: hidden; }
 
-/* A. 顶部紧凑状态条（42~56px） */
+/* 2) 顶部信息条（54~70px，左短标题 / 中战况 / 右控件留位） */
 body.mobile-combat-safe .topbar {
-  height: clamp(42px, 8dvh, 56px);
-  min-height: 42px;
-  padding: 2px 8px;
-  gap: 8px;
+  height: clamp(54px, 11dvh, 70px);
+  min-height: 54px;
+  display: flex;
   align-items: center;
+  gap: 8px;
+  padding: 3px 10px;
+  padding-right: calc(96px + env(safe-area-inset-right)); /* 给右上 audio/log 两个浮钮预留 */
   overflow: hidden;
 }
 body.mobile-combat-safe .topbar h1,
@@ -7015,79 +7031,89 @@ body.mobile-combat-safe .tower-progress,
 body.mobile-combat-safe .top-relic {
   display: none;
 }
-body.mobile-combat-safe .topbar .eyebrow { font-size: 10px; margin: 0; }
-body.mobile-combat-safe .turn-plaque { font-size: 10px; padding: 1px 6px; }
-body.mobile-combat-safe .turn-plaque strong { font-size: 14px; }
-body.mobile-combat-safe .top-gu-stone { font-size: 10px; padding: 1px 6px; }
-body.mobile-combat-safe .deck-view-button { font-size: 11px; padding: 3px 8px; }
-
-/* B. 中央战斗区：意图优先、结束回合按钮独立、不显示大字氛围文案 */
-body.mobile-combat-safe .arena-panel {
-  min-width: 0;
-  min-height: 0;
-  padding: 4px;
-  gap: 5px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+body.mobile-combat-safe #floorEyebrow.eyebrow {
+  order: 0;
+  margin: 0;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
   overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 38vw;
+  flex-shrink: 1;
 }
-/* 中央大字与旋转塔印等氛围装饰：手机横屏不常驻，避免多层文字叠在一起 */
-/* 氛围让位功能：手机横屏隐藏大标题、长描述、教学浮层、旋转塔印，杜绝中央叠字 */
-body.mobile-combat-safe .battle-copy,
-body.mobile-combat-safe .battle-coach,
-body.mobile-combat-safe .tower-sigil,
-body.mobile-combat-safe #castDisplay {
-  display: none;
+body.mobile-combat-safe .turn-plaque {
+  order: 1;
+  margin-left: auto;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  padding: 2px 8px;
+  flex-shrink: 0;
 }
-/* 隐藏次要的牌堆/弃牌计数，重置子元素外边距与定位，确保中央信息与结束回合按钮干净竖排、绝不重叠 */
-body.mobile-combat-safe .pile-status { display: none; }
-body.mobile-combat-safe .arena-panel > * { margin: 0; position: static; transform: none; }
-body.mobile-combat-safe #endTurnButton {
-  width: 100%;
-  max-width: 220px;
-  margin: 0 auto;
-  padding: 8px 10px;
-  position: relative;
-  z-index: 3;
+body.mobile-combat-safe .turn-plaque strong { font-size: 15px; }
+body.mobile-combat-safe .top-gu-stone {
+  order: 2;
+  font-size: 11px;
+  padding: 2px 8px;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
-body.mobile-combat-safe #endTurnButton span { font-size: 14px; }
-body.mobile-combat-safe #endTurnHint { font-size: 9px; }
+body.mobile-combat-safe .deck-view-button {
+  order: 3;
+  font-size: 11px;
+  padding: 3px 8px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
 
-/* D. 左右角色 / 敌人面板压缩为状态条：隐藏大立绘，仅保留战斗数值 */
+/* 3) 左右立绘卡：放大 + cover + 去黑（核心修复）。
+      立绘高度选择器特意提一档特异性(.player-panel .player-portrait = 0,3,0)，
+      稳压既有媒体查询 .player-panel .portrait(0,2,0)，不靠源序。 */
 body.mobile-combat-safe .player-panel,
 body.mobile-combat-safe .enemy-panel {
+  display: flex;
+  flex-direction: column;
   min-width: 0;
   min-height: 0;
-  padding: 4px 5px;
-  gap: 3px;
+  padding: 5px;
+  gap: 4px;
   overflow: hidden;
   font-size: 11px;
+  border: 1px solid rgba(189, 162, 109, 0.14);
+  border-radius: 10px;
 }
-body.mobile-combat-safe .active-relic-card,
-body.mobile-combat-safe .panel-heading .side-label,
-body.mobile-combat-safe .portrait-caption {
-  display: none;
-}
-/* 小立绘缩略图：避免画面过空，用已压缩的 -web.jpg，开销很小 */
-body.mobile-combat-safe .player-portrait,
-body.mobile-combat-safe .enemy-portrait {
+body.mobile-combat-safe .player-panel .player-portrait,
+body.mobile-combat-safe .enemy-panel .enemy-portrait {
+  flex: 0 0 auto;
   display: block;
   width: 100%;
-  height: clamp(38px, 8.5dvh, 62px);
+  height: clamp(64px, 15dvh, 104px);
   min-height: 0;
-  margin: 0 0 3px;
-  border-radius: 6px;
+  margin: 0;
+  border-radius: 8px;
   overflow: hidden;
   position: relative;
-  background: #0c0f0d;
+  border: 1px solid rgba(189, 162, 109, 0.18);
 }
+body.mobile-combat-safe .player-panel .player-portrait { background: #11160f; }
+body.mobile-combat-safe .enemy-panel .enemy-portrait { background: #15100d; }
+/* 去黑核心：覆盖基础 object-fit:contain，并杀掉 image-loaded 的 drop-shadow */
 body.mobile-combat-safe .portrait .portrait-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center 22%;
+}
+body.mobile-combat-safe .player-portrait .portrait-image { object-position: center 20%; }
+body.mobile-combat-safe .enemy-portrait .portrait-image { object-position: center 28%; }
+body.mobile-combat-safe .player-portrait.image-loaded .portrait-image,
+body.mobile-combat-safe .enemy-portrait.image-loaded .portrait-image { filter: none; }
+/* 小立绘上的压暗层减弱，避免发黑 */
+body.mobile-combat-safe .portrait-image-shade {
+  background: none;
+  box-shadow: none;
+  opacity: 0.28;
 }
 body.mobile-combat-safe .portrait .portrait-fallback {
   position: absolute;
@@ -7097,41 +7123,96 @@ body.mobile-combat-safe .portrait .portrait-fallback {
   justify-content: center;
   overflow: hidden;
 }
-body.mobile-combat-safe .portrait .portrait-fallback svg {
-  width: 86%;
-  height: 86%;
-}
+body.mobile-combat-safe .portrait .portrait-fallback svg { width: 82%; height: 82%; }
+/* 卡底铭牌 + 数值 */
 body.mobile-combat-safe .panel-heading h2 {
-  font-size: 12px;
+  font-size: 13px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   margin: 0;
 }
 body.mobile-combat-safe .resource-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 3px;
   font-size: 10px;
+  padding: 0;
 }
 body.mobile-combat-safe .resource-grid strong { font-size: 13px; }
-body.mobile-combat-safe .bar-track { height: 12px; }
+body.mobile-combat-safe .bar { height: 12px; }
 body.mobile-combat-safe .buff-list,
-body.mobile-combat-safe .enemy-status-list { font-size: 10px; gap: 2px; }
-body.mobile-combat-safe #intentBox {
-  padding: 4px 5px;
-  gap: 4px;
+body.mobile-combat-safe .enemy-status-list {
+  font-size: 10px;
+  gap: 2px;
+  flex-wrap: nowrap;
+  overflow: hidden;
 }
-body.mobile-combat-safe #intentIcon { width: 26px; height: 26px; font-size: 13px; }
-body.mobile-combat-safe #intentName { font-size: 12px; }
-body.mobile-combat-safe #intentDescription { font-size: 10px; margin: 0; }
-body.mobile-combat-safe #enemyPower { font-size: 10px; }
+/* 隐藏卡上噪音 */
+body.mobile-combat-safe .panel-heading .side-label,
+body.mobile-combat-safe .portrait-caption,
+body.mobile-combat-safe .active-relic-card {
+  display: none;
+}
 
-/* C. 底部手牌区：固定底部、横向滚动、卡牌足够宽、文字不重叠 */
-body.mobile-combat-safe .hand-panel {
-  min-height: 0;
-  padding: 2px 4px 4px;
+/* 4) 中列舞台：意图在上 + 按钮在下，竖排零叠字（JS 把 #intentBox 搬入 .arena-panel） */
+body.mobile-combat-safe .arena-panel {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 4px;
+}
+body.mobile-combat-safe .arena-panel > * { margin: 0; position: static; transform: none; }
+/* 隐藏中列氛围装饰，杜绝叠字与抢焦点 */
+body.mobile-combat-safe .battle-copy,
+body.mobile-combat-safe .battle-coach,
+body.mobile-combat-safe .tower-sigil,
+body.mobile-combat-safe #castDisplay,
+body.mobile-combat-safe .pile-status,
+body.mobile-combat-safe .end-turn-tip {
+  display: none;
+}
+body.mobile-combat-safe .arena-panel #intentBox {
+  order: 0;
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 3px;
+  padding: 6px 8px;
+  max-width: 160px;
+  min-height: 0;
+  border: 1px solid rgba(189, 162, 109, 0.3);
+  border-radius: 10px;
+}
+body.mobile-combat-safe #intentBox #intentIcon { width: 38px; height: 38px; font-size: 16px; }
+body.mobile-combat-safe #intentBox #intentName { font-size: 13px; }
+body.mobile-combat-safe #intentBox #intentDescription { font-size: 11px; margin: 0; }
+body.mobile-combat-safe #enemyPower { font-size: 10px; }
+body.mobile-combat-safe #endTurnButton {
+  order: 2;
+  width: 100%;
+  max-width: 180px;
+  margin: 0 auto;
+  padding: 9px 12px;
+  position: relative;
+  z-index: 3;
+  flex: 0 0 auto;
+}
+body.mobile-combat-safe #endTurnButton span { font-size: 15px; }
+body.mobile-combat-safe #endTurnHint { font-size: 9px; }
+
+/* 5) 底部手牌 Dock：横滑、卡宽 168px、短名 + 费用 + 类型 + 两行效果省略 */
+body.mobile-combat-safe .hand-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 2px 6px calc(4px + env(safe-area-inset-bottom));
   overflow: hidden;
+  border-top: 1px solid rgba(189, 162, 109, 0.14);
 }
 body.mobile-combat-safe .hand-heading { display: none; }
 body.mobile-combat-safe .hand {
@@ -7141,23 +7222,30 @@ body.mobile-combat-safe .hand {
   align-items: stretch;
   overflow-x: auto;
   overflow-y: hidden;
-  gap: 6px;
-  padding: 2px 2px 4px;
+  gap: 7px;
+  padding: 2px;
   -webkit-overflow-scrolling: touch;
   scroll-snap-type: x proximity;
+  scrollbar-width: none;
 }
+body.mobile-combat-safe .hand::-webkit-scrollbar { display: none; }
 body.mobile-combat-safe .hand .card {
   flex: 0 0 auto;
-  width: 178px;
-  min-width: 178px;
-  max-width: 178px;
+  width: 168px;
+  min-width: 168px;
+  max-width: 168px;
   height: auto;
   min-height: 0;
-  padding: 6px 8px;
+  max-height: none; /* 重置既有媒体查询 .card{max-height:82/102px} 的高度封顶，防裁切 */
+  padding: 7px 9px;
   scroll-snap-align: start;
+  border-radius: 8px;
   font-size: 11px;
+  border: 1px solid rgba(189, 162, 109, 0.3);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
-/* 隐藏大幅卡面装饰，腾出空间给卡名/费用/类型/效果，避免叠字与半张卡 */
+body.mobile-combat-safe .card:active { transform: translateY(-3px); }
+/* 隐藏大幅卡面装饰字，腾出空间 */
 body.mobile-combat-safe .card .card-art { display: none; }
 body.mobile-combat-safe .card .card-title-row {
   display: flex;
@@ -7167,7 +7255,7 @@ body.mobile-combat-safe .card .card-title-row {
 body.mobile-combat-safe .card .card-title-row h3 {
   flex: 1 1 auto;
   min-width: 0;
-  font-size: 13px;
+  font-size: 14px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -7184,26 +7272,64 @@ body.mobile-combat-safe .card .card-effect {
   line-height: 1.3;
 }
 
-/* 回合提示横幅：手机横屏短暂出现，不阻挡按钮与手牌 */
+/* 6) 减边框碎裂：统一关闭装饰伪元素框，仅保留各区单层细框 */
+body.mobile-combat-safe .combatant::before,
+body.mobile-combat-safe .arena-panel::before,
+body.mobile-combat-safe .log-panel::before,
+body.mobile-combat-safe .hand-panel::before,
+body.mobile-combat-safe .portrait::before,
+body.mobile-combat-safe .portrait::after,
+body.mobile-combat-safe .card::before,
+body.mobile-combat-safe .card::after {
+  display: none;
+}
+
+/* 7) 铭刻 / 音 浮钮重定位（≤44px，收进顶条高度内，不压手牌/按钮/意图） */
+body.mobile-combat-safe .mobile-audio-toggle {
+  top: calc((clamp(54px, 11dvh, 70px) - 38px) / 2 + max(0px, env(safe-area-inset-top)));
+  right: max(10px, calc(env(safe-area-inset-right) + 10px));
+  bottom: auto;
+  left: auto;
+  z-index: 96;
+}
+body.mobile-combat-safe .mobile-log-button {
+  top: calc((clamp(54px, 11dvh, 70px) - 38px) / 2 + max(0px, env(safe-area-inset-top)));
+  right: max(52px, calc(env(safe-area-inset-right) + 52px));
+  bottom: auto;
+  left: auto;
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  min-height: 38px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+  border-radius: 8px;
+  z-index: 84;
+}
+/* 日志面板：点开才显，从顶部下拉，绝不压底部手牌/中列按钮/意图 */
+body.mobile-combat-safe .log-panel { display: none; }
+body.mobile-combat-safe.mobile-log-open .log-panel {
+  display: flex;
+  position: fixed;
+  left: 8px;
+  right: 8px;
+  top: calc(clamp(54px, 11dvh, 70px) + 6px);
+  max-height: min(58%, calc(var(--app-height, 100dvh) * 0.58));
+  overflow-y: auto;
+  z-index: 90;
+}
+
+/* 8) 回合横幅：短暂出现，不挡按钮 */
 body.mobile-combat-safe .turn-banner {
-  top: clamp(46px, 9dvh, 62px);
+  top: clamp(54px, 11dvh, 70px);
   font-size: 12px;
   max-width: 82vw;
   pointer-events: none;
 }
 
-/* 铭刻日志：作为顶层浮层弹出，默认不占布局 */
-body.mobile-combat-safe .log-panel { display: none; }
-body.mobile-combat-safe.mobile-log-open .log-panel {
-  display: flex;
-  position: fixed;
-  inset: auto 8px 64px 8px;
-  max-height: min(62%, calc(var(--app-height, 100dvh) * 0.62));
-  overflow-y: auto;
-  z-index: 40;
-}
-
-/* 七、弹窗在横屏下限高 + 内部滚动，避免裁切关闭/底部按钮（不改弹窗内容逻辑） */
+/* 9) 弹窗在横屏下限高 + 内部滚动，避免裁切关闭/底部按钮（不改弹窗内容逻辑） */
 body.mobile-landscape [role="dialog"] {
   max-height: var(--app-height, 100dvh);
   overflow: hidden;
@@ -7214,3 +7340,17 @@ body.mobile-landscape [role="dialog"] > * {
   -webkit-overflow-scrolling: touch;
 }
 
+/* 10) 极矮屏（innerHeight<=430）再压一档氛围，先压装饰不压功能 */
+body.mobile-combat-safe.compact-low-height .game-shell {
+  grid-template-rows: clamp(48px, 12dvh, 60px) minmax(0, 1fr) auto;
+}
+body.mobile-combat-safe.compact-low-height .topbar {
+  height: clamp(48px, 12dvh, 60px);
+  min-height: 48px;
+}
+body.mobile-combat-safe.compact-low-height .player-panel .player-portrait,
+body.mobile-combat-safe.compact-low-height .enemy-panel .enemy-portrait {
+  height: clamp(52px, 13dvh, 80px);
+}
+body.mobile-combat-safe.compact-low-height .buff-list,
+body.mobile-combat-safe.compact-low-height .enemy-status-list { display: none; }
