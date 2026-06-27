@@ -715,7 +715,7 @@ const LORE_SKIP_ANIMATION_STORAGE_KEY = "reverseGu.lore.skipAnimation";
 const RECORDING_MODE_STORAGE_KEY = "reverseGu.recordingMode.enabled";
 const TRIAL_MODE_STORAGE_KEY = "reverseGu.trial.mode";
 const TRIAL_SEED_STORAGE_KEY = "reverseGu.trial.seedDraft";
-const GAME_VERSION = "V0.9.3.4 战斗手感预览版";
+const GAME_VERSION = "V0.9.4 战斗手感与卡牌预览";
 // TODO: 后续多幕路线扩展时继续抽象 finalNode / bossNode，避免固定四段流程继续扩散。
 const MAX_ROUTE_STEP = 4;
 const BOSS_ROUTE_STEP = 4;
@@ -3765,6 +3765,52 @@ function playCardSfx(card) {
   }, 80);
 }
 
+// 更新公告（只记正式版本；最新的放最前）。
+const UPDATE_LOG = [
+  { v: "V0.9.4", title: "战斗手感与卡牌预览", notes: [
+    "敌人意图新增「预计掉 X 血（已算护甲）」，大威胁时意图框红光警示",
+    "出牌、受击加入轻微振动反馈（手机）",
+    "点手牌可放大预览，看完整效果再决定出牌；预览弹窗加暗纹与寓言短句",
+    "第四段首领（尸盘）立绘在手机上更大、露出头部",
+  ] },
+  { v: "V0.9.3", title: "移动端全屏与战斗界面重构", notes: [
+    "手机横屏支持浏览器全屏（无地址栏），退出后可一键重进",
+    "战斗界面重构：信息更集中、双方状态完整显示、立绘对称、手牌可收纳",
+    "每局开战加入发牌动画；背景音乐与立绘大幅压缩，加载更快",
+  ] },
+];
+let updateLogEl = null;
+function showUpdateLog() {
+  if (!updateLogEl) {
+    updateLogEl = document.createElement("div");
+    updateLogEl.className = "update-log-overlay hidden";
+    let html = '<div class="update-log-backdrop"></div><div class="update-log-panel" role="dialog" aria-modal="true">'
+      + '<div class="update-log-head"><h2>更新公告</h2><button type="button" id="updateLogClose" aria-label="关闭">×</button></div>'
+      + '<div class="update-log-body">';
+    UPDATE_LOG.forEach((entry) => {
+      html += '<div class="update-log-entry"><p class="update-log-ver">' + entry.v + ' · ' + entry.title + '</p><ul>';
+      entry.notes.forEach((note) => { html += '<li>' + note + '</li>'; });
+      html += '</ul></div>';
+    });
+    updateLogEl.innerHTML = html + '</div></div>';
+    document.body.appendChild(updateLogEl);
+    updateLogEl.querySelector(".update-log-backdrop").addEventListener("click", hideUpdateLog);
+    updateLogEl.querySelector("#updateLogClose").addEventListener("click", hideUpdateLog);
+  }
+  updateLogEl.classList.remove("hidden");
+}
+function hideUpdateLog() { if (updateLogEl) updateLogEl.classList.add("hidden"); }
+// 检测到新正式版本时，首次进入自动弹一次更新公告。
+function maybeAutoShowUpdateLog() {
+  try {
+    const latest = UPDATE_LOG[0].v;
+    if (localStorage.getItem("niming.seenUpdate") !== latest) {
+      showUpdateLog();
+      localStorage.setItem("niming.seenUpdate", latest);
+    }
+  } catch (err) { /* localStorage 不可用则忽略 */ }
+}
+
 let cardPreviewEl = null;
 // 卡牌预览底部的氛围寓言短句（按类型变化，纯展示文案）。
 function cardFlavorText(card) {
@@ -6660,6 +6706,11 @@ function bindEvents() {
     playUiSfx();
     openTutorial(0);
   });
+  document.getElementById("updateLogButton")?.addEventListener("click", () => {
+    playUiSfx();
+    showUpdateLog();
+  });
+  maybeAutoShowUpdateLog();
   dom.loreOpenButton?.addEventListener("click", () => {
     playUiSfx();
     openLoreOverlay();
