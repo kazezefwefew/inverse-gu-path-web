@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="原创暗黑东方奇幻卡牌肉鸽原型《逆命蛊途》">
+  <title>逆命蛊途 · 命途塔试炼</title>
+  <script>window.__NMG_BUILD__ = "v0.9.2.7-comfort-preview";</script>
+  <link rel="stylesheet" href="style.v0927.css">
+  <script src="audio.v0927.js" defer></script>
+  <script src="game.v0927.js" defer></script>
+</head>
+<body>
+  <div class="mist mist-one" aria-hidden="true"></div>
+  <div class="mist mist-two" aria-hidden="true"></div>
+
+  <div id="mobileOrientationOverlay" class="mobile-orientation-overlay hidden" role="status" aria-live="polite">
+    <div class="mobile-orientation-card">
+      <span aria-hidden="true">横</span>
+      <h2>请横屏游玩《逆命蛊途》</h2>
+      <p>横屏后可获得更完整的卡牌战斗体验。</p>
+    </div>
+  </div>
+  <button id="mobileLogButton" class="mobile-log-button hidden" type="button" aria-expanded="false">铭刻</button>
+  <button id="mobileAudioToggle" class="mobile-audio-toggle hidden" type="button" aria-expanded="false" aria-label="打开音频设置">音</button>
+
+  <section id="startScreen" class="start-screen" aria-labelledby="startTitle">
+    <div class="start-backdrop" aria-hidden="true">
+      <span class="mountain mountain-one"></span>
+      <span class="mountain mountain-two"></span>
+      <span class="start-moon"></span>
+    </div>
+    <div class="start-content">
+      <p class="start-kicker">原创暗黑东方卡牌肉鸽 · V0.9.2.7 移动端横屏舒适布局</p>
+      <div class="start-logo" aria-hidden="true"><span>蛊</span></div>
+      <h1 id="startTitle">逆命蛊途</h1>
+      <p class="start-subtitle">以蛊为刃，以命为薪。命途塔中，从来没有天命之人。</p>
+      <div class="start-guide-actions" aria-label="新手与测试设置">
+        <button id="tutorialOpenButton" class="start-guide-button" type="button">初入命途</button>
+        <button id="loreOpenButton" class="start-guide-button lore-guide-button" type="button">命蛊残卷</button>
+        <button id="trialSettingsButton" class="start-guide-button trial-settings-button" type="button">试炼设置</button>
+        <button id="settingsOpenButton" class="start-guide-button settings-guide-button" type="button">设置</button>
+        <button id="balanceOpenButton" class="start-guide-button balance-guide-button" type="button">平衡检查</button>
+        <button id="recordingModeToggle" class="start-guide-button recording-mode-button" type="button" aria-pressed="false">录屏模式：关</button>
+        <button id="tutorialResetButton" class="start-reset-button" type="button">重置新手提示</button>
+      </div>
+      <p id="trialModeHint" class="trial-mode-hint hidden"></p>
+
+      <div class="start-divider"><i></i><span>选择入塔蛊修</span><i></i></div>
+      <div id="heroChoices" class="hero-choices" aria-label="选择一名入塔蛊修"></div>
+
+      <div class="start-divider"><i></i><span>选择本命遗物</span><i></i></div>
+      <div id="relicChoices" class="relic-choices" aria-label="选择一件本命遗物"></div>
+
+      <div class="start-deck-note">
+        <span>蛊匣异动</span>
+        <p>三名蛊修各有固定 10 张初始牌组；胜利后的炼蛊收获会优先出现当前流派专属蛊。</p>
+        <div id="advancedCardPreview" class="advanced-card-preview"></div>
+      </div>
+
+      <button id="startBattleButton" class="start-button" type="button">
+        <span>踏入命途塔</span>
+        <small>踏破四段，直面尸盘监守</small>
+      </button>
+      <p id="runProgress" class="run-progress hidden"></p>
+      <p class="start-feedback-note">网页试玩版：当前为开发测试版本，数据与内容仍会调整。</p>
+    </div>
+  </section>
+
+  <div id="fxLayer" class="fx-layer" aria-hidden="true"></div>
+  <div id="effectLayer" class="effect-layer" aria-hidden="true"></div>
+
+  <section id="mapScreen" class="map-screen hidden" aria-labelledby="mapTitle">
+    <div class="map-card">
+      <div class="map-heading">
+        <div>
+          <p class="map-eyebrow">命途图 / 分岔塔路</p>
+          <h2 id="mapTitle">命途塔路</h2>
+          <p id="mapDescription">塔路会在每局生成不同岔口。选择一处节点后，同段其他命途会被封锁。</p>
+        </div>
+        <div class="map-actions">
+          <span id="mapGuStones" class="map-gu-stones">蛊石 <strong>20</strong></span>
+          <button id="mapDeckButton" class="deck-mini-button" type="button">查看蛊囊</button>
+        </div>
+      </div>
+      <div id="mapProgress" class="map-progress" aria-label="命途图进度"></div>
+      <div id="mapStatus" class="map-status" aria-live="polite"></div>
+      <div id="mapRoute" class="map-route" aria-live="polite"></div>
+      <div id="mapNotice" class="map-notice hidden" aria-live="polite"></div>
+      <p id="mapHint" class="map-hint">选择当前发亮的命途节点继续。</p>
+      <div id="mapTransition" class="map-transition hidden" aria-live="assertive">
+        <strong id="mapTransitionText">命途流转</strong>
+      </div>
+    </div>
+  </section>
+  <div id="turnBanner" class="turn-banner" aria-live="polite" aria-atomic="true">
+    <span id="turnBannerKicker">命途流转</span>
+    <strong id="turnBannerText">第一回合</strong>
+  </div>
+  <div id="battleCoach" class="battle-coach hidden" aria-live="polite">
+    <button id="battleCoachClose" type="button" aria-label="关闭战斗提示">×</button>
+    <strong>入塔提示</strong>
+    <ul>
+      <li>每回合真元会恢复，点击卡牌即可使用。</li>
+      <li>防御会抵挡伤害，但回合结束后清零。</li>
+      <li>敌人意图会提前显示，注意防守或抢攻。</li>
+    </ul>
+  </div>
+  <div id="keywordTooltip" class="keyword-tooltip hidden" role="tooltip"></div>
+
+  <div id="audioControls" class="audio-controls" aria-label="背景音乐控制">
+    <strong class="mobile-audio-title">音律设置</strong>
+    <button id="mobileAudioClose" class="mobile-audio-close" type="button" aria-label="收起音频设置">×</button>
+    <button id="musicToggle" class="music-toggle" type="button" aria-pressed="false" title="开启或关闭背景音乐">
+      <span aria-hidden="true">♫</span>
+      <strong id="musicStatus">音乐：开</strong>
+    </button>
+    <label class="music-volume" for="musicVolume" title="调整背景音乐音量">
+      <span>音量</span>
+      <input id="musicVolume" type="range" min="0" max="1" step="0.05" value="0.45">
+    </label>
+    <small id="musicScene" aria-live="polite">未播放</small>
+    <small id="musicWakeHint" class="music-wake-hint" aria-live="polite">点击页面开启音乐</small>
+    <button id="effectToggle" class="effect-toggle" type="button" aria-pressed="true" title="开启或关闭轻量战斗视觉特效">
+      <span>战斗特效</span>
+      <strong id="effectStatus">开</strong>
+    </button>
+  </div>
+
+  <main class="game-shell" aria-label="逆命蛊途战斗界面">
+    <header class="topbar">
+      <div class="brand-mark" aria-hidden="true">蛊</div>
+      <div class="title-group">
+        <p id="floorEyebrow" class="eyebrow">命途图 · 第一段</p>
+        <h1>逆命蛊途</h1>
+      </div>
+      <div id="towerProgress" class="tower-progress" aria-label="命途塔进度"></div>
+      <div id="topGuStone" class="top-gu-stone" aria-label="当前蛊石">蛊石 <strong>20</strong></div>
+      <button id="deckViewButton" class="deck-view-button" type="button" title="查看当前完整卡组">蛊囊</button>
+      <div id="topRelic" class="top-relic" aria-label="当前遗物">
+        <span id="topRelicGlyph">玉</span>
+        <p>本命遗物<strong id="topRelicName">寒玉髓</strong></p>
+      </div>
+      <div class="turn-plaque">
+        <span>当前回合</span>
+        <strong id="turnNumber">1</strong>
+      </div>
+    </header>
+
+    <section class="combatant player-panel" aria-labelledby="playerTitle">
+      <div class="panel-heading">
+        <span id="playerSideLabel" class="side-label">蛊修</span>
+        <h2 id="playerTitle">无名逆命者</h2>
+      </div>
+      <div id="playerPortrait" class="portrait player-portrait" aria-label="无名逆命者立绘">
+        <div id="playerPortraitFallback" class="portrait-fallback" aria-hidden="true">
+          <svg class="player-figure-svg" viewBox="0 0 260 190" role="img" aria-hidden="true">
+          <defs>
+            <linearGradient id="robeGradient" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#293a31"/>
+              <stop offset="1" stop-color="#0a100d"/>
+            </linearGradient>
+            <linearGradient id="skinGradient" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#c5b9a3"/>
+              <stop offset="1" stop-color="#756d61"/>
+            </linearGradient>
+            <filter id="jadeGlow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          </defs>
+          <path class="portrait-smoke" d="M20 160 C45 132,36 108,72 90 S102 38,86 18" fill="none"/>
+          <path class="portrait-smoke smoke-two" d="M230 170 C200 143,221 105,187 87 S166 43,181 20" fill="none"/>
+          <path d="M50 190 C56 135 76 111 105 103 L154 103 C188 114 209 143 215 190Z" fill="url(#robeGradient)" stroke="#66816f" stroke-width="1"/>
+          <path d="M91 107 L70 150 L101 136 L128 188 L157 136 L189 151 L166 107Z" fill="#111914" stroke="#475e50"/>
+          <path d="M90 46 Q130 5 170 46 L160 95 Q130 127 100 95Z" fill="url(#skinGradient)"/>
+          <path d="M84 53 Q88 8 130 7 Q177 9 177 61 L162 46 Q130 30 96 49Z" fill="#07100c" stroke="#4b6655"/>
+          <path d="M94 82 Q109 74 121 80" fill="none" stroke="#1b2520" stroke-width="4"/>
+          <path d="M138 80 Q151 74 166 82" fill="none" stroke="#1b2520" stroke-width="4"/>
+          <circle cx="112" cy="81" r="2.6" fill="#8de0ad" filter="url(#jadeGlow)"/>
+          <circle cx="151" cy="81" r="2.6" fill="#8de0ad" filter="url(#jadeGlow)"/>
+          <path d="M124 98 Q132 102 141 97" fill="none" stroke="#514a42"/>
+          <path d="M102 109 L84 143 M158 109 L177 143" stroke="#9b2f2a" stroke-width="3"/>
+          <g class="portrait-gu" filter="url(#jadeGlow)">
+            <ellipse cx="58" cy="131" rx="10" ry="6" fill="#101e17" stroke="#6fbb8a"/>
+            <path d="M48 131 L38 124 M49 135 L38 140 M67 130 L77 122 M67 135 L78 142" stroke="#6fbb8a"/>
+            <circle cx="54" cy="129" r="1.5" fill="#c6f5d5"/>
+          </g>
+          <circle cx="130" cy="151" r="17" fill="#111914" stroke="#917b4f"/>
+          <text x="130" y="158" text-anchor="middle" fill="#bda26d" font-size="20" font-family="KaiTi">命</text>
+          </svg>
+        </div>
+        <img id="playerPortraitImage" class="portrait-image" alt="" decoding="async">
+        <span class="portrait-image-shade" aria-hidden="true"></span>
+        <span id="playerPortraitCaption" class="portrait-caption">蛊影随身 · 天命不受</span>
+      </div>
+      <div class="vital-block">
+        <div class="stat-line">
+          <span>生命</span>
+          <strong><span id="playerHp">50</span> / <span id="playerMaxHp">50</span></strong>
+        </div>
+        <div class="bar"><div id="playerHpBar" class="bar-fill hp-fill"></div></div>
+      </div>
+      <div class="resource-grid">
+        <div class="resource yuan-resource" data-keyword="真元" aria-label="真元：使用蛊牌的资源，每回合恢复。">
+          <span class="resource-icon">元</span>
+          <span>真元</span>
+          <strong id="playerEnergy">3 / 3</strong>
+        </div>
+        <div class="resource armor-resource" data-keyword="防御" aria-label="防御：抵挡伤害，回合结束后清零。">
+          <span class="resource-icon">御</span>
+          <span>防御</span>
+          <strong id="playerArmor">0</strong>
+        </div>
+        <div class="resource life-resource" data-keyword="寿元" aria-label="寿元：部分强力蛊会消耗的长期资源。">
+          <span class="resource-icon">寿</span>
+          <span>寿元</span>
+          <strong id="playerLifespan">20</strong>
+        </div>
+        <div class="resource blood-resource" data-keyword="血煞" aria-label="血煞：血道蛊修的爆发资源，会强化血道攻击。">
+          <span class="resource-icon">煞</span>
+          <span>血煞</span>
+          <strong id="playerBlood">0</strong>
+        </div>
+      </div>
+      <div id="buffList" class="buff-list" aria-live="polite">
+        <span class="empty-buff">暂无蛊术加持</span>
+      </div>
+      <div id="activeRelicCard" class="active-relic-card">
+        <span id="activeRelicGlyph">玉</span>
+        <p><small>本命遗物</small><strong id="activeRelicName">寒玉髓</strong></p>
+      </div>
+    </section>
+
+    <section class="arena-panel" aria-labelledby="battleInfoTitle">
+      <div class="tower-sigil" aria-hidden="true">
+        <span class="sigil-ring ring-outer"></span>
+        <span class="sigil-ring ring-inner"></span>
+        <span class="sigil-character">逆</span>
+      </div>
+      <div id="castDisplay" class="cast-display" aria-hidden="true">
+        <span id="castGlyph">蛊</span>
+        <strong id="castName">蛊术催动</strong>
+      </div>
+      <div class="battle-copy">
+        <p id="arenaKicker" class="arena-kicker">阴风穿塔，兽啸逼近</p>
+        <h2 id="battleInfoTitle">此战，唯有一方能离开</h2>
+        <p id="battleMessage" class="battle-message" aria-live="polite">山魈伏在阴影中，正窥伺你的破绽。</p>
+      </div>
+      <div class="pile-status" aria-label="牌堆状态">
+        <div><span>牌堆</span><strong id="drawCount">5</strong></div>
+        <i aria-hidden="true"></i>
+        <div><span>弃牌</span><strong id="discardCount">0</strong></div>
+      </div>
+      <button id="endTurnButton" class="end-turn-button" type="button">
+        <span>结束回合</span>
+        <small id="endTurnHint">敌人将执行意图</small>
+      </button>
+      <p class="end-turn-tip">真元耗尽后可结束回合</p>
+    </section>
+
+    <section class="combatant enemy-panel" aria-labelledby="enemyTitle">
+      <div class="panel-heading enemy-heading">
+        <span id="enemySideLabel" class="side-label">塔中凶兽</span>
+        <h2 id="enemyTitle">山魈</h2>
+      </div>
+      <div id="enemyPortrait" class="portrait enemy-portrait" aria-label="塔中敌人立绘"></div>
+      <div class="vital-block">
+        <div class="stat-line">
+          <span>生命</span>
+          <strong><span id="enemyHp">48</span> / <span id="enemyMaxHp">48</span></strong>
+        </div>
+        <div class="bar"><div id="enemyHpBar" class="bar-fill enemy-hp-fill"></div></div>
+      </div>
+      <div id="intentBox" class="intent-box" aria-live="polite">
+        <div id="intentIcon" class="intent-icon">爪</div>
+        <div>
+          <span>敌人意图</span>
+          <strong id="intentName">爪击</strong>
+          <p id="intentDescription">将造成 7 点伤害</p>
+        </div>
+      </div>
+      <div id="enemyPower" class="enemy-power hidden">蓄势：下次攻击 +5</div>
+      <div id="enemyStatusList" class="enemy-status-list" aria-live="polite"></div>
+    </section>
+
+    <aside class="log-panel" aria-labelledby="logTitle">
+      <div class="log-heading">
+        <div>
+          <span>铭刻分卷</span>
+          <h2 id="logTitle">战斗铭刻</h2>
+        </div>
+        <button id="clearLogButton" type="button" title="清空当前日志">清</button>
+      </div>
+      <div class="log-tabs" role="tablist" aria-label="日志分类">
+        <button id="logBattleTab" class="active" type="button" role="tab" aria-selected="true" data-log-channel="battle">战斗铭刻</button>
+        <button id="logJourneyTab" type="button" role="tab" aria-selected="false" data-log-channel="journey">命途札记</button>
+      </div>
+      <button id="logHistoryToggle" class="log-history-toggle hidden" type="button" aria-expanded="false"></button>
+      <ol id="battleLog" class="battle-log" aria-live="polite" aria-relevant="additions"></ol>
+      <ol id="journeyLog" class="battle-log journey-log hidden" aria-live="polite" aria-relevant="additions"></ol>
+    </aside>
+
+    <section class="hand-panel" aria-labelledby="handTitle">
+      <div class="hand-heading">
+        <div>
+          <span class="section-kicker">蛊匣</span>
+          <h2 id="handTitle">手牌</h2>
+        </div>
+        <p><kbd>点击卡牌</kbd> 即可催动蛊术</p>
+      </div>
+      <div id="hand" class="hand" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <div id="resultOverlay" class="result-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="resultTitle">
+    <div class="result-card">
+      <div id="resultSeal" class="result-seal">承</div>
+      <p id="resultEyebrow">命途逆转</p>
+      <h2 id="resultTitle">夺得传承</h2>
+      <p id="resultDescription">山魈伏诛，命途塔的古老传承向你敞开。</p>
+      <div class="result-stats">
+        <span>历经 <strong id="resultTurns">1</strong> 回合</span>
+        <span>剩余生命 <strong id="resultHp">50</strong></span>
+      </div>
+      <div class="result-mini-actions">
+        <button id="resultDeckButton" class="deck-mini-button" type="button">查看蛊囊</button>
+        <button id="resultStatsButton" class="deck-mini-button stats-mini-button" type="button">本局统计</button>
+        <button id="resultLoreButton" class="deck-mini-button lore-mini-button hidden" type="button">查看命蛊残卷</button>
+        <button id="resultFeedbackButton" class="deck-mini-button feedback-mini-button hidden" type="button">复制反馈信息</button>
+      </div>
+      <div id="cardRewardPanel" class="card-reward-panel hidden">
+        <div class="refine-heading">
+          <span>三枚蛊卵，仅可收纳其一</span>
+          <h3>炼蛊收获</h3>
+        </div>
+        <div id="cardRewardChoices" class="card-reward-choices"></div>
+        <button id="skipRewardButton" class="reward-skip" type="button">舍弃收获</button>
+      </div>
+      <div id="materialRewardPanel" class="material-reward-panel hidden">
+        <div class="refine-heading">
+          <span>炉灰有灵，仅可取一</span>
+          <h3>炼蛊材料</h3>
+        </div>
+        <div id="materialRewardChoices" class="material-reward-choices"></div>
+        <button id="skipMaterialButton" class="reward-skip" type="button">不取材料</button>
+      </div>
+      <div id="refinePanel" class="refine-panel hidden">
+        <div class="refine-heading">
+          <span>三蛊同炉，仅可取一</span>
+          <h3>炼蛊择变</h3>
+        </div>
+        <div id="refineChoices" class="refine-choices"></div>
+      </div>
+      <div id="furnacePanel" class="furnace-panel hidden">
+        <div class="refine-heading">
+          <span>材料入炉，蛊性难测</span>
+          <h3>蛊炉异变</h3>
+        </div>
+        <div id="furnaceMaterialList" class="furnace-material-list"></div>
+        <div id="furnaceMaterialChoices" class="furnace-material-choices"></div>
+        <div id="furnaceChoices" class="furnace-choices"></div>
+        <div id="furnaceConfirm" class="furnace-confirm hidden">
+          <div id="furnaceConfirmOriginal" class="furnace-compare"></div>
+          <div id="furnaceConfirmUpgraded" class="furnace-compare upgraded"></div>
+          <div id="furnaceRouteSummary" class="furnace-route-summary"></div>
+          <div class="furnace-confirm-actions">
+            <button id="confirmFurnaceButton" type="button">开炉炼蛊</button>
+            <button id="backFurnaceButton" class="reward-skip" type="button">返回选择</button>
+          </div>
+        </div>
+        <div id="furnaceComplete" class="furnace-complete hidden"></div>
+        <button id="furnaceSkipButton" class="reward-skip" type="button">暂熄炉火</button>
+      </div>
+      <div id="eventPanel" class="event-panel hidden">
+        <div class="refine-heading">
+          <span>命途暗涌，三念定局</span>
+          <h3 id="eventName">机缘</h3>
+        </div>
+        <p id="eventStory" class="event-story"></p>
+        <div id="eventChoices" class="event-choices"></div>
+        <div id="eventResult" class="event-result hidden"></div>
+      </div>
+      <div id="eliteConfirmPanel" class="elite-confirm-panel hidden">
+        <div class="refine-heading">
+          <span>血煞盘踞，退路已断</span>
+          <h3>凶煞阻路</h3>
+        </div>
+        <p>此战风险更高，胜后奖励更厚。</p>
+        <div class="elite-confirm-actions">
+          <button id="eliteConfirmButton" type="button">迎战</button>
+          <button id="eliteCancelButton" class="reward-skip" type="button">暂不进入</button>
+        </div>
+      </div>
+      <div id="shopPanel" class="shop-panel hidden">
+        <div class="refine-heading">
+          <span>蛊坊灯暗，价码分明</span>
+          <h3>蛊坊</h3>
+        </div>
+        <div class="shop-stone-line">当前蛊石：<strong id="shopGuStones">20</strong></div>
+        <div id="shopOverview" class="shop-overview"></div>
+        <div id="shopCardChoices" class="shop-card-choices"></div>
+        <div id="shopActions" class="shop-actions"></div>
+        <div id="shopRemovePanel" class="shop-remove-panel hidden">
+          <p>选择一张蛊牌移除。卡组不能少于 6 张。</p>
+          <div id="shopRemoveChoices" class="shop-remove-choices"></div>
+          <div id="shopRemoveConfirm" class="shop-remove-confirm hidden">
+            <strong>确认焚去此蛊？</strong>
+            <p id="shopRemoveConfirmText"></p>
+            <div class="shop-remove-confirm-actions">
+              <button id="shopConfirmRemoveButton" type="button">确认移除</button>
+              <button id="shopBackRemoveButton" class="reward-skip" type="button">返回</button>
+            </div>
+          </div>
+          <button id="shopCancelRemoveButton" class="reward-skip" type="button">返回蛊坊</button>
+        </div>
+      </div>
+      <div id="runSummary" class="run-summary hidden"></div>
+      <textarea id="feedbackCopyFallback" class="feedback-copy-fallback hidden" readonly aria-label="内测反馈信息"></textarea>
+      <button id="resultPrimaryButton" type="button">开启炼蛊</button>
+      <button id="resultSecondaryButton" class="result-secondary hidden" type="button">返回命途</button>
+    </div>
+  </div>
+
+  <div id="deckOverlay" class="deck-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="deckTitle">
+    <div class="deck-card">
+      <button id="deckCloseButton" class="deck-close-button" type="button" aria-label="关闭蛊囊">×</button>
+      <p class="deck-eyebrow">蛊囊 / 卡组查看</p>
+      <h2 id="deckTitle">当前蛊匣</h2>
+      <button id="deckLoreButton" class="deck-lore-button" type="button">命蛊残卷</button>
+      <button id="deckStatsButton" class="deck-stats-button" type="button">本局统计</button>
+      <div id="deckSummary" class="deck-summary"></div>
+      <div id="deckStats" class="deck-stats"></div>
+      <div id="deckMaterials" class="deck-materials"></div>
+      <div id="deckRelics" class="deck-relics"></div>
+      <div id="deckMarks" class="deck-marks"></div>
+      <div id="deckList" class="deck-list"></div>
+    </div>
+  </div>
+
+  <div id="runStatsOverlay" class="stats-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="runStatsTitle">
+    <div class="stats-card">
+      <button id="runStatsCloseButton" class="deck-close-button" type="button" aria-label="关闭本局统计">×</button>
+      <p class="deck-eyebrow">实战统计 / 结算追踪</p>
+      <h2 id="runStatsTitle">本局统计</h2>
+      <p class="stats-intro">只记录真实发生的数据；毒性结算无法归属到单卡时独立显示。</p>
+      <div id="runStatsSummary" class="run-stats-summary"></div>
+      <div class="stats-actions">
+        <button id="runStatsCopyButton" type="button">复制本局统计摘要</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="balanceOverlay" class="balance-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="balanceTitle">
+    <div class="balance-card">
+      <button id="balanceCloseButton" class="deck-close-button" type="button" aria-label="关闭平衡检查">×</button>
+      <p class="deck-eyebrow">开发测试 / 配置摘要</p>
+      <h2 id="balanceTitle">平衡检查</h2>
+      <p class="balance-intro">仅用于内测核对数值入口；录屏模式开启后自动隐藏。</p>
+      <div id="balanceSummary" class="balance-summary"></div>
+      <div class="balance-actions">
+        <button id="balanceCopyButton" type="button">复制平衡摘要</button>
+        <button id="balanceCopyRunStatsButton" type="button">复制本局统计摘要</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="trialSettingsOverlay" class="trial-settings-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="trialSettingsTitle">
+    <div class="trial-settings-card">
+      <button id="trialSettingsCloseButton" class="deck-close-button" type="button" aria-label="关闭试炼设置">×</button>
+      <p class="deck-eyebrow">试玩模式 / 路线种子</p>
+      <h2 id="trialSettingsTitle">试炼设置</h2>
+      <p class="settings-intro">选择下一局的试玩用途。切换后不影响已经开始的一局。</p>
+      <div id="trialModeChoices" class="trial-mode-choices" role="list"></div>
+      <label class="seed-setting-row" for="trialSeedInput">
+        <span>命途种子</span>
+        <input id="trialSeedInput" type="text" maxlength="7" placeholder="平衡测试可填，如 MT-7F3A">
+      </label>
+      <div class="settings-actions">
+        <button id="trialSeedClearButton" type="button">下局随机种子</button>
+        <button id="trialSettingsApplyButton" type="button">保存设置</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="settingsOverlay" class="settings-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+    <div class="settings-card">
+      <button id="settingsCloseButton" class="deck-close-button" type="button" aria-label="关闭设置">×</button>
+      <p class="deck-eyebrow">试玩包设置</p>
+      <h2 id="settingsTitle">设置</h2>
+      <p id="settingsVersion" class="settings-version">当前版本：V0.9.2.7 移动端横屏舒适布局</p>
+      <div class="settings-list">
+        <button id="settingsMusicToggle" type="button">音乐：开</button>
+        <label class="settings-volume" for="settingsVolume">
+          <span>音量</span>
+          <input id="settingsVolume" type="range" min="0" max="1" step="0.05" value="0.45">
+        </label>
+        <button id="settingsEffectToggle" type="button">战斗特效：开</button>
+        <button id="settingsRecordingToggle" type="button">录屏模式：关</button>
+        <button id="settingsLoreAnimationToggle" type="button">跳过残卷动画：关</button>
+        <div class="settings-session-actions" aria-label="试炼操作">
+          <button id="settingsHomeButton" type="button">返回首页</button>
+          <button id="settingsRestartButton" type="button">重新开始当前试炼</button>
+        </div>
+        <button id="settingsTutorialResetButton" class="settings-reset-action" type="button">重置新手提示</button>
+        <button id="settingsLoreResetButton" class="settings-reset-action" type="button">重置残卷解锁</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="tutorialOverlay" class="tutorial-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="tutorialTitle">
+    <div class="tutorial-card">
+      <button id="tutorialCloseButton" class="tutorial-close-button" type="button" aria-label="关闭新手说明">×</button>
+      <p class="tutorial-eyebrow">初入命途</p>
+      <h2 id="tutorialTitle">选择蛊修</h2>
+      <div id="tutorialBody" class="tutorial-body"></div>
+      <div class="tutorial-progress" aria-label="新手说明页数">
+        <span id="tutorialPageText">1 / 4</span>
+        <i id="tutorialDots"></i>
+      </div>
+      <div class="tutorial-actions">
+        <button id="tutorialPrevButton" type="button">上一页</button>
+        <button id="tutorialNextButton" type="button">下一页</button>
+        <button id="tutorialSkipButton" class="tutorial-skip-button" type="button">跳过</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="loreOverlay" class="lore-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="loreTitle">
+    <div class="lore-card">
+      <button id="loreCloseButton" class="lore-close-button" type="button" aria-label="关闭命蛊残卷">×</button>
+      <p class="lore-eyebrow">古页照命</p>
+      <h2 id="loreTitle">命蛊残卷</h2>
+      <p class="lore-intro">残卷不记功过，只照见蛊道初生时的旧影。</p>
+      <div id="loreProgress" class="lore-progress"></div>
+      <div id="loreList" class="lore-list"></div>
+      <div class="lore-settings">
+        <span>残卷设置</span>
+        <button id="loreAnimationToggle" type="button" aria-pressed="false">跳过残卷动画：关</button>
+        <button id="loreResetButton" type="button">重置残卷解锁</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
