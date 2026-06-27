@@ -28,6 +28,7 @@ body {
   margin: 0;
   overflow-x: auto;
   color: var(--paper);
+  font-size: 16px;
   font-family: "Microsoft YaHei", "Noto Sans SC", system-ui, sans-serif;
   background:
     radial-gradient(circle at 17% 48%, rgba(79, 123, 91, 0.16), transparent 34%),
@@ -156,7 +157,7 @@ button {
 .side-label {
   margin: 0 0 4px;
   color: var(--gold);
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.25em;
   text-transform: uppercase;
 }
@@ -169,7 +170,7 @@ button {
   padding-left: 18px;
   border-left: 1px solid var(--line);
   color: var(--muted);
-  font-size: 12px;
+  font-size: 13px;
   letter-spacing: 0.12em;
 }
 
@@ -641,7 +642,7 @@ button {
   display: block;
   margin: -2px 0 7px;
   color: #c7b88c;
-  font-size: 11px;
+  font-size: 12px;
   font-style: normal;
   letter-spacing: 0.1em;
 }
@@ -650,14 +651,14 @@ button {
   display: inline-block;
   margin-bottom: 8px;
   color: var(--gold);
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 0.12em;
 }
 
 .map-node p {
   margin: 0;
   color: #a9ad9d;
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1.55;
 }
 
@@ -828,7 +829,7 @@ button {
   justify-content: space-between;
   margin-bottom: 6px;
   color: var(--muted);
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .stat-line strong {
@@ -875,7 +876,7 @@ button {
   border: 1px solid rgba(189, 162, 109, 0.13);
   background: rgba(255, 255, 255, 0.018);
   color: var(--muted);
-  font-size: 10px;
+  font-size: 11px;
 }
 
 .resource-icon {
@@ -893,7 +894,7 @@ button {
 .resource strong {
   align-self: end;
   color: var(--paper);
-  font-size: 14px;
+  font-size: 16px;
 }
 
 .yuan-resource .resource-icon { color: #82b8a0; }
@@ -1046,7 +1047,7 @@ button {
   padding: 4px 7px;
   border: 1px solid rgba(104, 165, 91, 0.32);
   color: #9bc58d;
-  font-size: 9px;
+  font-size: 10px;
   background: rgba(52, 103, 48, 0.11);
 }
 
@@ -1158,7 +1159,7 @@ button {
   min-height: 38px;
   margin: 0;
   color: var(--muted);
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.7;
 }
 
@@ -1204,13 +1205,13 @@ button {
 .end-turn-button span {
   display: block;
   font-family: "KaiTi", serif;
-  font-size: 17px;
+  font-size: 18px;
   letter-spacing: 0.16em;
 }
 
 .end-turn-button small {
   color: #a79d88;
-  font-size: 9px;
+  font-size: 10px;
   letter-spacing: 0.08em;
 }
 
@@ -1605,7 +1606,7 @@ kbd {
   max-width: 100%;
   margin: 1px 0 0;
   overflow: hidden;
-  font: 600 clamp(14px, 1.12vw, 18px) "STKaiti", "KaiTi", serif;
+  font: 600 clamp(15px, 1.18vw, 19px) "STKaiti", "KaiTi", serif;
   letter-spacing: 0.06em;
   line-height: 1.18;
   white-space: nowrap;
@@ -1665,7 +1666,7 @@ kbd {
   max-height: 52px;
   overflow: hidden;
   color: #b9b9ae;
-  font-size: clamp(10.5px, 0.72vw, 11.5px);
+  font-size: clamp(11.5px, 0.78vw, 12.5px);
   line-height: 1.42;
   -webkit-line-clamp: 3;
   line-clamp: 3;
@@ -4450,9 +4451,9 @@ button.lore-index-card:hover {
 }
 
 .run-summary-item.wide { grid-column: 1 / -1; }
-.run-summary-item span { display: block; color: var(--muted); font-size: 8px; letter-spacing: 0.1em; }
-.run-summary-item strong { display: block; margin-top: 3px; color: var(--paper); font: 14px "KaiTi", serif; line-height: 1.45; }
-.run-summary-item.feedback-line strong { color: #bda26d; font-size: 12px; }
+.run-summary-item span { display: block; color: var(--muted); font-size: 9px; letter-spacing: 0.1em; }
+.run-summary-item strong { display: block; margin-top: 3px; color: var(--paper); font: 15px "KaiTi", serif; line-height: 1.45; }
+.run-summary-item.feedback-line strong { color: #bda26d; font-size: 13px; }
 
 .refine-heading span {
   color: var(--muted);
@@ -4707,6 +4708,28 @@ button.lore-index-card:hover {
   color: #d7c58f;
   cursor: pointer;
   background: rgba(9, 15, 11, 0.64);
+}
+
+.settings-session-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  padding: 8px;
+  border: 1px solid rgba(189, 162, 109, 0.18);
+  background: rgba(189, 162, 109, 0.035);
+}
+
+.settings-session-actions button {
+  min-height: 38px;
+  color: #ead7a2;
+}
+
+.settings-session-actions button:first-child {
+  border-color: rgba(111, 152, 119, 0.42);
+}
+
+.settings-session-actions button:last-child {
+  border-color: rgba(168, 62, 52, 0.42);
 }
 
 .settings-actions {
@@ -5870,13 +5893,13 @@ body {
   .active-relic-card { margin-top: 6px; padding-block: 5px; }
   .tower-sigil { width: 76px; height: 76px; margin-bottom: 5px; }
   .battle-copy h2 { margin-block: 3px 5px; }
-  .battle-message { height: 36px; max-height: 36px; font-size: 11px; line-height: 1.55; }
+  .battle-message { height: 38px; max-height: 38px; font-size: 12.5px; line-height: 1.5; }
   .pile-status { margin: 8px 0; }
   .hand-heading { padding-block: 7px 6px; }
   .hand { padding: 7px 11px 9px; }
   .card { height: auto; max-height: 156px; padding-top: 9px; }
   .card-art { height: 34px; margin-block: 5px; }
-  .card-effect { font-size: 10px; line-height: 1.32; }
+  .card-effect { font-size: 11px; line-height: 1.32; }
   .log-heading { padding-block: 10px 8px; }
   .battle-log { padding-top: 7px; padding-bottom: 9px; }
   .battle-log li { padding-block: 6px 7px; line-height: 1.42; }
@@ -6212,13 +6235,13 @@ body {
     margin: 0;
     padding: 5px;
     gap: 5px;
-    grid-template-columns: 150px minmax(240px, 1fr) 170px;
-    grid-template-rows: 36px minmax(0, 1fr) 132px;
+    grid-template-columns: 162px minmax(210px, 1fr) 184px;
+    grid-template-rows: 32px minmax(0, 1fr) clamp(124px, 34dvh, 142px);
   }
 
   .topbar {
     min-height: 0;
-    height: 36px;
+    height: 32px;
     padding: 3px 48px 3px 6px;
     gap: 6px;
     overflow: hidden;
@@ -6351,32 +6374,30 @@ body {
 
   .resource {
     display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-columns: minmax(0, 1fr) auto;
     align-items: center;
-    column-gap: 3px;
-    min-height: 27px;
-    padding: 3px 4px;
-    font-size: 8px;
+    column-gap: 5px;
+    min-height: 28px;
+    padding: 4px 5px;
+    font-size: 9px;
     overflow: hidden;
   }
 
   .resource-icon {
-    width: 17px;
-    height: 17px;
-    font-size: 9px;
+    display: none;
   }
 
   .resource span:not(.resource-icon) {
     min-width: 0;
     overflow: hidden;
-    font-size: 8px;
+    font-size: 9px;
     line-height: 1;
     white-space: nowrap;
     text-overflow: clip;
   }
 
   .resource strong {
-    font-size: 12px;
+    font-size: 13px;
     line-height: 1;
     white-space: nowrap;
   }
@@ -6404,14 +6425,12 @@ body {
     grid-row: 2;
     min-width: 0;
     min-height: 0;
-    padding: 7px;
+    padding: 6px;
     overflow: hidden;
   }
 
   .tower-sigil {
-    width: 48px;
-    height: 48px;
-    margin-bottom: 3px;
+    display: none;
   }
 
   .sigil-character {
@@ -6419,30 +6438,33 @@ body {
   }
 
   .battle-copy h2 {
-    margin: 2px 0 3px;
-    font-size: clamp(19px, 4.2vw, 28px);
+    margin: 0 0 2px;
+    font-size: clamp(13px, 2.5vw, 17px);
+    letter-spacing: 0.08em;
+    line-height: 1.15;
   }
 
   .arena-kicker,
   .battle-message {
-    font-size: 10px;
+    font-size: 9.5px;
   }
 
   .battle-message {
-    height: 28px;
-    max-height: 28px;
-    line-height: 1.45;
+    height: 23px;
+    max-height: 23px;
+    overflow: hidden;
+    line-height: 1.25;
   }
 
   .pile-status {
-    margin: 6px 0;
+    margin: 4px 0;
     font-size: 9px;
   }
 
   .end-turn-button {
     min-width: 112px;
-    min-height: 46px;
-    padding: 8px 14px;
+    min-height: 42px;
+    padding: 6px 13px;
   }
 
   .end-turn-button span {
@@ -6463,7 +6485,7 @@ body {
   }
 
   .intent-box {
-    min-height: 58px;
+    min-height: 56px;
     padding: 5px;
     gap: 5px;
   }
@@ -6490,7 +6512,7 @@ body {
   }
 
   .enemy-status-list {
-    max-height: 34px;
+    max-height: 38px;
     overflow-y: auto;
   }
 
@@ -6568,8 +6590,8 @@ body {
   }
 
   .hand-heading {
-    min-height: 30px;
-    padding: 5px 8px 3px;
+    min-height: 26px;
+    padding: 4px 8px 2px;
   }
 
   .hand-heading h2 {
@@ -6582,21 +6604,21 @@ body {
 
   .hand {
     box-sizing: border-box;
-    height: calc(100% - 30px);
+    height: calc(100% - 26px);
     min-height: 0;
-    padding: 6px 52px 9px 8px;
+    padding: 5px 54px 8px 8px;
     gap: 8px;
     overflow-x: auto;
     overflow-y: hidden;
   }
 
   .card {
-    flex: 0 0 140px;
-    width: 140px;
-    min-width: 140px;
-    height: 94px;
-    max-height: 94px;
-    padding: 6px 7px;
+    flex: 0 0 154px;
+    width: 154px;
+    min-width: 154px;
+    height: 102px;
+    max-height: 102px;
+    padding: 6px 8px;
   }
 
   .card:hover:not(:disabled) {
@@ -6605,13 +6627,13 @@ body {
 
   .card-title-row {
     align-items: flex-start;
-    min-height: 22px;
+    min-height: 24px;
     gap: 5px;
   }
 
   .card-title-row h3 {
-    font-size: 14px;
-    line-height: 1.05;
+    font-size: 14.5px;
+    line-height: 1.1;
     max-width: calc(100% - 52px);
   }
 
@@ -6627,9 +6649,9 @@ body {
   }
 
   .card-type {
-    max-width: 86px;
+    max-width: 96px;
     padding: 2px 4px;
-    font-size: 8px;
+    font-size: 8.5px;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -6641,9 +6663,9 @@ body {
 
   .card-effect {
     margin-top: 4px;
-    min-height: 28px;
-    max-height: 31px;
-    font-size: 9.5px;
+    min-height: 31px;
+    max-height: 34px;
+    font-size: 10.2px;
     line-height: 1.35;
     -webkit-line-clamp: 2;
   }
@@ -6816,6 +6838,12 @@ body {
     min-height: 36px;
   }
 
+  .settings-session-actions {
+    grid-template-columns: 1fr;
+    gap: 6px;
+    padding: 6px;
+  }
+
   .card-reward-choices,
   .material-reward-choices,
   .refine-choices,
@@ -6861,6 +6889,23 @@ body {
 
   .battle-effect.center-effect {
     max-width: 82vw;
+    min-width: 0;
+    padding: 7px 14px;
+    font-size: 14px;
+    line-height: 1.25;
+    letter-spacing: 0.1em;
+  }
+
+  .effect-boss-title-prime {
+    font-size: 18px;
+  }
+
+  .effect-boss-subtitle {
+    top: 55%;
+    max-width: 78vw;
+    padding: 5px 12px;
+    font-size: 10px;
+    line-height: 1.25;
   }
 }
 

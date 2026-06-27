@@ -41,6 +41,7 @@
   let initialized = false;
   let hasUserInteracted = false;
   let firstInteractionArmed = false;
+  let lifecyclePaused = false;
 
   // 单通道串行换曲：从结构上保证不会有两首 BGM 同时播放。
   const channels = [createChannel()];
@@ -101,6 +102,17 @@
     return Boolean(startScreen && !startScreen.classList.contains("hidden"));
   }
 
+  function isMenuSceneVisible() {
+    const startScreen = document.getElementById("startScreen");
+    const mapScreen = document.getElementById("mapScreen");
+    const resultOverlay = document.getElementById("resultOverlay");
+    return Boolean(
+      (startScreen && !startScreen.classList.contains("hidden")) ||
+      (mapScreen && !mapScreen.classList.contains("hidden")) ||
+      (resultOverlay && !resultOverlay.classList.contains("hidden"))
+    );
+  }
+
   function updateControls() {
     if (!initialized) return;
     const playing = channels.some((channel) => !channel.paused);
@@ -159,6 +171,9 @@
     const serial = ++transitionSerial;
     stopFade(false);
     const active = activeIndex >= 0 ? channels[activeIndex] : null;
+    const fadeDuration = sceneKey === "menu"
+      ? clamp(duration, 300, 600)
+      : clamp(duration, 400, 700);
     if (active && !active.paused) {
       const fadedOut = await fadeChannel(active, active.volume, 0, clamp(duration, 300, 700), serial);
       if (!fadedOut || serial !== transitionSerial) return false;
@@ -202,11 +217,29 @@
       return true;
     }
 
+    if (sceneKey === currentScene && active && active.paused && active.getAttribute("src") === scene.src) {
+      const serial = ++transitionSerial;
+      stopFade(false);
+      active.volume = 0;
+      active.muted = muted;
+      active.dataset.transitionSerial = String(serial);
+      updateControls();
+      try {
+        await active.play();
+      } catch (error) {
+        if (!shouldSuppressPlayWarning(error, quiet)) {
+          console.warn(`[背景音乐恢复失败] ${scene.src}。请再次点击页面或音乐开关后重试。`, error);
+        }
+        return false;
+      }
+      const resumed = await fadeChannel(active, 0, volume, fadeDuration, serial);
+      if (resumed && serial === transitionSerial) active.volume = volume;
+      updateControls();
+      return Boolean(resumed && serial === transitionSerial);
+    }
+
     const serial = ++transitionSerial;
     stopFade(false);
-    const fadeDuration = sceneKey === "menu"
-      ? clamp(duration, 300, 600)
-      : clamp(duration, 400, 700);
 
     // 先完整淡出并停止旧曲，再启动新曲；任何时刻都只允许一个 audio 通道播放。
     if (active && !active.paused) {
@@ -249,7 +282,7 @@
   }
 
   function maybeStartMenuAfterInteraction() {
-    if (!hasUserInteracted || muted || !isStartMenuVisible()) return;
+    if (!hasUserInteracted || muted || !isMenuSceneVisible()) return;
     playScene("menu", { duration: 480, quiet: true });
   }
 
@@ -326,6 +359,38 @@
     return true;
   }
 
+  function pauseForPageLifecycle() {
+    if (!initialized) return;
+    const active = activeIndex >= 0 ? channels[activeIndex] : null;
+    stopFade(false);
+    if (active && !active.paused) {
+      lifecyclePaused = true;
+      active.pause();
+    }
+    updateControls();
+  }
+
+  function resumeForPageLifecycle() {
+    if (!initialized || muted || !hasUserInteracted || document.hidden) return;
+    const scene = currentScene || (isMenuSceneVisible() ? "menu" : null);
+    if (!scene) return;
+    playScene(scene, { duration: 360, quiet: true });
+    lifecyclePaused = false;
+  }
+
+  function bindLifecycleEvents() {
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) pauseForPageLifecycle();
+      else if (lifecyclePaused || currentScene || isMenuSceneVisible()) resumeForPageLifecycle();
+    });
+    window.addEventListener("pagehide", pauseForPageLifecycle);
+    window.addEventListener("beforeunload", pauseForPageLifecycle);
+    window.addEventListener("blur", pauseForPageLifecycle);
+    window.addEventListener("focus", () => {
+      if (lifecyclePaused || currentScene || isMenuSceneVisible()) resumeForPageLifecycle();
+    });
+  }
+
   function init() {
     if (initialized) return;
     ui.container = document.getElementById("audioControls");
@@ -353,6 +418,7 @@
     ui.toggle.addEventListener("click", toggleMute);
     ui.volume.addEventListener("input", (event) => setVolume(event.target.value));
     armFirstInteractionListeners();
+    bindLifecycleEvents();
     updateControls();
   }
 

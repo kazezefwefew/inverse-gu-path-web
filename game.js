@@ -1,7 +1,7 @@
 "use strict";
 
 /*
- * 《逆命蛊途》V0.9.2「网页试玩版」
+ * 《逆命蛊途》V0.9.2.1「网页试玩首轮反馈修复」
  * 结构说明：
  * 1. CARD_LIBRARY / ENEMY_LIBRARY / RELICS / REFINEMENTS 只保存数据；
  * 2. game 保存单场战斗状态，runState 保存完整四段命途试炼的继承数据；
@@ -715,7 +715,7 @@ const LORE_SKIP_ANIMATION_STORAGE_KEY = "reverseGu.lore.skipAnimation";
 const RECORDING_MODE_STORAGE_KEY = "reverseGu.recordingMode.enabled";
 const TRIAL_MODE_STORAGE_KEY = "reverseGu.trial.mode";
 const TRIAL_SEED_STORAGE_KEY = "reverseGu.trial.seedDraft";
-const GAME_VERSION = "V0.9.2 网页试玩版";
+const GAME_VERSION = "V0.9.2.1 网页试玩首轮反馈修复";
 // TODO: 后续多幕路线扩展时继续抽象 finalNode / bossNode，避免固定四段流程继续扩散。
 const MAX_ROUTE_STEP = 4;
 const BOSS_ROUTE_STEP = 4;
@@ -1124,7 +1124,7 @@ function cacheDom() {
     "shopPanel", "shopGuStones", "shopOverview", "shopCardChoices", "shopActions", "shopRemovePanel", "shopRemoveChoices", "shopRemoveConfirm", "shopRemoveConfirmText", "shopConfirmRemoveButton", "shopBackRemoveButton", "shopCancelRemoveButton",
     "loreOverlay", "loreCloseButton", "loreList", "loreProgress", "loreAnimationToggle", "loreResetButton",
     "trialSettingsOverlay", "trialSettingsCloseButton", "trialSettingsTitle", "trialModeChoices", "trialSeedInput", "trialSeedClearButton", "trialSettingsApplyButton",
-    "settingsOverlay", "settingsCloseButton", "settingsTitle", "settingsVersion", "settingsMusicToggle", "settingsVolume", "settingsEffectToggle", "settingsRecordingToggle", "settingsLoreAnimationToggle", "settingsTutorialResetButton", "settingsLoreResetButton",
+    "settingsOverlay", "settingsCloseButton", "settingsTitle", "settingsVersion", "settingsMusicToggle", "settingsVolume", "settingsEffectToggle", "settingsRecordingToggle", "settingsLoreAnimationToggle", "settingsHomeButton", "settingsRestartButton", "settingsTutorialResetButton", "settingsLoreResetButton",
     "resultPrimaryButton", "resultSecondaryButton",
   ].forEach((id) => { dom[id] = document.getElementById(id); });
 }
@@ -1526,6 +1526,28 @@ function openSettingsOverlay() {
 function closeSettingsOverlay() {
   dom.settingsOverlay?.classList.add("hidden");
   refreshModalLock();
+}
+
+function confirmReturnToTitle() {
+  const message = "当前试炼进度将不会继续，确定返回首页吗？";
+  if (!window.confirm(message)) return;
+  playUiSfx();
+  closeSettingsOverlay();
+  resetRunToTitle();
+}
+
+function confirmRestartRun() {
+  const message = "将重新开始一局，确定吗？";
+  if (!window.confirm(message)) return;
+  playUiSfx();
+  closeSettingsOverlay();
+  clearCombatEffects();
+  hideRewardPanels();
+  dom.resultOverlay?.classList.add("hidden");
+  dom.deckOverlay?.classList.add("hidden");
+  dom.runStatsOverlay?.classList.add("hidden");
+  dom.loreOverlay?.classList.add("hidden");
+  startNewRun();
 }
 
 function keywordAttr(keyword) {
@@ -2260,7 +2282,7 @@ function showMapScreen() {
   dom.mapScreen.classList.remove("hidden");
   document.body.classList.remove("title-open");
   refreshModalLock();
-  window.AudioManager?.playScene("battle", { duration: 520, quiet: true });
+  window.AudioManager?.playScene("menu", { duration: 520, quiet: true });
   renderMapScreen();
   updateMobileViewportState();
 }
@@ -6554,6 +6576,12 @@ function bindEvents() {
   dom.settingsLoreAnimationToggle?.addEventListener("click", () => {
     playUiSfx();
     toggleLoreAnimationSkip();
+  });
+  dom.settingsHomeButton?.addEventListener("click", () => {
+    confirmReturnToTitle();
+  });
+  dom.settingsRestartButton?.addEventListener("click", () => {
+    confirmRestartRun();
   });
   dom.settingsTutorialResetButton?.addEventListener("click", () => {
     playUiSfx();
