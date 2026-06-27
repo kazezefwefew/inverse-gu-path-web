@@ -7156,13 +7156,14 @@ body.mobile-combat-safe .active-relic-card {
 }
 
 /* 4) 中列舞台：意图在上 + 按钮在下，竖排零叠字（JS 把 #intentBox 搬入 .arena-panel） */
+/* 中列改 grid：按钮独占 auto 行永远完整可见；意图占 1fr 行、过高只裁自己，绝不裁按钮 */
 body.mobile-combat-safe .arena-panel {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
   align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 4px;
+  justify-items: center;
+  gap: 6px;
+  padding: 4px 4px 8px;
 }
 body.mobile-combat-safe .arena-panel > * { margin: 0; position: static; transform: none; }
 /* 隐藏中列氛围装饰，杜绝叠字与抢焦点 */
@@ -7175,16 +7176,19 @@ body.mobile-combat-safe .end-turn-tip {
   display: none;
 }
 body.mobile-combat-safe .arena-panel #intentBox {
-  order: 0;
-  flex: 0 0 auto;
+  grid-row: 1;
+  align-self: center;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
   gap: 3px;
-  padding: 6px 8px;
-  max-width: 160px;
+  padding: 7px 10px;
+  width: min(86%, 230px);
+  max-width: 230px;
+  max-height: 100%;
   min-height: 0;
+  overflow: hidden;
   border: 1px solid rgba(189, 162, 109, 0.3);
   border-radius: 10px;
 }
@@ -7193,14 +7197,15 @@ body.mobile-combat-safe #intentBox #intentName { font-size: 13px; }
 body.mobile-combat-safe #intentBox #intentDescription { font-size: 11px; margin: 0; }
 body.mobile-combat-safe #enemyPower { font-size: 10px; }
 body.mobile-combat-safe #endTurnButton {
-  order: 2;
+  grid-row: 2;
+  align-self: end;
   width: 100%;
-  max-width: 180px;
+  max-width: 200px;
+  min-height: 44px;
   margin: 0 auto;
   padding: 9px 12px;
   position: relative;
   z-index: 3;
-  flex: 0 0 auto;
 }
 body.mobile-combat-safe #endTurnButton span { font-size: 15px; }
 body.mobile-combat-safe #endTurnHint { font-size: 9px; }
@@ -7237,7 +7242,7 @@ body.mobile-combat-safe .hand .card {
   height: auto;
   min-height: 0;
   max-height: none; /* 重置既有媒体查询 .card{max-height:82/102px} 的高度封顶，防裁切 */
-  padding: 7px 9px;
+  padding: 6px 9px; /* 轻微降高，给中央结束回合按钮留空间 */
   scroll-snap-align: start;
   border-radius: 8px;
   font-size: 11px;
