@@ -7113,6 +7113,9 @@ body.mobile-combat-safe .portrait .portrait-image {
 }
 body.mobile-combat-safe .player-portrait .portrait-image { object-position: center 20%; }
 body.mobile-combat-safe .enemy-portrait .portrait-image { object-position: center 28%; }
+/* 四段 Boss（尸盘）立绘更大、并上移露出头部，不只露胸口（普通敌人不变） */
+body.mobile-combat-safe .enemy-corpsepuppet .portrait-image { object-position: center 10%; }
+body.mobile-combat-safe .enemy-panel .enemy-portrait.enemy-corpsepuppet { max-height: clamp(96px, 24dvh, 170px); }
 body.mobile-combat-safe .player-portrait.image-loaded .portrait-image,
 body.mobile-combat-safe .enemy-portrait.image-loaded .portrait-image { filter: none; }
 /* 小立绘上的压暗层减弱，避免发黑 */
