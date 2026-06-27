@@ -7449,6 +7449,9 @@ body.mobile-combat-safe.compact-low-height .enemy-panel .enemy-portrait {
 body.mobile-combat-safe.compact-low-height .buff-list,
 body.mobile-combat-safe.compact-low-height .enemy-status-list { max-height: clamp(28px, 7dvh, 44px); }
 
+/* 战斗中隐藏全屏/安装工具按钮，避免压住手牌（仅在标题/菜单页显示） */
+body.mobile-combat-safe .pwa-fs-button,
+body.mobile-combat-safe .pwa-install-button { display: none !important; }
 /* 全屏按钮（华为等无法装 PWA 时的可靠方案）：调用浏览器全屏 API，地址栏/状态栏全隐 */
 .pwa-fs-button {
   position: fixed;
