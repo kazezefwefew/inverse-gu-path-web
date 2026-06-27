@@ -7449,12 +7449,26 @@ body.mobile-combat-safe.compact-low-height .enemy-panel .enemy-portrait {
 body.mobile-combat-safe.compact-low-height .buff-list,
 body.mobile-combat-safe.compact-low-height .enemy-status-list { max-height: clamp(28px, 7dvh, 44px); }
 
+/* 全屏按钮（华为等无法装 PWA 时的可靠方案）：调用浏览器全屏 API，地址栏/状态栏全隐 */
+.pwa-fs-button {
+  position: fixed;
+  left: 12px;
+  bottom: 12px;
+  z-index: 9999;
+  padding: 9px 16px;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  border: 1px solid #bda26d;
+  border-radius: 8px;
+  background: rgba(20, 26, 18, 0.96);
+  color: #d8c79a;
+}
 /* PWA 一键安装按钮：浏览器支持安装时由 JS 显示，点一下弹原生安装框 */
 .pwa-install-button {
   display: none;
   position: fixed;
   left: 12px;
-  bottom: 12px;
+  bottom: 58px;
   z-index: 9999;
   padding: 9px 16px;
   font-size: 13px;

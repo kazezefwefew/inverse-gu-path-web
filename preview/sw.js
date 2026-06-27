@@ -1,16 +1,16 @@
 "use strict";
 /* 逆命蛊途 PWA service worker：让网页可“添加到主屏幕”后全屏离线运行。
    预缓存核心壳文件，其余资源（立绘/音频）首次访问后运行时缓存。 */
-const CACHE = "niming-pwa-v0.9.2.8.6";
+const CACHE = "niming-pwa-v0.9.2.8.7";
 const CORE = [
   "./",
   "./index.html",
   "./manifest.json",
   "./icon-192.png",
   "./icon-512.png",
-  "./style.v09286.css",
-  "./audio.v09286.js",
-  "./game.v09286.js",
+  "./style.v09287.css",
+  "./audio.v09287.js",
+  "./game.v09287.js",
 ];
 
 self.addEventListener("install", (event) => {
