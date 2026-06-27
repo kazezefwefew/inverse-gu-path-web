@@ -715,7 +715,7 @@ const LORE_SKIP_ANIMATION_STORAGE_KEY = "reverseGu.lore.skipAnimation";
 const RECORDING_MODE_STORAGE_KEY = "reverseGu.recordingMode.enabled";
 const TRIAL_MODE_STORAGE_KEY = "reverseGu.trial.mode";
 const TRIAL_SEED_STORAGE_KEY = "reverseGu.trial.seedDraft";
-const GAME_VERSION = "V0.9.3.1 点牌放大预览版";
+const GAME_VERSION = "V0.9.3.2 卡牌预览美化预览版";
 // TODO: 后续多幕路线扩展时继续抽象 finalNode / bossNode，避免固定四段流程继续扩散。
 const MAX_ROUTE_STEP = 4;
 const BOSS_ROUTE_STEP = 4;
@@ -3766,6 +3766,15 @@ function playCardSfx(card) {
 }
 
 let cardPreviewEl = null;
+// 卡牌预览底部的氛围寓言短句（按类型变化，纯展示文案）。
+function cardFlavorText(card) {
+  const t = card.typeName || "";
+  if (t.indexOf("毒") >= 0) return "毒入膏肓，无声蚀命。";
+  if (t.indexOf("血") >= 0) return "血债血偿，煞气凝形。";
+  if (card.type === "attack") return "蛊牙噬骨，一击索命。";
+  if (card.type === "defense") return "甲胄覆身，万邪退避。";
+  return "蛊术无形，唯心可御。";
+}
 // 手机端点牌放大预览：弹出大图看完整效果，点“使用”才出牌、“取消/背景”关闭。只动展示，不改出牌逻辑。
 function showCardPreview(instanceId) {
   const card = game && game.hand ? game.hand.find((c) => c.instanceId === instanceId) : null;
@@ -3778,6 +3787,7 @@ function showCardPreview(instanceId) {
       + '<div class="card-preview-head"><h3 id="cardPreviewName"></h3><span id="cardPreviewCost"></span></div>'
       + '<div id="cardPreviewType" class="card-preview-type"></div>'
       + '<p id="cardPreviewEffect" class="card-preview-effect"></p>'
+      + '<p id="cardPreviewFlavor" class="card-preview-flavor"></p>'
       + '<div class="card-preview-actions"><button type="button" id="cardPreviewCancel">取消</button>'
       + '<button type="button" id="cardPreviewPlay">使用</button></div></div>';
     document.body.appendChild(cardPreviewEl);
@@ -3795,6 +3805,7 @@ function showCardPreview(instanceId) {
   cardPreviewEl.querySelector("#cardPreviewCost").textContent = "消耗 " + effectiveCost;
   cardPreviewEl.querySelector("#cardPreviewType").textContent = card.typeName || "";
   cardPreviewEl.querySelector("#cardPreviewEffect").innerHTML = card.effect || "";
+  cardPreviewEl.querySelector("#cardPreviewFlavor").textContent = cardFlavorText(card);
   cardPreviewEl.classList.remove("hidden");
 }
 function hideCardPreview() {
