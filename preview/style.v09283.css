@@ -7084,19 +7084,23 @@ body.mobile-combat-safe .enemy-panel {
   border: 1px solid rgba(189, 162, 109, 0.14);
   border-radius: 10px;
 }
+/* 立绘优先收缩、永不消失：HP/真元/防御/状态固定占位，立绘吸收剩余空间、最小 44px */
 body.mobile-combat-safe .player-panel .player-portrait,
 body.mobile-combat-safe .enemy-panel .enemy-portrait {
-  flex: 0 0 auto;
+  flex: 1 1 auto;
   display: block;
   width: 100%;
-  height: clamp(64px, 15dvh, 104px);
-  min-height: 0;
+  height: auto;
+  min-height: 44px;
+  max-height: clamp(64px, 15dvh, 104px);
   margin: 0;
   border-radius: 8px;
   overflow: hidden;
   position: relative;
   border: 1px solid rgba(189, 162, 109, 0.18);
 }
+body.mobile-combat-safe .player-panel > :not(.portrait),
+body.mobile-combat-safe .enemy-panel > :not(.portrait) { flex: 0 0 auto; }
 body.mobile-combat-safe .player-panel .player-portrait { background: #11160f; }
 body.mobile-combat-safe .enemy-panel .enemy-portrait { background: #15100d; }
 /* 去黑核心：覆盖基础 object-fit:contain，并杀掉 image-loaded 的 drop-shadow */
@@ -7292,6 +7296,41 @@ body.mobile-combat-safe .hand .card {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 body.mobile-combat-safe .card:active { transform: translateY(-3px); }
+
+/* 手牌可收纳：点收纳把手降下手牌、露出完整战场（立绘与状态全程不消失） */
+body.mobile-combat-safe .hand-panel { position: relative; }
+body.mobile-combat-safe .hand-collapse-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  position: absolute;
+  top: 3px;
+  right: 8px;
+  z-index: 6;
+  padding: 2px 10px;
+  font-size: 11px;
+  border: 1px solid rgba(189, 162, 109, 0.35);
+  border-radius: 999px;
+  background: rgba(20, 26, 18, 0.9);
+  color: #cbb27a;
+}
+body.mobile-combat-safe .hand-collapse-toggle::after { content: "▾"; }
+body.mobile-combat-safe.hand-collapsed .hand-collapse-toggle::after { content: "▴"; }
+body.mobile-combat-safe.hand-collapsed .hand { display: none; }
+body.mobile-combat-safe.hand-collapsed .hand-panel { min-height: 0; padding-top: 2px; padding-bottom: 2px; }
+
+/* 发牌特效：每局开战时手牌依次滑入淡入（桌面/手机通用，仅开战 0.9s 窗口） */
+@keyframes nimingDealIn { from { opacity: 0; transform: translateY(16px) scale(0.96); } to { opacity: 1; transform: none; } }
+body.hand-dealing .hand .card { animation: nimingDealIn 0.42s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+body.hand-dealing .hand .card:nth-child(1) { animation-delay: 0.02s; }
+body.hand-dealing .hand .card:nth-child(2) { animation-delay: 0.07s; }
+body.hand-dealing .hand .card:nth-child(3) { animation-delay: 0.12s; }
+body.hand-dealing .hand .card:nth-child(4) { animation-delay: 0.17s; }
+body.hand-dealing .hand .card:nth-child(5) { animation-delay: 0.22s; }
+body.hand-dealing .hand .card:nth-child(6) { animation-delay: 0.27s; }
+body.hand-dealing .hand .card:nth-child(7) { animation-delay: 0.32s; }
+body.hand-dealing .hand .card:nth-child(8) { animation-delay: 0.37s; }
+@media (prefers-reduced-motion: reduce) { body.hand-dealing .hand .card { animation: none; } }
 /* 隐藏大幅卡面装饰字，腾出空间 */
 body.mobile-combat-safe .card .card-art { display: none; }
 body.mobile-combat-safe .card .card-title-row {
