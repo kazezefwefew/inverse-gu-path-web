@@ -715,7 +715,7 @@ const LORE_SKIP_ANIMATION_STORAGE_KEY = "reverseGu.lore.skipAnimation";
 const RECORDING_MODE_STORAGE_KEY = "reverseGu.recordingMode.enabled";
 const TRIAL_MODE_STORAGE_KEY = "reverseGu.trial.mode";
 const TRIAL_SEED_STORAGE_KEY = "reverseGu.trial.seedDraft";
-const GAME_VERSION = "V0.9.3.3 Boss立绘放大预览版";
+const GAME_VERSION = "V0.9.3.4 战斗手感预览版";
 // TODO: 后续多幕路线扩展时继续抽象 finalNode / bossNode，避免固定四段流程继续扩散。
 const MAX_ROUTE_STEP = 4;
 const BOSS_ROUTE_STEP = 4;
@@ -3827,6 +3827,7 @@ function playCard(instanceId) {
 
   // 一次出牌结算期间锁住输入，避免双击同一张牌造成重复扣费或重复伤害。
   game.inputLocked = true;
+  safeVibrate(14);
   window.clearTimeout(cardUnlockTimer);
   const cardElement = dom.hand.querySelector(`[data-card-id="${instanceId}"]`);
   if (cardElement) {
@@ -5778,6 +5779,7 @@ function spawnFloatText(target, text, kind) {
 }
 
 function animateHit(element) {
+  if (element && element.closest && element.closest(".player-panel")) safeVibrate(16);
   if (!effectsAllowed() || !element) return;
   const panel = element.closest(".combatant");
   restartTimedClass(element, "damage-flash", 380);
@@ -5786,6 +5788,13 @@ function animateHit(element) {
 
 function effectsAllowed() {
   return Boolean(effectsEnabled && dom.effectLayer);
+}
+
+// 轻振动：特性检测 + try/catch，仅在 navigator.vibrate 存在时调用；桌面无害。
+function safeVibrate(ms) {
+  try {
+    if (typeof navigator !== "undefined" && typeof navigator.vibrate === "function") navigator.vibrate(ms);
+  } catch (err) { /* 部分浏览器非用户手势会抛错，忽略 */ }
 }
 
 function appendEffectNode(node, fallbackDuration = 900) {
@@ -6419,6 +6428,7 @@ function renderIntent() {
   dom.intentName.textContent = action.name;
   if (action.kind === "charge") {
     dom.intentDescription.textContent = `本回合不攻击；下一次攻击 +${action.bonus}${action.armor ? `，获得 ${action.armor} 防御` : ""}`;
+    updateIntentThreat(0);
   } else {
     const hitCount = action.hits || 1;
     const lowHpBonus = action.lowHpExtra && game.player.hp < game.player.maxHp / 2 ? action.lowHpExtra : 0;
@@ -6437,9 +6447,37 @@ function renderIntent() {
     if (action.energyDrain) extras.push(`下回合少 ${action.energyDrain} 真元`);
     if (action.playerPoison) extras.push(`施加 ${action.playerPoison} 层毒性`);
     dom.intentDescription.textContent = `将造成 ${totalDamage} 点伤害${extras.length ? `（${extras.join("，")}）` : ""}`;
+    // 净伤宣示：护甲一次性全量抵消（与 resolveEnemyTurn 同逻辑），预计掉血 = max(0, 总伤 - 当前护甲)。
+    const netDamage = Math.max(0, totalDamage - (game.player.armor || 0));
+    updateIntentThreat(netDamage);
   }
   dom.enemyPower.textContent = `蓄势：下次攻击 +${game.enemy.chargedBonus}`;
   dom.enemyPower.classList.toggle("hidden", game.enemy.chargedBonus === 0);
+}
+
+// 意图框内「预计掉 X 血（已算护甲）」一行 + 高威胁红光脉动。节点建一次后复用(切 hidden)，避免反复增删触发 aria-live 播报；脉动受 effectsAllowed 控制。
+function updateIntentThreat(netDamage) {
+  if (!dom.intentBox) return;
+  let line = dom.intentBox.querySelector(".intent-net-damage");
+  if (!line) {
+    line = document.createElement("p");
+    line.className = "intent-net-damage hidden";
+    line.setAttribute("aria-hidden", "true");
+    const host = dom.intentDescription && dom.intentDescription.parentNode ? dom.intentDescription.parentNode : dom.intentBox;
+    host.appendChild(line);
+  }
+  if (netDamage > 0) {
+    line.textContent = `预计掉 ${netDamage} 血（已算护甲）`;
+    line.classList.remove("hidden");
+    const playerHp = game.player ? game.player.hp : 0;
+    const highThreat = effectsAllowed() && (netDamage >= 12 || (playerHp > 0 && netDamage > playerHp / 3));
+    line.classList.toggle("is-high-threat", highThreat);
+    dom.intentBox.classList.toggle("intent-threat-high", highThreat);
+  } else {
+    line.classList.add("hidden");
+    line.classList.remove("is-high-threat");
+    dom.intentBox.classList.remove("intent-threat-high");
+  }
 }
 
 function stripTags(html) {
