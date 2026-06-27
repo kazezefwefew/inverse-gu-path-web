@@ -715,7 +715,7 @@ const LORE_SKIP_ANIMATION_STORAGE_KEY = "reverseGu.lore.skipAnimation";
 const RECORDING_MODE_STORAGE_KEY = "reverseGu.recordingMode.enabled";
 const TRIAL_MODE_STORAGE_KEY = "reverseGu.trial.mode";
 const TRIAL_SEED_STORAGE_KEY = "reverseGu.trial.seedDraft";
-const GAME_VERSION = "V0.9.2.8.11 取消安装与全屏可重进预览版";
+const GAME_VERSION = "V0.9.3.1 点牌放大预览版";
 // TODO: 后续多幕路线扩展时继续抽象 finalNode / bossNode，避免固定四段流程继续扩散。
 const MAX_ROUTE_STEP = 4;
 const BOSS_ROUTE_STEP = 4;
@@ -3765,7 +3765,44 @@ function playCardSfx(card) {
   }, 80);
 }
 
+let cardPreviewEl = null;
+// 手机端点牌放大预览：弹出大图看完整效果，点“使用”才出牌、“取消/背景”关闭。只动展示，不改出牌逻辑。
+function showCardPreview(instanceId) {
+  const card = game && game.hand ? game.hand.find((c) => c.instanceId === instanceId) : null;
+  if (!card) { playCard(instanceId); return; }
+  if (!cardPreviewEl) {
+    cardPreviewEl = document.createElement("div");
+    cardPreviewEl.className = "card-preview-overlay hidden";
+    cardPreviewEl.innerHTML = '<div class="card-preview-backdrop"></div>'
+      + '<div class="card-preview-panel" role="dialog" aria-modal="true">'
+      + '<div class="card-preview-head"><h3 id="cardPreviewName"></h3><span id="cardPreviewCost"></span></div>'
+      + '<div id="cardPreviewType" class="card-preview-type"></div>'
+      + '<p id="cardPreviewEffect" class="card-preview-effect"></p>'
+      + '<div class="card-preview-actions"><button type="button" id="cardPreviewCancel">取消</button>'
+      + '<button type="button" id="cardPreviewPlay">使用</button></div></div>';
+    document.body.appendChild(cardPreviewEl);
+    cardPreviewEl.querySelector(".card-preview-backdrop").addEventListener("click", hideCardPreview);
+    cardPreviewEl.querySelector("#cardPreviewCancel").addEventListener("click", hideCardPreview);
+    cardPreviewEl.querySelector("#cardPreviewPlay").addEventListener("click", () => {
+      const id = cardPreviewEl.dataset.cardId;
+      hideCardPreview();
+      if (id) playCard(id);
+    });
+  }
+  cardPreviewEl.dataset.cardId = instanceId;
+  cardPreviewEl.querySelector("#cardPreviewName").textContent = card.name || "";
+  const effectiveCost = game ? getEffectiveCardCost(card) : card.cost;
+  cardPreviewEl.querySelector("#cardPreviewCost").textContent = "消耗 " + effectiveCost;
+  cardPreviewEl.querySelector("#cardPreviewType").textContent = card.typeName || "";
+  cardPreviewEl.querySelector("#cardPreviewEffect").innerHTML = card.effect || "";
+  cardPreviewEl.classList.remove("hidden");
+}
+function hideCardPreview() {
+  if (cardPreviewEl) cardPreviewEl.classList.add("hidden");
+}
+
 function playCard(instanceId) {
+  hideCardPreview();
   if (!game || game.status !== "playing" || game.inputLocked) return;
   const cardIndex = game.hand.findIndex((card) => card.instanceId === instanceId);
   if (cardIndex < 0) return;
@@ -6852,7 +6889,10 @@ function bindEvents() {
   });
   dom.hand.addEventListener("click", (event) => {
     const cardButton = event.target.closest(".card");
-    if (cardButton) playCard(cardButton.dataset.cardId);
+    if (!cardButton) return;
+    const id = cardButton.dataset.cardId;
+    if (document.body.classList.contains("mobile-combat-safe")) showCardPreview(id);
+    else playCard(id);
   });
   dom.endTurnButton.addEventListener("click", () => {
     playUiSfx();
