@@ -7093,8 +7093,8 @@ body.mobile-combat-safe .enemy-panel .enemy-portrait {
   display: block;
   width: 100%;
   height: auto;
-  min-height: 40px;
-  max-height: clamp(64px, 15dvh, 104px);
+  min-height: 52px;
+  max-height: clamp(72px, 17dvh, 120px);
   margin: 0;
   border-radius: 8px;
   overflow: hidden;
@@ -7146,6 +7146,8 @@ body.mobile-combat-safe .resource-grid {
   padding: 0;
 }
 body.mobile-combat-safe .resource-grid strong { font-size: 13px; }
+/* 资源格压紧，腾出竖向空间让玩家立绘和敌人对称 */
+body.mobile-combat-safe .resource { padding: 2px 5px; min-height: 0; }
 body.mobile-combat-safe .bar { height: 12px; }
 /* 可扩展状态 chip 区：自动换行 + 超出滚动，任何新状态自动成 chip，不用重排布局 */
 body.mobile-combat-safe .buff-list,
@@ -7203,6 +7205,7 @@ body.mobile-combat-safe .arena-panel {
   justify-items: center;
   gap: 6px;
   padding: 4px 4px 8px;
+  background: radial-gradient(ellipse at 50% 46%, rgba(74, 104, 84, 0.13), rgba(7, 10, 8, 0) 66%);
 }
 body.mobile-combat-safe .arena-panel > * { margin: 0; position: static; transform: none; }
 /* 隐藏中列氛围装饰，杜绝叠字与抢焦点 */
