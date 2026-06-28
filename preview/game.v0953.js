@@ -3815,6 +3815,7 @@ function isGuUnlocked(item, discovered) {
 const GU_CATEGORIES = [
   { id: "gu", label: "蛊虫秘录", ready: true },
   { id: "lore", label: "命蛊残卷", ready: true },
+  { id: "eco", label: "生态·未实装", ready: true },
   { id: "enemy", label: "敌怪图谱", ready: false },
   { id: "boss", label: "首领残卷", ready: false },
   { id: "anecdote", label: "命途异闻", ready: false },
@@ -3925,30 +3926,41 @@ function renderWanGuLu() {
   if (!cat || !cat.ready) { content.innerHTML = '<div class="wangulu-empty">此卷尚封，墨迹未干。<br><span>敌怪 · 首领 · 异闻 · 流派，即将开放。</span></div>'; return; }
   if (cat.id === "lore") { content.innerHTML = renderWanGuLuLore(); return; }
   if (wanGuLuState.detailId) { content.innerHTML = renderGuDetail(wanGuLuState.detailId); return; }
-  content.innerHTML = renderGuList();
+  content.innerHTML = renderGuList(cat.id);
 }
 
-function renderGuList() {
-  const items = (window.GU_CATALOG || []).filter((it) => it.category === "gu");
+function renderGuList(catId) {
+  catId = catId || "gu";
+  const isEco = catId === "eco";
+  const items = (window.GU_CATALOG || []).filter((it) => it.category === catId);
   const discovered = getDiscoveredGuKeys();
-  const filter = GU_FILTERS.find((f) => f.id === wanGuLuState.filter) || GU_FILTERS[0];
-  const shown = items.filter((it) => filter.test(it, discovered));
-  const unlockedCount = items.filter((it) => isGuUnlocked(it, discovered)).length;
-  const chips = GU_FILTERS.map((f) => '<button type="button" class="wangulu-chip' + (f.id === wanGuLuState.filter ? " is-active" : "") + '" data-gu-filter="' + f.id + '">' + escGu(f.label) + '</button>').join("");
-  const filterBar = '<div class="wangulu-filterbar' + (wanGuLuState.filterOpen ? " is-open" : "") + '">'
-    + '<button type="button" class="wangulu-filter-toggle" data-gu-filter-toggle aria-expanded="' + (wanGuLuState.filterOpen ? "true" : "false") + '">筛选 · ' + escGu(filter.label) + '</button>'
-    + '<div class="wangulu-chips">' + chips + '</div></div>';
-  const counter = '<p class="wangulu-counter">已悟 ' + unlockedCount + ' / ' + items.length + ' 蛊</p>';
+  const isOpen = (it) => isEco ? true : isGuUnlocked(it, discovered);
+  let head = "";
+  let shown = items;
+  if (isEco) {
+    head = '<p class="wangulu-counter">生态图鉴 · 共 ' + items.length + ' 种（暂未实装为战斗蛊牌）</p>';
+  } else {
+    const filter = GU_FILTERS.find((f) => f.id === wanGuLuState.filter) || GU_FILTERS[0];
+    shown = items.filter((it) => filter.test(it, discovered));
+    const unlockedCount = items.filter((it) => isGuUnlocked(it, discovered)).length;
+    const chips = GU_FILTERS.map((f) => '<button type="button" class="wangulu-chip' + (f.id === wanGuLuState.filter ? " is-active" : "") + '" data-gu-filter="' + f.id + '">' + escGu(f.label) + '</button>').join("");
+    head = '<div class="wangulu-filterbar' + (wanGuLuState.filterOpen ? " is-open" : "") + '">'
+      + '<button type="button" class="wangulu-filter-toggle" data-gu-filter-toggle aria-expanded="' + (wanGuLuState.filterOpen ? "true" : "false") + '">筛选 · ' + escGu(filter.label) + '</button>'
+      + '<div class="wangulu-chips">' + chips + '</div></div>'
+      + '<p class="wangulu-counter">已悟 ' + unlockedCount + ' / ' + items.length + ' 蛊</p>';
+  }
   let grid = '<div class="wangulu-grid">';
   if (!shown.length) { grid += '<div class="wangulu-empty">无符此筛之蛊。</div>'; }
   shown.forEach((it) => {
-    const unlocked = isGuUnlocked(it, discovered);
-    if (unlocked) {
-      grid += '<button type="button" class="wangulu-item" data-gu-id="' + it.id + '">'
-        + '<span class="wangulu-item-glyph">' + escGu(guGlyphFor(it)) + '</span>'
-        + '<span class="wangulu-item-name">' + escGu(it.name) + '</span>'
-        + '<span class="wangulu-item-rarity wangulu-r-' + escGu(it.rarity) + '">' + escGu(it.rarity) + '</span>'
-        + '</button>';
+    if (isOpen(it)) {
+      const face = it.image
+        ? '<span class="wangulu-item-glyph wangulu-item-thumb"><img src="' + escGu(it.image) + '" alt="' + escGu(it.name) + '" loading="lazy"></span>'
+        : '<span class="wangulu-item-glyph">' + escGu(guGlyphFor(it)) + '</span>';
+      const tag = isEco
+        ? '<span class="wangulu-item-rarity wangulu-eco-badge">未实装</span>'
+        : '<span class="wangulu-item-rarity wangulu-r-' + escGu(it.rarity) + '">' + escGu(it.rarity) + '</span>';
+      grid += '<button type="button" class="wangulu-item' + (isEco ? " is-eco" : "") + '" data-gu-id="' + it.id + '">'
+        + face + '<span class="wangulu-item-name">' + escGu(it.name) + '</span>' + tag + '</button>';
     } else {
       grid += '<button type="button" class="wangulu-item is-locked" data-gu-id="' + it.id + '" aria-disabled="true">'
         + '<span class="wangulu-item-glyph wangulu-silhouette">?</span>'
@@ -3958,28 +3970,32 @@ function renderGuList() {
     }
   });
   grid += '</div>';
-  return filterBar + counter + grid;
+  return head + grid;
 }
 
 function renderGuDetail(id) {
   const it = (window.GU_CATALOG || []).find((x) => x.id === id);
   if (!it) return '<div class="wangulu-empty">残页佚失。</div>';
   const discovered = getDiscoveredGuKeys();
-  if (!isGuUnlocked(it, discovered)) { wanGuLuState.detailId = null; return renderGuList(); }
+  if (it.category !== "eco" && !isGuUnlocked(it, discovered)) { wanGuLuState.detailId = null; return renderGuList(wanGuLuState.tab); }
   const glyph = guGlyphFor(it);
   const artHtml = it.image
     ? '<img class="wangulu-art-img" src="' + escGu(it.image) + '" alt="' + escGu(it.name) + '" loading="lazy">'
     : '<span class="wangulu-art-glyph">' + escGu(glyph) + '</span>';
   const row = (label, val) => val ? '<div class="wangulu-row"><span class="wangulu-row-k">' + escGu(label) + '</span><span class="wangulu-row-v">' + escGu(val) + '</span></div>' : "";
+  const effectHtml = it.gameplayEffect
+    ? '<p class="wangulu-effect">' + escGu(it.gameplayEffect) + '</p><p class="wangulu-short">' + escGu(it.descriptionShort) + '</p>'
+    : '<p class="wangulu-effect wangulu-unimpl">暂未实装为战斗蛊牌（生态图鉴）</p><p class="wangulu-short">' + escGu(it.descriptionShort) + '</p>';
+  const ecoTag = it.category === "eco" ? '<span class="wangulu-eco-badge">未实装</span>' : '';
   return '<button type="button" class="wangulu-back" data-gu-back>‹ 返回蛊录</button>'
     + '<article class="wangulu-detail">'
     + '<header class="wangulu-detail-head"><h3>' + escGu(it.name) + '</h3>'
     + '<p class="wangulu-detail-alias">' + escGu(it.alias || "") + '</p>'
     + '<div class="wangulu-tags"><span class="wangulu-r-' + escGu(it.rarity) + '">' + escGu(it.rarity) + '</span>'
-    + '<span>' + escGu(it.faction) + '</span><span>' + escGu(it.type) + '</span></div></header>'
+    + '<span>' + escGu(it.faction) + '</span><span>' + escGu(it.type) + '</span>' + ecoTag + '</div></header>'
     + '<section class="wangulu-sec"><h4>立绘</h4><div class="wangulu-art">' + artHtml + '<i class="wangulu-art-stage">' + escGu(it.stage || "") + '</i></div></section>'
     + '<section class="wangulu-sec"><h4>基本信息</h4>' + row("别名", it.alias) + row("品阶", it.rarity) + row("道脉", it.faction) + row("类型", it.type) + row("形态", it.stage) + '</section>'
-    + '<section class="wangulu-sec"><h4>战斗效果</h4><p class="wangulu-effect">' + escGu(it.gameplayEffect) + '</p><p class="wangulu-short">' + escGu(it.descriptionShort) + '</p></section>'
+    + '<section class="wangulu-sec"><h4>战斗效果</h4>' + effectHtml + '</section>'
     + '<section class="wangulu-sec"><h4>生态习性</h4>' + row("栖息", it.habitat) + row("食性", it.feeding) + row("秉性", it.temperament) + '</section>'
     + '<section class="wangulu-sec"><h4>来历异闻</h4><p class="wangulu-lore">' + escGu(it.descriptionLore) + '</p>' + row("出处", it.dropsFrom) + row("录入", it.unlockCondition) + '</section>'
     + '<section class="wangulu-sec"><h4>组合克制</h4>' + row("演化", it.evolution) + row("相济", it.synergy) + row("相克", it.counteredBy) + '</section>'
