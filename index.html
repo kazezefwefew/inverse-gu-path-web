@@ -4,13 +4,19 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="theme-color" content="#0a0d0a">
+  <!-- V0.9.6.4 boot-loader 关键内联样式：先于外链 style.css 生效，确保启动界面第一帧绘制、彻底盖住主菜单不闪现。完整样式见 style.css。 -->
+  <style>
+    #bootLoader{position:fixed;inset:0;z-index:100000;display:grid;place-items:center;padding:24px;background:radial-gradient(circle at 50% 22%,rgba(75,119,88,0.10),transparent 42%),radial-gradient(circle at 18% 82%,rgba(157,47,42,0.12),transparent 46%),#080b09;color:#bda26d;font-family:"STKaiti","KaiTi",serif;opacity:1;transition:opacity .6s ease;}
+    #bootLoader.boot-hidden{opacity:0;pointer-events:none;visibility:hidden;}
+    body.boot-active{overflow:hidden;}
+  </style>
   <meta name="description" content="原创暗黑东方奇幻卡牌肉鸽原型《逆命蛊途》">
   <title>逆命蛊途 · 命途塔试炼</title>
-  <script>window.__NMG_BUILD__ = "v0.9.6.3-layer2-release";</script>
-  <link rel="stylesheet" href="style.v0966.css">
+  <script>window.__NMG_BUILD__ = "v0.9.6.4-boot-loader";</script>
+  <link rel="stylesheet" href="style.v0968.css">
   <script src="audio.v0962.js" defer></script>
   <script src="gu_catalog.js?v=v0965" defer></script>
-  <script src="game.v0967.js" defer></script>
+  <script src="game.v0969.js" defer></script>
   <script>
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.getRegistrations().then(function (rs) { rs.forEach(function (r) { r.unregister(); }); }).catch(function () {});
@@ -44,6 +50,26 @@
   <div class="mist mist-one" aria-hidden="true"></div>
   <div class="mist mist-two" aria-hidden="true"></div>
 
+  <!-- V0.9.6.4 全屏启动加载界面（boot-loader）：打开网页即显示，预加载资源、显进度，点击「入局」后调用现有音频解锁逻辑并淡出，进现有主菜单。仅加性，不改音频状态机。 -->
+  <div id="bootLoader" class="boot-loader" role="status" aria-live="polite" aria-label="《逆命蛊途》加载中">
+    <div class="boot-loader-fog" aria-hidden="true"></div>
+    <div class="boot-loader-runes" aria-hidden="true"></div>
+    <div class="boot-loader-content">
+      <div class="boot-loader-seal" aria-hidden="true"><span>蛊</span></div>
+      <h1 class="boot-loader-title">逆命蛊途</h1>
+      <p class="boot-loader-subtitle" id="bootLoaderSubtitle">残卷无言，蛊鸣自起。</p>
+      <div class="boot-loader-progress">
+        <div class="boot-loader-bar"><div class="boot-loader-fill" id="bootLoaderFill"></div></div>
+        <div class="boot-loader-percent"><span id="bootLoaderPercent">0</span>%</div>
+      </div>
+      <p class="boot-loader-status" id="bootLoaderStatus">凝神聚气，开启命途……</p>
+      <button id="bootLoaderStart" class="boot-loader-start hidden" type="button">
+        <span class="boot-loader-start-main">点击入局</span>
+        <small class="boot-loader-start-sub">轻触开始修行</small>
+      </button>
+    </div>
+  </div>
+
   <div id="mobileOrientationOverlay" class="mobile-orientation-overlay hidden" role="status" aria-live="polite">
     <div class="mobile-orientation-card">
       <span aria-hidden="true">横</span>
@@ -61,7 +87,7 @@
       <span class="start-moon"></span>
     </div>
     <div class="start-content">
-      <p class="start-kicker">原创暗黑东方卡牌肉鸽 · V0.9.6.3 第二层生态关卡</p>
+      <p class="start-kicker">原创暗黑东方卡牌肉鸽 · V0.9.6.4 启动加载界面</p>
       <div class="start-logo" aria-hidden="true"><span>蛊</span></div>
       <h1 id="startTitle">逆命蛊途</h1>
       <p class="start-subtitle">以蛊为刃，以命为薪。命途塔中，从来没有天命之人。</p>
@@ -517,7 +543,7 @@
       <button id="settingsCloseButton" class="deck-close-button" type="button" aria-label="关闭设置">×</button>
       <p class="deck-eyebrow">试玩包设置</p>
       <h2 id="settingsTitle">设置</h2>
-      <p id="settingsVersion" class="settings-version">当前版本：V0.9.6.3 第二层生态关卡</p>
+      <p id="settingsVersion" class="settings-version">当前版本：V0.9.6.4 启动加载界面</p>
       <div class="settings-list">
         <button id="settingsMusicToggle" type="button">音乐：开</button>
         <label class="settings-volume" for="settingsVolume">
