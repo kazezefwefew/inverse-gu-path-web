@@ -868,7 +868,7 @@ const LORE_SKIP_ANIMATION_STORAGE_KEY = "reverseGu.lore.skipAnimation";
 const RECORDING_MODE_STORAGE_KEY = "reverseGu.recordingMode.enabled";
 const TRIAL_MODE_STORAGE_KEY = "reverseGu.trial.mode";
 const TRIAL_SEED_STORAGE_KEY = "reverseGu.trial.seedDraft";
-const GAME_VERSION = "V0.9.6.3 第二层生态关卡";
+const GAME_VERSION = "V0.9.6.4 启动加载界面（preview）";
 // TODO: 后续多幕路线扩展时继续抽象 finalNode / bossNode，避免固定四段流程继续扩散。
 const MAX_ROUTE_STEP = 4;
 const BOSS_ROUTE_STEP = 4;
@@ -8918,6 +8918,237 @@ function buildDevPanelDom() {
   });
 }
 
+// ===================== V0.9.6.4 boot-loader 预加载清单（全相对路径，4 优先级，仅确认存在的真实文件） =====================
+// priority 1 首屏必需（主角立绘 + 菜单 BGM）→ 2 一层首战（敌人立绘 + 战斗/首领 BGM + 常用 SFX）
+// → 3 二层敌人/Boss 立绘 → 4 万蛊录卡牌图鉴 + 尾列 SFX。任一失败仅 console.warn + 计入完成，绝不白屏。
+const PRELOAD_ASSETS = [
+  // ---- 优先级 1：菜单首屏 + 主角立绘 ----
+  { url: "assets/portraits/hero-fate-web.jpg", type: "image", priority: 1, label: "命途主角" },
+  { url: "assets/portraits/hero-blood-web.jpg", type: "image", priority: 1, label: "血道主角" },
+  { url: "assets/portraits/hero-poison-web.jpg", type: "image", priority: 1, label: "毒道主角" },
+  { url: "assets/audio/menu-web.mp3", type: "audio", priority: 1, label: "命途余音" },
+  // ---- 优先级 2：一层首战敌人 + 战斗 BGM + 常用 SFX ----
+  { url: "assets/portraits/enemy-shanxiao-web.jpg", type: "image", priority: 2, label: "山魈" },
+  { url: "assets/portraits/enemy-bloodwolf-web.jpg", type: "image", priority: 2, label: "血狼" },
+  { url: "assets/portraits/enemy-beeswarm-web.jpg", type: "image", priority: 2, label: "蜂潮" },
+  { url: "assets/portraits/enemy-corpsepuppet-web.jpg", type: "image", priority: 2, label: "尸傀" },
+  { url: "assets/audio/battle-web.mp3", type: "audio", priority: 2, label: "普通战" },
+  { url: "assets/audio/boss-web.mp3", type: "audio", priority: 2, label: "首领战" },
+  { url: "assets/audio/sfx/card-play.mp3", type: "audio", priority: 2, label: "出牌音效" },
+  { url: "assets/audio/sfx/hit-light.mp3", type: "audio", priority: 2, label: "轻击音效" },
+  { url: "assets/audio/sfx/hit-heavy.mp3", type: "audio", priority: 2, label: "重击音效" },
+  { url: "assets/audio/sfx/block.mp3", type: "audio", priority: 2, label: "格挡音效" },
+  { url: "assets/audio/sfx/poison-apply.mp3", type: "audio", priority: 2, label: "施毒音效" },
+  { url: "assets/audio/sfx/ui-click.mp3", type: "audio", priority: 2, label: "界面音效" },
+  // ---- 优先级 3：二层瘴林/血沼敌人 + Boss 立绘 ----
+  { url: "assets/portraits/rot-leaf-gu-insect.webp", type: "image", priority: 3, label: "腐叶蛊虫" },
+  { url: "assets/portraits/green-miasma-parasite.webp", type: "image", priority: 3, label: "青瘴寄生" },
+  { url: "assets/portraits/poison-vine-thrall.webp", type: "image", priority: 3, label: "毒藤傀儡" },
+  { url: "assets/portraits/miasma-lantern-keeper.webp", type: "image", priority: 3, label: "瘴灯守" },
+  { url: "assets/portraits/hundred-miasma-mother-gu.webp", type: "image", priority: 3, label: "百瘴母蛊" },
+  { url: "assets/portraits/red-marsh-leech-swarm.webp", type: "image", priority: 3, label: "赤沼水蛭" },
+  { url: "assets/portraits/severed-meridian-cultist.webp", type: "image", priority: 3, label: "断脉教徒" },
+  { url: "assets/portraits/blood-mud-puppet.webp", type: "image", priority: 3, label: "血泥傀儡" },
+  { url: "assets/portraits/bloodrobe-gu-sacrificer.webp", type: "image", priority: 3, label: "血袍祭蛊" },
+  { url: "assets/portraits/bloodrobe-gu-mother.webp", type: "image", priority: 3, label: "血袍母蛊" },
+  { url: "assets/portraits/enemy-corpsepuppet-phase2-web.jpg", type: "image", priority: 3, label: "尸傀·变" },
+  // ---- 优先级 4：万蛊录卡牌图鉴 + 尾列 SFX ----
+  { url: "assets/codex/gu/moonblade-gu.webp", type: "image", priority: 4, label: "月刃蛊" },
+  { url: "assets/codex/gu/iron-shell-gu.webp", type: "image", priority: 4, label: "铁甲蛊" },
+  { url: "assets/codex/gu/wineworm-gu.webp", type: "image", priority: 4, label: "酒虫蛊" },
+  { url: "assets/codex/gu/bloodblade-gu.webp", type: "image", priority: 4, label: "血刃蛊" },
+  { url: "assets/codex/gu/green-miasma-gu.webp", type: "image", priority: 4, label: "青瘴蛊" },
+  { url: "assets/codex/gu/swarm-gu.webp", type: "image", priority: 4, label: "群蜂蛊" },
+  { url: "assets/codex/gu/fate-thread-gu.webp", type: "image", priority: 4, label: "命丝蛊" },
+  { url: "assets/codex/gu/burning-yuan-gu.webp", type: "image", priority: 4, label: "焚元蛊" },
+  { url: "assets/codex/gu/heart-devour-gu.webp", type: "image", priority: 4, label: "噬心蛊" },
+  { url: "assets/codex/gu/reverse-blood-gu.webp", type: "image", priority: 4, label: "逆血蛊" },
+  { url: "assets/codex/gu/broken-shell-gu.webp", type: "image", priority: 4, label: "破甲蛊" },
+  { url: "assets/codex/gu/inverse-path-gu.webp", type: "image", priority: 4, label: "逆命蛊" },
+  { url: "assets/codex/gu/molting-shell-gu.webp", type: "image", priority: 4, label: "蜕壳蛊" },
+  { url: "assets/codex/gu/return-poison-gu.webp", type: "image", priority: 4, label: "回毒蛊" },
+  { url: "assets/codex/gu/bonebell-gu.webp", type: "image", priority: 4, label: "骨铃蛊" },
+  { url: "assets/codex/gu/chaos-bee-gu.webp", type: "image", priority: 4, label: "乱蜂蛊" },
+  { url: "assets/codex/gu/bloodmarsh-gu.webp", type: "image", priority: 4, label: "血沼蛊" },
+  { url: "assets/audio/sfx/victory.mp3", type: "audio", priority: 4, label: "胜利音效" },
+  { url: "assets/audio/sfx/defeat.mp3", type: "audio", priority: 4, label: "败北音效" },
+];
+
+// 随机残卷副文案（暗黑东方·古籍感），boot-loader 启动时随机取一句。
+const BOOT_SUBTITLES = [
+  "残卷无言，蛊鸣自起。",
+  "以蛊为刃，以命为薪。",
+  "命途塔中，从来没有天命之人。",
+  "毒入骨髓时，方知此身非身。",
+  "千蛊噬命，唯逆者生。",
+  "瘴起为林，血凝为沼，皆是修行。",
+  "此卷一开，再无回头之路。",
+];
+
+// boot-loader 状态文字轮换（与优先级阶段呼应，纯展示）。
+const BOOT_STATUS_TEXTS = [
+  "凝神聚气，开启命途……",
+  "唤醒沉睡的蛊群……",
+  "推演塔中分岔之路……",
+  "翻检万蛊残卷……",
+  "命途已通，静候入局。",
+];
+
+
+/* ===================== V0.9.6.4 全屏启动加载界面 boot-loader（加性，绝不重构音频状态机） ===================== */
+let bootLoaderActive = false;
+const bootLoaderTimers = [];
+function bootLoaderClearTimers() {
+  while (bootLoaderTimers.length) {
+    const id = bootLoaderTimers.pop();
+    try { window.clearTimeout(id); } catch (e) {}
+    try { window.clearInterval(id); } catch (e) {}
+  }
+}
+
+// 预加载单个资源：成功/失败都 resolve（失败 console.warn），永不 reject，确保不白屏。
+function bootPreloadAsset(asset) {
+  return new Promise((resolve) => {
+    let settled = false;
+    const done = () => { if (settled) return; settled = true; resolve(); };
+    try {
+      if (asset.type === "image") {
+        const img = new Image();
+        img.decoding = "async";
+        img.onload = done;
+        img.onerror = () => { console.warn("[boot-loader] 资源加载失败：" + asset.url); done(); };
+        img.src = asset.url;
+        if (img.complete) done(); // 命中缓存的极端情况
+      } else if (asset.type === "audio") {
+        const au = document.createElement("audio");
+        au.preload = "auto";
+        au.muted = true;
+        const onok = () => done();
+        au.addEventListener("canplaythrough", onok, { once: true });
+        au.addEventListener("loadeddata", onok, { once: true });
+        au.addEventListener("error", () => { console.warn("[boot-loader] 资源加载失败：" + asset.url); done(); }, { once: true });
+        au.src = asset.url;
+        try { au.load(); } catch (e) { console.warn("[boot-loader] 音频 load 异常：" + asset.url); done(); }
+      } else {
+        done();
+      }
+    } catch (err) {
+      console.warn("[boot-loader] 预加载异常：" + (asset && asset.url), err);
+      done();
+    }
+  });
+}
+
+// 淡出并彻底隐藏 boot-loader（清定时器、解除滚动锁，无残留）。
+function bootLoaderHide() {
+  const el = document.getElementById("bootLoader");
+  bootLoaderActive = false;
+  bootLoaderClearTimers();
+  document.body.classList.remove("boot-active");
+  if (!el) return;
+  el.classList.add("boot-hidden");
+  const tid = window.setTimeout(() => {
+    if (el && el.parentNode) el.parentNode.removeChild(el); // 彻底移除，释放装饰动画/DOM
+  }, 700);
+  // 该计时器属于隐藏阶段，单独跟踪以便页面卸载时清理。
+  bootLoaderTimers.push(tid);
+}
+
+// 「点击入局」：调现有音频解锁 + 触发菜单 BGM（不重构状态机、不叠播），随后淡出进主菜单。
+function bootLoaderEnter() {
+  const btn = document.getElementById("bootLoaderStart");
+  if (btn) { if (btn.disabled) return; btn.disabled = true; }
+  try { playUiSfx(); } catch (e) {}
+  try { window.AudioManager && window.AudioManager.unlockAudio && window.AudioManager.unlockAudio(); } catch (e) {}
+  // 触发菜单 BGM 淡入（解锁后此调用方能过守门）；与现有 showMapScreen 的菜单场景一致，不另开通道。
+  try { window.AudioManager && window.AudioManager.playScene && window.AudioManager.playScene("menu", { duration: 600, quiet: true }); } catch (e) {}
+  bootLoaderHide();
+}
+
+// boot-loader 主流程：显示→随机文案→逐个预加载更新进度→完成/超时(最大10s)放行→显「点击入局」。
+function initBootLoader() {
+  const el = document.getElementById("bootLoader");
+  if (!el) { return; } // 无标记则不阻塞，正常进菜单（容错）
+  bootLoaderActive = true;
+  document.body.classList.add("boot-active");
+
+  const fillEl = document.getElementById("bootLoaderFill");
+  const percentEl = document.getElementById("bootLoaderPercent");
+  const statusEl = document.getElementById("bootLoaderStatus");
+  const subtitleEl = document.getElementById("bootLoaderSubtitle");
+  const startBtn = document.getElementById("bootLoaderStart");
+
+  // 随机残卷副文案
+  try {
+    if (subtitleEl && Array.isArray(BOOT_SUBTITLES) && BOOT_SUBTITLES.length) {
+      subtitleEl.textContent = BOOT_SUBTITLES[Math.floor(Math.random() * BOOT_SUBTITLES.length)];
+    }
+  } catch (e) {}
+
+  // 状态文字轮换（纯展示，2.2s 一换）
+  let statusIdx = 0;
+  if (statusEl && typeof BOOT_STATUS_TEXTS !== "undefined" && Array.isArray(BOOT_STATUS_TEXTS) && BOOT_STATUS_TEXTS.length) {
+    statusEl.textContent = BOOT_STATUS_TEXTS[0];
+    const rot = window.setInterval(() => {
+      if (!bootLoaderActive) return;
+      statusIdx = (statusIdx + 1) % BOOT_STATUS_TEXTS.length;
+      statusEl.textContent = BOOT_STATUS_TEXTS[statusIdx];
+    }, 2200);
+    bootLoaderTimers.push(rot);
+  }
+
+  const list = (typeof PRELOAD_ASSETS !== "undefined" && Array.isArray(PRELOAD_ASSETS)) ? PRELOAD_ASSETS.slice() : [];
+  const total = list.length || 1;
+  let completed = 0;
+  let revealed = false;
+
+  const updateProgress = () => {
+    const pct = Math.min(100, Math.round((completed / total) * 100));
+    if (fillEl) fillEl.style.width = pct + "%";
+    if (percentEl) percentEl.textContent = String(pct);
+  };
+  updateProgress();
+
+  const reveal = (timedOut) => {
+    if (revealed) return;
+    revealed = true;
+    if (fillEl) fillEl.style.width = "100%";
+    if (percentEl) percentEl.textContent = "100";
+    if (statusEl) statusEl.textContent = timedOut ? "命途已通（部分资源延后），可入局。" : "命途已通，静候入局。";
+    if (startBtn) {
+      startBtn.classList.remove("hidden");
+      startBtn.addEventListener("click", bootLoaderEnter, { once: false });
+    } else {
+      // 极端容错：无按钮则直接淡出（不在非用户手势路径解锁音频）
+      bootLoaderHide();
+    }
+  };
+
+  // 最大等待 10s 超时也放行（弱网/离线场景不卡死）
+  const timeoutId = window.setTimeout(() => { reveal(true); }, 10000);
+  bootLoaderTimers.push(timeoutId);
+
+  if (!list.length) {
+    reveal(false);
+  } else {
+    Promise.all(list.map((asset) =>
+      bootPreloadAsset(asset).then(() => {
+        completed += 1;
+        updateProgress();
+      })
+    )).then(() => {
+      try { window.clearTimeout(timeoutId); } catch (e) {}
+      reveal(false);
+    }).catch(() => {
+      // Promise.all 在子 promise 永不 reject 的前提下不会走到此分支，仍兜底放行
+      reveal(false);
+    });
+  }
+}
+// 页面卸载时清理 boot-loader 定时器，避免泄漏
+window.addEventListener("pagehide", bootLoaderClearTimers);
+/* ===================== /V0.9.6.4 boot-loader ===================== */
+
 function initDevMode() {
   if (!isDevMode()) return; // 门控不满足：不注入任何 DOM / 按钮
   document.body.classList.add("dev-mode-on");
@@ -8935,6 +9166,9 @@ document.addEventListener("DOMContentLoaded", () => {
   updateTrialModeControls();
   bindEvents();
   updateMobileViewportState();
+  // V0.9.6.4：先启动全屏 boot-loader（已在 DOM 中、z-index 最高、盖住主菜单与 DEV 按钮）。
+  // 预加载资源、显进度，玩家点击「入局」→解锁音频→淡出后才露出下方主菜单与 DEV 按钮。
+  initBootLoader();
   showStartScreen();
   initDevMode();
 });

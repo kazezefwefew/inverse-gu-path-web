@@ -7971,3 +7971,224 @@ body:not(.dev-mode-on) .dev-mode-badge { display: none !important; }
 }
 .enemy-status.enemy-charge-status { color: #ffe2a0; border-color: rgba(200, 160, 60, 0.6); }
 .heal-float { color: #8fe6a8; text-shadow: 0 0 8px rgba(74, 200, 120, 0.6); }
+
+/* ===================== V0.9.6.4 启动加载界面 boot-loader（加性，暗黑东方·墨绿瘴气/暗红符纹/金褐字/虫影古籍） ===================== */
+.boot-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 100000; /* 高于 .dev-panel(99999)、.start-screen(50)、所有弹窗；淡出后才露出主菜单与 DEV 按钮 */
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  padding: 24px;
+  background:
+    radial-gradient(circle at 50% 22%, rgba(75, 119, 88, 0.10), transparent 42%),
+    radial-gradient(circle at 18% 82%, rgba(157, 47, 42, 0.12), transparent 46%),
+    linear-gradient(180deg, rgba(10, 14, 11, 0.99), rgba(6, 8, 6, 0.99)),
+    #080b09;
+  color: var(--gold, #bda26d);
+  font-family: "STKaiti", "KaiTi", serif;
+  opacity: 1;
+  transition: opacity 0.6s ease;
+}
+.boot-loader.boot-hidden {
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+body.boot-active { overflow: hidden; }
+
+/* 瘴气雾层（CSS 轻动画，无 canvas/复杂粒子） */
+.boot-loader-fog {
+  position: absolute;
+  inset: -20%;
+  background:
+    radial-gradient(circle at 30% 30%, rgba(73, 125, 98, 0.16), transparent 45%),
+    radial-gradient(circle at 72% 64%, rgba(73, 125, 98, 0.12), transparent 50%);
+  filter: blur(6px);
+  opacity: 0.8;
+  animation: boot-fog-drift 14s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+@keyframes boot-fog-drift {
+  0% { transform: translate3d(-2%, -1%, 0) scale(1.02); }
+  100% { transform: translate3d(2%, 2%, 0) scale(1.08); }
+}
+
+/* 暗红符纹环（缓慢旋转，古籍感） */
+.boot-loader-runes {
+  position: absolute;
+  width: min(70vmin, 460px);
+  height: min(70vmin, 460px);
+  border: 1px solid rgba(157, 47, 42, 0.18);
+  border-radius: 50%;
+  box-shadow: 0 0 60px rgba(157, 47, 42, 0.10) inset, 0 0 30px rgba(189, 162, 109, 0.06);
+  opacity: 0.55;
+  animation: boot-runes-spin 38s linear infinite;
+  pointer-events: none;
+}
+.boot-loader-runes::before {
+  content: "";
+  position: absolute;
+  inset: 14%;
+  border: 1px dashed rgba(189, 162, 109, 0.14);
+  border-radius: 50%;
+  animation: boot-runes-spin 26s linear infinite reverse;
+}
+@keyframes boot-runes-spin {
+  to { transform: rotate(360deg); }
+}
+
+.boot-loader-content {
+  position: relative;
+  z-index: 1;
+  width: min(560px, 92vw);
+  max-width: 100%;
+  text-align: center;
+}
+
+/* 蛊印（虫影呼吸） */
+.boot-loader-seal {
+  width: 76px;
+  height: 76px;
+  margin: 0 auto 14px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(189, 162, 109, 0.34);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(73, 125, 98, 0.22), rgba(20, 14, 12, 0.7));
+  box-shadow: 0 0 22px rgba(73, 125, 98, 0.22), inset 0 0 14px rgba(0, 0, 0, 0.5);
+  animation: boot-seal-pulse 3.6s ease-in-out infinite;
+}
+.boot-loader-seal span {
+  font-size: 34px;
+  color: var(--gold, #bda26d);
+  text-shadow: 0 0 12px rgba(189, 162, 109, 0.5);
+}
+@keyframes boot-seal-pulse {
+  0%, 100% { box-shadow: 0 0 18px rgba(73, 125, 98, 0.18), inset 0 0 14px rgba(0, 0, 0, 0.5); transform: scale(1); }
+  50% { box-shadow: 0 0 30px rgba(73, 125, 98, 0.34), inset 0 0 14px rgba(0, 0, 0, 0.5); transform: scale(1.04); }
+}
+
+.boot-loader-title {
+  margin: 0 0 8px;
+  color: var(--gold, #bda26d);
+  font: 700 clamp(34px, 8vw, 54px) "STKaiti", "KaiTi", serif;
+  letter-spacing: 0.14em;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6), 0 0 22px rgba(189, 162, 109, 0.22);
+}
+.boot-loader-subtitle {
+  margin: 0 0 30px;
+  min-height: 34px;
+  color: var(--jade-bright, #86b798);
+  font-size: clamp(12px, 2.4vw, 14px);
+  line-height: 1.6;
+  letter-spacing: 0.08em;
+  opacity: 0.86;
+  transition: opacity 0.4s ease;
+}
+
+.boot-loader-progress { margin: 0 auto 18px; width: min(320px, 86vw); }
+.boot-loader-bar {
+  height: 6px;
+  border: 1px solid rgba(189, 162, 109, 0.30);
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.36);
+  overflow: hidden;
+}
+.boot-loader-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--jade-bright, #86b798), var(--gold, #bda26d));
+  box-shadow: 0 0 10px rgba(134, 183, 152, 0.5);
+  border-radius: 2px;
+  transition: width 0.28s ease-out;
+}
+.boot-loader-percent {
+  margin-top: 8px;
+  font: 700 12px Georgia, "STKaiti", serif;
+  letter-spacing: 0.06em;
+  color: var(--gold, #bda26d);
+}
+
+.boot-loader-status {
+  margin: 0 0 22px;
+  min-height: 16px;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: rgba(189, 162, 109, 0.74);
+}
+
+.boot-loader-start {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 200px;
+  padding: 12px 34px;
+  border: 1px solid rgba(189, 162, 109, 0.5);
+  border-radius: 2px;
+  color: var(--paper, #ded5bd);
+  cursor: pointer;
+  background: linear-gradient(135deg, rgba(91, 28, 25, 0.7), rgba(42, 20, 17, 0.86));
+  box-shadow: 0 7px 20px rgba(0, 0, 0, 0.32), inset 0 1px rgba(255, 255, 255, 0.05);
+  transition: filter 0.16s ease, transform 0.16s ease, border-color 0.16s ease;
+  animation: boot-start-in 0.5s ease both;
+}
+.boot-loader-start-main { font: 700 16px "STKaiti", "KaiTi", serif; letter-spacing: 0.12em; }
+.boot-loader-start-sub { font-size: 10px; letter-spacing: 0.16em; color: rgba(222, 213, 189, 0.62); }
+.boot-loader-start:hover:not(:disabled) {
+  border-color: var(--gold, #bda26d);
+  filter: brightness(1.16);
+  transform: translateY(-2px);
+}
+.boot-loader-start:disabled { opacity: 0.62; cursor: wait; }
+.boot-loader-start.hidden { display: none !important; }
+@keyframes boot-start-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* 安全区避让（刘海/异形屏） */
+@supports (padding: max(0px)) {
+  .boot-loader {
+    padding:
+      max(24px, env(safe-area-inset-top)) max(24px, env(safe-area-inset-right))
+      max(24px, env(safe-area-inset-bottom)) max(24px, env(safe-area-inset-left));
+  }
+}
+
+/* 手机横屏 / 窄屏适配 */
+@media (max-width: 768px) {
+  .boot-loader { padding: 16px; }
+  .boot-loader-seal { width: 60px; height: 60px; margin-bottom: 10px; }
+  .boot-loader-seal span { font-size: 28px; }
+  .boot-loader-title { font-size: clamp(28px, 7vw, 42px); letter-spacing: 0.1em; }
+  .boot-loader-subtitle { margin-bottom: 22px; min-height: 30px; }
+  .boot-loader-progress { width: min(280px, 82vw); }
+  .boot-loader-start { min-width: 168px; padding: 11px 26px; }
+}
+
+/* 横屏矮屏（手机横置）：纵向紧凑，标题不被地址栏挤 */
+@media (orientation: landscape) and (max-height: 520px) {
+  .boot-loader-seal { width: 46px; height: 46px; margin-bottom: 6px; }
+  .boot-loader-seal span { font-size: 22px; }
+  .boot-loader-title { font-size: clamp(24px, 6vh, 36px); margin-bottom: 4px; }
+  .boot-loader-subtitle { margin-bottom: 14px; min-height: 24px; font-size: 11px; }
+  .boot-loader-progress { margin-bottom: 12px; }
+  .boot-loader-status { margin-bottom: 12px; }
+  .boot-loader-start { padding: 9px 24px; }
+  .boot-loader-runes { width: min(54vmin, 320px); height: min(54vmin, 320px); }
+}
+
+/* 超小屏 */
+@media (max-width: 380px) {
+  .boot-loader-title { font-size: 26px; }
+  .boot-loader-progress { width: 86vw; }
+}
+
+/* 尊重无障碍：降低动画 */
+@media (prefers-reduced-motion: reduce) {
+  .boot-loader-fog, .boot-loader-runes, .boot-loader-runes::before, .boot-loader-seal, .boot-loader-start { animation: none !important; }
+}
+/* ===================== /V0.9.6.4 boot-loader ===================== */
