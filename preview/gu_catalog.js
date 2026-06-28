@@ -188,7 +188,7 @@ window.GU_CATALOG = [
     habitat: "栖于瘴林腐叶堆、终年不见日的湿沟。", feeding: "啃腐叶、吸瘴气，越湿越肥。", temperament: "蛰伏怯战，受激则成片涌出。",
     evolution: "积毒可蜕为「青瘴寄生」。", synergy: "与瘴林同类叠毒铺场。", counteredBy: "惧火与速攻，毒未深已亡。",
     dropsFrom: "第二层·瘴林深径 普通战。", unlockCondition: "于瘴林遭遇即录入。",
-    gameplayEffect: "", image: "",
+    gameplayEffect: "", image: "assets/portraits/rot-leaf-gu-insect.webp",
   },
   {
     id: "enemy_miasmaparasite", category: "enemy", cardKey: "", enemyId: "miasmaParasite",
@@ -198,7 +198,7 @@ window.GU_CATALOG = [
     habitat: "潜伏瘴林湿洼、毒藤盘结的阴处。", feeding: "噬中毒之血肉，借毒滋养。", temperament: "阴忍善缠，毒发无声。",
     evolution: "（生态敌怪，暂无玩家蛊牌。）", synergy: "与施毒同类成阵。", counteredBy: "惧净毒与爆发速决。",
     dropsFrom: "第二层·瘴林深径 普通战。", unlockCondition: "于瘴林遭遇即录入。",
-    gameplayEffect: "", image: "",
+    gameplayEffect: "", image: "assets/portraits/green-miasma-parasite.webp",
   },
   {
     id: "enemy_poisonvinecorpse", category: "enemy", cardKey: "", enemyId: "poisonVineCorpse",
@@ -208,7 +208,7 @@ window.GU_CATALOG = [
     habitat: "立于瘴林深径、藤网密结之地。", feeding: "由寄主毒藤汲养，无须进食。", temperament: "迟缓而凶，受创愈狂。",
     evolution: "（生态敌怪，暂无玩家蛊牌。）", synergy: "与执灯者同列瘴林精锐。", counteredBy: "惧速杀，免其暴走相位。",
     dropsFrom: "第二层·瘴林深径 普通战。", unlockCondition: "于瘴林遭遇即录入。",
-    gameplayEffect: "", image: "",
+    gameplayEffect: "", image: "assets/portraits/poison-vine-thrall.webp",
   },
   {
     id: "enemy_miasmalantern", category: "enemy", cardKey: "", enemyId: "miasmaLanternEliteGu",
@@ -218,7 +218,7 @@ window.GU_CATALOG = [
     habitat: "巡行瘴林深处，灯不离手。", feeding: "焚魂引瘴，以瘴为食。", temperament: "冷峻执拗，逼近则狂瘴四溢。",
     evolution: "（生态精英，暂无玩家蛊牌。）", synergy: "为百瘴母蛊开路。", counteredBy: "惧高爆速攻，避其叠毒滚雪。",
     dropsFrom: "第二层·瘴林深径 精英战。", unlockCondition: "于瘴林遭遇即录入。",
-    gameplayEffect: "", image: "",
+    gameplayEffect: "", image: "assets/portraits/miasma-lantern-keeper.webp",
   },
   {
     id: "enemy_bloodleech", category: "enemy", cardKey: "", enemyId: "bloodLeechSwarm",
@@ -228,7 +228,7 @@ window.GU_CATALOG = [
     habitat: "潜伏血沼浅滩、尸血淤积的泥层。", feeding: "吸活血而肥，越腥越聚。", temperament: "无主而贪，势成则倾巢。",
     evolution: "（生态敌怪，暂无玩家蛊牌。）", synergy: "与血沼同类压迫低血者。", counteredBy: "惧范围与速攻，散则力竭。",
     dropsFrom: "第二层·血沼沉渊 普通战。", unlockCondition: "于血沼遭遇即录入。",
-    gameplayEffect: "", image: "",
+    gameplayEffect: "", image: "assets/portraits/red-marsh-leech-swarm.webp",
   },
   {
     id: "enemy_brokenmeridian", category: "enemy", cardKey: "", enemyId: "brokenMeridianGu",
@@ -238,7 +238,7 @@ window.GU_CATALOG = [
     habitat: "游荡血沼血径、血祭遗坛附近。", feeding: "以自身之血饲蛊换力。", temperament: "亢奋自残，血少则更凶。",
     evolution: "（生态敌怪，暂无玩家蛊牌。）", synergy: "与血衣祭蛊者同源。", counteredBy: "惧护甲与稳守，耗其自损。",
     dropsFrom: "第二层·血沼沉渊 普通战。", unlockCondition: "于血沼遭遇即录入。",
-    gameplayEffect: "", image: "",
+    gameplayEffect: "", image: "assets/portraits/severed-meridian-cultist.webp",
   },
   {
     id: "enemy_bloodmudgolem", category: "enemy", cardKey: "", enemyId: "bloodMudGolem",
@@ -248,7 +248,7 @@ window.GU_CATALOG = [
     habitat: "盘踞血沼深处、血泥淤积之地。", feeding: "吸沼血自补，受创愈贪。", temperament: "迟缓固执，残血则暴凝。",
     evolution: "（生态敌怪，暂无玩家蛊牌。）", synergy: "与血沼同类拖延耗血。", counteredBy: "惧高爆一波带走，免其回血。",
     dropsFrom: "第二层·血沼沉渊 普通战。", unlockCondition: "于血沼遭遇即录入。",
-    gameplayEffect: "", image: "",
+    gameplayEffect: "", image: "assets/portraits/blood-mud-puppet.webp",
   },
   {
     id: "enemy_bloodrobepriest", category: "enemy", cardKey: "", enemyId: "bloodRobePriestEliteGu",
@@ -258,7 +258,7 @@ window.GU_CATALOG = [
     habitat: "守在血沼血祭坛前，血衣不离身。", feeding: "以自身与祭品之血饲蛊。", temperament: "狂信自残，逼近则血祭狂涌。",
     evolution: "（生态精英，暂无玩家蛊牌。）", synergy: "为血衣蛊母开路。", counteredBy: "惧稳守高血，避其低血压迫。",
     dropsFrom: "第二层·血沼沉渊 精英战。", unlockCondition: "于血沼遭遇即录入。",
-    gameplayEffect: "", image: "",
+    gameplayEffect: "", image: "assets/portraits/bloodrobe-gu-sacrificer.webp",
   },
 
   /* ===== V0.9.6 第二层 · 首领残卷（category:"boss"，带 enemyId） ===== */
@@ -270,7 +270,7 @@ window.GU_CATALOG = [
     habitat: "盘踞瘴林最深的母蛊巢穴。", feeding: "吞噬一切腐物与瘴气孕育新毒。", temperament: "慵懒贪睡，半血则暴怒苏醒。",
     evolution: "半血触发「瘴母苏醒」相位，施毒大增。", synergy: "麾下尽是瘴林毒蛊。", counteredBy: "惧高爆速杀；拖延则毒层失控。",
     dropsFrom: "第二层·瘴林深径 路线 Boss。", unlockCondition: "于瘴林遭遇即录入。",
-    gameplayEffect: "", image: "",
+    gameplayEffect: "", image: "assets/portraits/hundred-miasma-mother-gu.webp",
   },
   {
     id: "boss_bloodrobemother", category: "boss", cardKey: "", enemyId: "bloodRobeMotherBoss",
@@ -280,7 +280,7 @@ window.GU_CATALOG = [
     habitat: "端坐血沼深渊的血池之心。", feeding: "饮搏杀之血、纳祭蛊者之命。", temperament: "亢奋嗜战，半血则血衣覆身。",
     evolution: "半血触发「血衣覆身」相位，吸血压迫大增。", synergy: "麾下尽是血沼血道之徒。", counteredBy: "惧高血稳推；低血则被反噬。",
     dropsFrom: "第二层·血沼沉渊 路线 Boss。", unlockCondition: "于血沼遭遇即录入。",
-    gameplayEffect: "", image: "",
+    gameplayEffect: "", image: "assets/portraits/bloodrobe-gu-mother.webp",
   },
 
   /* ===== V0.9.6 第二层 · 生态条目（category:"eco"，沿用现有 eco 渲染，恒显示） ===== */

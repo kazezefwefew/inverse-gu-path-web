@@ -416,6 +416,16 @@ const PORTRAIT_PATHS = Object.freeze({
     wildBeeTide: "assets/portraits/enemy-beeswarm-web.jpg",
     corpsepuppet: "assets/portraits/enemy-corpsepuppet-web.jpg",
     corpsepuppetPhase2: "assets/portraits/enemy-corpsepuppet-phase2-web.jpg",
+    rotleafGu: "assets/portraits/rot-leaf-gu-insect.webp",
+    miasmaParasite: "assets/portraits/green-miasma-parasite.webp",
+    poisonVineCorpse: "assets/portraits/poison-vine-thrall.webp",
+    miasmaLanternEliteGu: "assets/portraits/miasma-lantern-keeper.webp",
+    miasmaMotherBoss: "assets/portraits/hundred-miasma-mother-gu.webp",
+    bloodLeechSwarm: "assets/portraits/red-marsh-leech-swarm.webp",
+    brokenMeridianGu: "assets/portraits/severed-meridian-cultist.webp",
+    bloodMudGolem: "assets/portraits/blood-mud-puppet.webp",
+    bloodRobePriestEliteGu: "assets/portraits/bloodrobe-gu-sacrificer.webp",
+    bloodRobeMotherBoss: "assets/portraits/bloodrobe-gu-mother.webp",
   },
 });
 
@@ -858,7 +868,7 @@ const LORE_SKIP_ANIMATION_STORAGE_KEY = "reverseGu.lore.skipAnimation";
 const RECORDING_MODE_STORAGE_KEY = "reverseGu.recordingMode.enabled";
 const TRIAL_MODE_STORAGE_KEY = "reverseGu.trial.mode";
 const TRIAL_SEED_STORAGE_KEY = "reverseGu.trial.seedDraft";
-const GAME_VERSION = "V0.9.6 第二层生态关卡预览版";
+const GAME_VERSION = "V0.9.6.1 第二层地图化+敌人状态说明";
 // TODO: 后续多幕路线扩展时继续抽象 finalNode / bossNode，避免固定四段流程继续扩散。
 const MAX_ROUTE_STEP = 4;
 const BOSS_ROUTE_STEP = 4;
@@ -2575,13 +2585,22 @@ function renderMapScreen() {
   if (!runState || !dom.mapRoute) return;
   updateGuStoneDisplays();
   const stepText = runState.currentRouteStep <= MAX_ROUTE_STEP ? `第 ${runState.currentRouteStep} 段` : "终局";
-  dom.mapDescription.textContent = runState.currentRouteStep === 1
+  const __isL2Map = runState.layer === 2 || runState.layer2?.active;
+  dom.mapDescription.textContent = __isL2Map
+    ? (runState.currentRouteStep === 1
+        ? "生态歧路重新铺开，两头凶影各踞一径。择一而行，另一岔路将闭。"
+        : runState.currentRouteStep === 2
+          ? "深处再裂：迎生态精英、探机缘，或入残灯蛊坊。"
+          : runState.currentRouteStep === REST_ROUTE_STEP
+            ? "残卷遗落于此，拾之倾向此径之道。"
+            : "生态之主盘踞末路，破之则深行已尽。")
+    : (runState.currentRouteStep === 1
     ? "塔路初分，凶兽各踞一阶。择一而行，另一岔路将闭。"
     : runState.currentRouteStep === 2
       ? "命途再裂：取机缘、入蛊坊，或迎血煞精英。"
       : runState.currentRouteStep === REST_ROUTE_STEP
         ? "临门分岔：再战一场，或在塔隙中稍作休整。"
-        : "尸盘已转，守关者在塔顶等你。";
+        : "尸盘已转，守关者在塔顶等你。");
   dom.mapHint.textContent = runState.currentRouteStep <= MAX_ROUTE_STEP
     ? "选择发亮节点继续；灰暗岔路本局不再开启。"
     : "命途已尽，等待结算。";
@@ -2614,7 +2633,11 @@ function renderMapScreen() {
         <p>${node.description}</p>
       </button>`;
     }).join("");
-    const segmentTitle = step === REST_ROUTE_STEP ? "第 3 段 · 临门分岔" : step === BOSS_ROUTE_STEP ? "第 4 段 · 尸盘门" : `第 ${step} 段`;
+    const isL2 = runState.layer === 2 || runState.layer2?.active;
+    const l2Name = runState.layer2?.routeName || "生态深径";
+    const segmentTitle = isL2
+      ? (step === BOSS_ROUTE_STEP ? `末段 · ${l2Name}之主` : step === REST_ROUTE_STEP ? `第 ${step} 段 · 残卷` : `第 ${step} 段 · ${l2Name}`)
+      : (step === REST_ROUTE_STEP ? "第 3 段 · 临门分岔" : step === BOSS_ROUTE_STEP ? "第 4 段 · 尸盘门" : `第 ${step} 段`);
     return `<section class="map-segment segment-step-${step} ${lineClass}">
       <div class="map-segment-label"><span>${segmentTitle}</span><i></i></div>
       <div class="map-node-row">${nodes}</div>
@@ -2632,10 +2655,20 @@ function lockSiblingNodes(node) {
 
 function enterMapNode(node) {
   if (!runState || !node) return;
+  /* 第二层残卷节点：走专门奖励入口（不进战斗） */
+  if (node.type === "reward" && runState.layer2?.active) {
+    runState.currentNode = node;
+    runState.floor = node.step;
+    lockSiblingNodes(node);
+    addLog(`命途分岔：你选择了${node.name}。`, "important");
+    openLayer2Reward({ name: node.name });
+    return;
+  }
   runState.currentNode = node;
   runState.floor = node.step;
   lockSiblingNodes(node);
   addLog(`命途分岔：你选择了${node.name}。`, "important");
+  if (node.enemyId && runState.layer2?.active && typeof layer2MarkBestiary === "function") layer2MarkBestiary(node.enemyId);
   if (node.type === "battle" || node.type === "elite" || node.type === "boss") {
     startFloorBattle();
   } else if (node.type === "event") {
@@ -2656,6 +2689,7 @@ function selectMapNode(nodeId) {
     openEliteConfirm(node);
     return;
   }
+  if (node.type === "reward") { showMapTransition("生态残卷遗落", () => enterMapNode(node)); return; }
   showMapTransition(getMapTransitionText(node.type), () => enterMapNode(node));
 }
 
@@ -2946,10 +2980,10 @@ function chooseLayer2Route(routeId) {
   layer2MarkProgress(routeId === "miasma" ? "miasmaEntered" : "bloodmarshEntered");
   getRunStats().layer2Entered = true;
   getRunStats().layer2Route = route.name;
-  unlockLorePage(route.codexTaskId === "codex_miasmaProbe" ? "unfinished" : "unfinished");
-  addJourneyLog(`命途未尽：你踏入第二层「${route.name}」。`, "important");
+  unlockLorePage(route.loreId || "unfinished");
   dom.runSummary.classList.add("hidden");
-  layer2Advance();
+  /* V0.9.6.1：不再走线性 layer2Advance，进入真正的第二层分岔地图 */
+  enterLayer2Map(routeId);
 }
 
 /* 第二层调度：依 nodeIndex 取节点，写入合成 currentNode，复用现有节点入口 */
@@ -2979,6 +3013,158 @@ function layer2Advance() {
   dom.resultOverlay.classList.add("hidden");
   refreshModalLock();
   startFloorBattle();
+}
+
+/* ===================================================================
+ * V0.9.6.1 第二层「地图化」核心
+ * 设计：不另写一套地图渲染/点击/推进。进二层时，把 runState.mapState
+ * 换成「与一层同形」的 segments 结构（createLayer2MapState 生成），并把
+ * runState.layer 置 2、重置 currentRouteStep/completedNodes/lockedNodes，
+ * 然后调用现成 showMapScreen()。renderMapScreen / selectMapNode /
+ * enterMapNode / lockSiblingNodes / getMapNodeState / getMapNodeStateLabel
+ * 全部原样复用（它们只读 runState.mapState.segments + currentRouteStep）。
+ * 只在 4 个“层感知”收口点做最小分支（见 jsEdits）。
+ * 节点结构：起点(2普通分岔)→中段(精英/事件/休整/蛊坊 多选)→残卷奖励→Boss。
+ * 主题：theme = miasma | bloodmarsh，影响普通战/精英/Boss 敌人与文案。
+ * =================================================================== */
+
+/* 第二层主题敌人池（取自 V0.9.6 已定义的 ENEMY_LIBRARY 条目，不新增敌人） */
+const LAYER2_THEME_POOLS = {
+  miasma: {
+    normals: ["rotleafGu", "miasmaParasite", "poisonVineCorpse"],
+    elite: "miasmaLanternEliteGu",
+    boss: "miasmaMotherBoss",
+  },
+  bloodmarsh: {
+    normals: ["bloodLeechSwarm", "brokenMeridianGu", "bloodMudGolem"],
+    elite: "bloodRobePriestEliteGu",
+    boss: "bloodRobeMotherBoss",
+  },
+};
+
+/* 第二层非战斗节点文案占位（缺内容也不报错） */
+const LAYER2_NODE_TEXT = {
+  battle: "生态凶影，胜后取蛊。",
+  event: "深处异兆，三念定局。",
+  rest: "塔隙微明，可暂养息一息。",
+  shop: "残灯下蛊坊半掩，以蛊石易牌。",
+  elite: "生态精英，厚利藏险。",
+  reward: "生态残卷遗落，倾向此径之道。",
+  boss: "生态之主盘踞末路，破之深行。",
+};
+
+/* 抽取一个主题普通战敌人（带去重，避免一局重复太多） */
+function pickLayer2Normal(theme, used) {
+  const pool = (LAYER2_THEME_POOLS[theme]?.normals || LAYER2_THEME_POOLS.miasma.normals)
+    .filter((id) => ENEMY_LIBRARY[id]);
+  const fresh = pool.filter((id) => !used.has(id));
+  const id = (fresh.length ? fresh : pool)[Math.floor(Math.random() * (fresh.length ? fresh.length : pool.length))] || pool[0];
+  used.add(id);
+  return id;
+}
+
+/* 生成与一层同形的第二层地图 segments：
+ *   段1：2 个普通战分岔（左/右，倾向标记仅作文案，敌人都来自主题池）
+ *   段2：精英 + 事件/休整/蛊坊 三选一中的两条分岔（精英为高风险路）
+ *   段3：生态残卷（reward，单节点）
+ *   段4：第二层 Boss
+ * routeId 即主题 theme（miasma/bloodmarsh）。 */
+function createLayer2MapState(theme) {
+  const pool = LAYER2_THEME_POOLS[theme] || LAYER2_THEME_POOLS.miasma;
+  const used = new Set();
+  const n1 = pickLayer2Normal(theme, used);
+  const n2 = pickLayer2Normal(theme, used);
+  const themeName = theme === "miasma" ? "瘴" : "血";
+  const seg1 = [
+    { id: "l2-1-a", step: 1, type: "battle", enemyId: n1, layer2: true, l2theme: theme,
+      icon: "兽", name: ENEMY_LIBRARY[n1]?.name || "生态凶影", description: LAYER2_NODE_TEXT.battle },
+    { id: "l2-1-b", step: 1, type: "battle", enemyId: n2, layer2: true, l2theme: theme,
+      icon: "兽", name: ENEMY_LIBRARY[n2]?.name || "生态凶影", description: LAYER2_NODE_TEXT.battle },
+  ];
+  /* 段2：三条分岔——精英(高风险高奖) / 机缘事件 / 休整蛊坊（随机给到其一非战斗），保证至少 2 选 */
+  const softNode = Math.random() < 0.5
+    ? { id: "l2-2-c", step: 2, type: "shop", layer2: true, l2theme: theme, icon: "坊", name: "残灯蛊坊", description: LAYER2_NODE_TEXT.shop }
+    : { id: "l2-2-c", step: 2, type: "rest", layer2: true, l2theme: theme, icon: "息", name: "沼隙休整", description: LAYER2_NODE_TEXT.rest };
+  const seg2 = [
+    { id: "l2-2-a", step: 2, type: "elite", enemyId: pool.elite, layer2: true, l2theme: theme,
+      icon: "煞", name: ENEMY_LIBRARY[pool.elite]?.name || "生态精英", description: LAYER2_NODE_TEXT.elite },
+    { id: "l2-2-b", step: 2, type: "event", layer2: true, l2theme: theme, icon: "缘", name: "生态机缘", description: LAYER2_NODE_TEXT.event },
+    softNode,
+  ];
+  /* 段3：生态残卷（用 reward 类型，enterMapNode 走专门入口） */
+  const seg3 = [
+    { id: "l2-3-a", step: REST_ROUTE_STEP, type: "reward", layer2: true, l2theme: theme,
+      icon: "卷", name: theme === "miasma" ? "瘴林残卷" : "血道残谱", description: LAYER2_NODE_TEXT.reward },
+  ];
+  /* 段4：第二层 Boss */
+  const seg4 = [
+    { id: "l2-4-boss", step: BOSS_ROUTE_STEP, type: "boss", enemyId: pool.boss, layer2: true, l2theme: theme,
+      icon: themeName, name: ENEMY_LIBRARY[pool.boss]?.name || "生态之主", description: LAYER2_NODE_TEXT.boss },
+  ];
+  return { segments: [seg1, seg2, seg3, seg4], theme };
+}
+
+/* 进入第二层地图：复用一层渲染管线（替换 mapState + 重置步进 + layer=2） */
+function enterLayer2Map(routeId) {
+  const route = LAYER2_ROUTES[routeId];
+  if (!route || !runState) return;
+  const theme = routeId; /* miasma / bloodmarsh */
+  runState.layer = 2;
+  runState.layer2 = {
+    active: true,
+    routeId,
+    routeName: route.name,
+    theme,
+    branchChoice: "",
+    bossDefeated: false,
+    nodesCleared: 0,
+    lastNodeName: "第二层入口",
+  };
+  /* 用第二层地图替换一层地图（一层地图体验不受影响：此时一层已结束） */
+  runState.mapState = createLayer2MapState(theme);
+  runState.currentRouteStep = 1;
+  runState.completedNodes = [];
+  runState.lockedNodes = [];
+  runState.currentNode = null;
+  runState.bossPrepRelicGranted = true; /* 二层不再触发一层 Boss 前整备遗物 */
+  layer2MarkProgress(routeId === "miasma" ? "miasmaEntered" : "bloodmarshEntered");
+  getRunStats().layer2Entered = true;
+  getRunStats().layer2Route = route.name;
+  addJourneyLog(`命途未尽：你踏入第二层「${route.name}」，生态歧路在脚下重新铺开。`, "important");
+  dom.runSummary?.classList.add("hidden");
+  dom.resultOverlay.classList.add("hidden");
+  refreshModalLock();
+  showMapScreen();
+}
+
+/* 第二层奖励节点（残卷）：复用 V0.9.6 倾向选牌；完成后回二层地图 */
+function enterLayer2RewardNode(node) {
+  runState.currentNode = node;
+  lockSiblingNodes(node);
+  openLayer2Reward({ name: node.name }); /* 复用现成奖励面板；完成走 completeOverlayNode→二层返图 */
+}
+
+/* 第二层战斗/非战斗完成后：推进步进、回到二层地图；Boss → 二层结算 */
+function layer2CompleteNodeAndReturnMap() {
+  const st = runState?.layer2;
+  if (!st || !runState?.currentNode) return;
+  const node = runState.currentNode;
+  if (!runState.completedNodes.includes(node.id)) runState.completedNodes.push(node.id);
+  if (!runState.routeHistory.includes(node.name)) runState.routeHistory.push(node.name);
+  st.nodesCleared = (st.nodesCleared || 0) + 1;
+  st.lastNodeName = `${st.routeName}·${node.name}`;
+  if (node.type === "boss") {
+    st.bossDefeated = true;
+    getRunStats().layer2BossDefeated = true;
+    layer2MarkProgress(st.routeId === "miasma" ? "miasmaBossDefeated" : "bloodmarshBossDefeated");
+    runState.currentNode = null;
+    showLayer2Conclusion(true);
+    return;
+  }
+  runState.lastMapNotice = `第二层 · ${node.name}已了`;
+  runState.currentRouteStep = Math.min(MAX_ROUTE_STEP, node.step + 1);
+  runState.currentNode = null;
+  showMapScreen();
 }
 
 /* 第二层节点完成后推进（被 finishBattle 胜利分支 / 奖励完成 / 事件完成调用） */
@@ -3050,6 +3236,8 @@ function openLayer2Reward(node) {
   const route = LAYER2_ROUTES[st.routeId];
   unlockLorePage(route.loreId); /* 复用现成残卷页，作“路线残卷”露出 */
   runState.layer2.rewardResolved = false;
+  runState.rewardResolved = false;
+  runState.materialRewardResolved = false;
   /* 复用 openCardReward 的展示，但用倾向选牌覆盖候选 */
   const choices = generateLayer2RewardChoices(route);
   runState.pendingRewardKeys = choices;
@@ -3113,7 +3301,7 @@ function showLayer2Conclusion(cleared) {
 function completeOverlayNode() {
   dom.resultOverlay.classList.add("hidden");
   refreshModalLock();
-  if (runState?.layer2?.active) { layer2OnNodeCleared(); return; }
+  if (runState?.layer2?.active) { layer2CompleteNodeAndReturnMap(); return; }
   completeCurrentNodeAndReturnMap();
 }
 
@@ -3944,7 +4132,7 @@ function closeBattleCoach(markSeen = true) {
 function showKeywordTooltip(target) {
   if (!target || !dom.keywordTooltip) return;
   const keyword = target.dataset.keyword;
-  const text = KEYWORD_HELP[keyword];
+  const text = KEYWORD_HELP[keyword] || ENEMY_STATUS_HELP[keyword];
   if (!text) return;
   dom.keywordTooltip.innerHTML = `<strong>${keyword}</strong><span>${text}</span>`;
   dom.keywordTooltip.classList.remove("hidden");
@@ -4266,6 +4454,12 @@ function playCardSfx(card) {
 
 // 更新公告（只记正式版本；最新的放最前）。
 const UPDATE_LOG = [
+  { v: "V0.9.6.1", title: "第二层地图化 + 敌人状态说明", notes: [
+    "第二层升级为真正的分岔地图：起点双岔→精英/机缘/蛊坊多选→生态残卷→第二层 Boss，复用一层地图的渲染与点击",
+    "瘴林 / 血沼主题影响普通战与精英、Boss 敌人池，进二层即有「新一关」感",
+    "敌人状态图标可点击 / 长按查看说明（毒性、防御、塔压、狂怒、尸盘压毒等），与玩家状态共用同一套说明",
+    "保留「命途未尽」入口与第二层结算字段（路线 / Boss / 节点数 / 新增万蛊录）",
+  ] },
   { v: "V0.9.6", title: "第二层生态关卡预览", notes: [
     "一层 Boss 后新增「命途未尽」：可就此结算，或继续深入第二层",
     "第二层两条生态路线：瘴林深径（毒道）与血沼沉渊（血道），各含普通/三选一/精英/奖励/Boss",
@@ -5649,10 +5843,10 @@ function finishBattle(victory) {
     }
     // TODO: 后续多幕路线扩展时抽象 finalNode / bossNode。
     if (runState.layer2?.active) {
-      // 第二层战斗：胜利后交由第二层调度（Boss→二层结算，其余→下一节点）
+      // 第二层战斗：胜利后回第二层地图（Boss→二层结算），复用地图推进
       dom.resultTurns.textContent = game.turn;
       dom.resultHp.textContent = game.player.hp;
-      layer2OnNodeCleared();
+      layer2CompleteNodeAndReturnMap();
       return;
     }
     if (runState.currentNode?.type === "boss" || runState.floor === MAX_ROUTE_STEP) {
@@ -5806,7 +6000,9 @@ function resolveCardReward(cardKey = null) {
   }
   dom.cardRewardChoices.querySelectorAll("button").forEach((button) => { button.disabled = true; });
   dom.skipRewardButton.disabled = true;
-  if (runState.currentNode?.type === "elite") {
+  if (runState.layer2?.active && runState.currentNode?.type === "reward") {
+    window.setTimeout(() => { dom.resultOverlay.classList.add("hidden"); refreshModalLock(); layer2CompleteNodeAndReturnMap(); }, 220);
+  } else if (runState.currentNode?.type === "elite") {
     window.setTimeout(openFurnace, 180);
   } else {
     window.setTimeout(openMaterialReward, 180);
@@ -6362,7 +6558,7 @@ function advanceToNextFloor() {
   if (runState.currentNode?.type === "elite" && !runState.furnaceResolved) return;
   dom.resultOverlay.classList.add("hidden");
   refreshModalLock();
-  if (runState?.layer2?.active) { layer2OnNodeCleared(); return; }
+  if (runState?.layer2?.active) { layer2CompleteNodeAndReturnMap(); return; }
   completeCurrentNodeAndReturnMap();
 }
 
@@ -7458,17 +7654,49 @@ async function copyBalanceSummary() {
   }
 }
 
+/* ===================================================================
+ * V0.9.6.1 敌人状态说明：复用玩家那套 keyword tooltip（#keywordTooltip）。
+ * 思路：扩 KEYWORD_HELP 增补“敌人侧”关键词；renderEnemyStatuses 里每个
+ * 状态 span 用 enemyStatusAttr() 输出 data-keyword（命中则走统一 tooltip），
+ * 命不中时回退到原 title。全局 pointerover/focusin/click/长按监听已覆盖
+ * [data-keyword]（见 jsEdits 的长按补丁），桌面悬停/点击、手机长按/点击皆可看。
+ * 无专属文案的状态：至少给“名 + 基础效果”兜底，Console 不报错。
+ * =================================================================== */
+
+/* 敌人状态说明（与玩家共用 KEYWORD_HELP；这里补敌人侧词条） */
+const ENEMY_STATUS_HELP = {
+  尸盘压毒: "毒性超过 12 层时，敌方回合结束清除 3 层毒性。",
+  尸盘转轮: "生命过半后进入二阶，攻击与蓄势增强。",
+  塔压: "此战敌人生命略微提高。",
+  狂怒: "生命低于阈值后进入狂怒，攻击力提升。",
+  自损: "以割伤自身换取更高伤害；你血量越低它越亢奋。",
+  吸血: "命中后回复等量生命，续战不退。",
+  蓄势: "本回合蓄力，下次攻击附加额外伤害。",
+  护体: "覆一层血衣/护甲，先抵挡伤害后清零。",
+};
+
+/* 生成敌人状态的 tooltip 属性：优先 KEYWORD_HELP，其次 ENEMY_STATUS_HELP，
+ * 都没有时用 fallback 文案兜底（保证“名+基础效果”），始终带 data-keyword。 */
+function enemyStatusAttr(keyword, fallback) {
+  const text = KEYWORD_HELP[keyword] || ENEMY_STATUS_HELP[keyword] || fallback || `${keyword}：敌方状态。`;
+  /* 临时注入到敌人侧字典，使 showKeywordTooltip 能取到文案（不动玩家 KEYWORD_HELP 词条） */
+  if (!KEYWORD_HELP[keyword] && !ENEMY_STATUS_HELP[keyword]) ENEMY_STATUS_HELP[keyword] = text;
+  return ` data-keyword="${keyword}" tabindex="0" role="button" aria-label="${escapeAttribute(`${keyword}：${text}`)}"`;
+}
+
 function renderEnemyStatuses() {
   const statuses = [];
   if (game.enemy.id === "corpsepuppet") {
-    statuses.push('<span class="enemy-status enemy-boss-passive" title="尸盘压毒：毒性超过 12 层时，回合结束清除 3 层毒性。">尸盘压毒</span>');
+    statuses.push(`<span class="enemy-status enemy-boss-passive"${enemyStatusAttr("尸盘压毒")}>尸盘压毒</span>`);
     if (game.enemy.phase2) {
-      statuses.push('<span class="enemy-status enemy-boss-phase" title="尸盘转轮：生命过半后，攻击与蓄势增强。">尸盘转轮</span>');
+      statuses.push(`<span class="enemy-status enemy-boss-phase"${enemyStatusAttr("尸盘转轮")}>尸盘转轮</span>`);
     }
   }
-  if (game.enemy.towerPressure) statuses.push('<span class="enemy-status" title="塔压：此战敌人生命略微提高。">塔压</span>');
-  if ((game.enemy.armor || 0) > 0) statuses.push(`<span class="enemy-status enemy-armor-status"${keywordAttr("防御")}>防御 <strong>${game.enemy.armor}</strong></span>`);
-  if (game.enemy.poison > 0) statuses.push(`<span class="enemy-status enemy-poison-status"${keywordAttr("毒性")}>毒性 <strong>${game.enemy.poison}</strong></span>`);
+  /* 第二层敌人狂怒相位（V0.9.6 enrage）可查询 */
+  if (game.enemy.enraged) statuses.push(`<span class="enemy-status enemy-enrage-status"${enemyStatusAttr(game.enemy.enrageName || "狂怒", "生命低于阈值后狂怒，攻击提升。")}>${game.enemy.enrageName || "狂怒"}</span>`);
+  if (game.enemy.towerPressure) statuses.push(`<span class="enemy-status"${enemyStatusAttr("塔压")}>塔压</span>`);
+  if ((game.enemy.armor || 0) > 0) statuses.push(`<span class="enemy-status enemy-armor-status"${enemyStatusAttr("防御")}>防御 <strong>${game.enemy.armor}</strong></span>`);
+  if (game.enemy.poison > 0) statuses.push(`<span class="enemy-status enemy-poison-status"${enemyStatusAttr("毒性")}>毒性 <strong>${game.enemy.poison}</strong></span>`);
   dom.enemyStatusList.innerHTML = statuses.join("");
   if (game.pendingEnemyPoisonPulse) {
     game.pendingEnemyPoisonPulse = false;
@@ -7991,6 +8219,19 @@ function bindEvents() {
   document.addEventListener("focusout", (event) => {
     if (event.target.closest?.("[data-keyword]")) hideKeywordTooltip();
   });
+  /* 手机长按状态图标看说明（玩家/敌人共用 data-keyword） */
+  let __kwLongPressTimer = null;
+  document.addEventListener("touchstart", (event) => {
+    const target = event.target.closest?.("[data-keyword]");
+    if (!target) return;
+    window.clearTimeout(__kwLongPressTimer);
+    __kwLongPressTimer = window.setTimeout(() => showKeywordTooltip(target), 320);
+  }, { passive: true });
+  document.addEventListener("touchend", () => {
+    window.clearTimeout(__kwLongPressTimer);
+    window.setTimeout(hideKeywordTooltip, 1600);
+  }, { passive: true });
+  document.addEventListener("touchmove", () => { window.clearTimeout(__kwLongPressTimer); }, { passive: true });
   document.addEventListener("click", (event) => {
     if (document.body.classList.contains("mobile-audio-open")) {
       const insideAudio = dom.audioControls?.contains(event.target);
