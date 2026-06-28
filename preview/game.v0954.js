@@ -3955,7 +3955,7 @@ function renderGuList(catId) {
     if (isOpen(it)) {
       const face = it.image
         ? '<span class="wangulu-item-glyph wangulu-item-thumb"><img src="' + escGu(it.image) + '" alt="' + escGu(it.name) + '" loading="lazy"></span>'
-        : '<span class="wangulu-item-glyph">' + escGu(guGlyphFor(it)) + '</span>';
+        : '<span class="wangulu-item-glyph' + (isEco ? '' : ' wangulu-glyph-pending') + '">' + escGu(guGlyphFor(it)) + (isEco ? '' : '<i class="wangulu-pending-corner">待补</i>') + '</span>';
       const tag = isEco
         ? '<span class="wangulu-item-rarity wangulu-eco-badge">未实装</span>'
         : '<span class="wangulu-item-rarity wangulu-r-' + escGu(it.rarity) + '">' + escGu(it.rarity) + '</span>';
@@ -3981,7 +3981,7 @@ function renderGuDetail(id) {
   const glyph = guGlyphFor(it);
   const artHtml = it.image
     ? '<img class="wangulu-art-img" src="' + escGu(it.image) + '" alt="' + escGu(it.name) + '" loading="lazy">'
-    : '<span class="wangulu-art-glyph">' + escGu(glyph) + '</span>';
+    : '<span class="wangulu-art-glyph">' + escGu(glyph) + '</span>' + (it.category === "eco" ? '' : '<span class="wangulu-art-pending">待补立绘</span>');
   const row = (label, val) => val ? '<div class="wangulu-row"><span class="wangulu-row-k">' + escGu(label) + '</span><span class="wangulu-row-v">' + escGu(val) + '</span></div>' : "";
   const effectHtml = it.gameplayEffect
     ? '<p class="wangulu-effect">' + escGu(it.gameplayEffect) + '</p><p class="wangulu-short">' + escGu(it.descriptionShort) + '</p>'

@@ -69,7 +69,7 @@ window.GU_CATALOG = [
   },
   {
     id: "gu_fatethread", category: "gu", cardKey: "fateThread",
-    name: "命线蛊", alias: "牵命丝", rarity: "异蛊", faction: "控场", type: "攻击", stage: "异蛊·命形",
+    name: "命线蛊", alias: "牵命丝", rarity: "异蛊", faction: "命途", type: "攻击", stage: "异蛊·命形",
     descriptionShort: "借命势加成、势盛则伤增的命蛊。",
     descriptionLore: "逆命残篇：此蛊体内有一缕看不见的细丝，连主之气运。蛊师攻守相替、命势渐积，丝便绷紧；势满则丝如弓弦，一拨之间割开敌命。无名逆命者无天命可恃，唯以这一线之势，自命途夹缝里硬挣出一条生路。",
     habitat: "无定所，唯附于气运纠缠、生死交错之人。", feeding: "不食血肉，唯汲主之「命势」而长。", temperament: "灵而傲，势弱则蛰伏，势盛则锋出。",
@@ -119,7 +119,7 @@ window.GU_CATALOG = [
   },
   {
     id: "gu_reversepath", category: "gu", cardKey: "reversePath",
-    name: "逆途蛊", alias: "踏命引", rarity: "灵蛊", faction: "控场", type: "辅助", stage: "灵蛊·途形",
+    name: "逆途蛊", alias: "踏命引", rarity: "灵蛊", faction: "命途", type: "辅助", stage: "灵蛊·途形",
     descriptionShort: "零耗积势、攻守相替的命势辅蛊。",
     descriptionLore: "逆命残篇：天命之人顺途而行，无名逆命者却只能逆途夺命。此蛊不耗真元，只在主每一次攻守转换间，悄悄替他攒下一分命势、一缕护气。途虽逆，步步皆数。「顺者天与，逆者自取。」",
     habitat: "无定所，附于不肯认命、屡败屡起之人。", feeding: "不食血肉，汲主攻守交替间漏出的命势。", temperament: "沉静而执，势弱不弃，步步为营。",
