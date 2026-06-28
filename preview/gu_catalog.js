@@ -91,11 +91,11 @@ window.GU_CATALOG = [
     id: "gu_hearteater", category: "gu", cardKey: "heartEater",
     name: "噬心蛊", alias: "啖心赤蛛", rarity: "异蛊", faction: "血道", type: "攻击", stage: "异蛊·赤形",
     descriptionShort: "血煞愈厚、一击啖心的重攻血蛊。",
-    descriptionLore: "血道残卷：此蛊形如赤蛛，多须如根，专寻心血最盛之处下口。血煞未凝时，它只是缓缓啃咬；煞气一足，便如开闸，整颗心连血带念一并啖尽。绛妄门下传言，养此蛊者夜里常听见自己的心跳被另一物数着。（注：桌面立绘题作「蚀心蛊」，按游戏真名归为噬心蛊。）",
+    descriptionLore: "血道残卷：此蛊形如赤蛛，多须如根，专寻心血最盛之处下口。血煞未凝时，它只是缓缓啃咬；煞气一足，便如开闸，整颗心连血带念一并啖尽。绛妄门下传言，养此蛊者夜里常听见自己的心跳被另一物数着。",
     habitat: "盘踞血祭遗坛、尸心未冷的暗祠。", feeding: "唯啖心血与凝结的血煞。", temperament: "贪忍而耐，越是养得久越是难填。",
     evolution: "煞极而变，可与「血月蛊」共振，月圆则啖。", synergy: "与「血刃蛊」「血祭蛊」叠煞，煞满二层则一口翻倍。", counteredBy: "煞气一断便绵软无力；惧疗血与净煞之术。",
     dropsFrom: "通用进阶牌池(战后奖励)、血道蛊奖励。", unlockCondition: "蛊囊中曾收容此蛊即录入。",
-    gameplayEffect: "造成 12 点伤害；血煞不少于 2 层时改为 20。", image: "assets/codex/gu/heart-eater-gu.webp",
+    gameplayEffect: "造成 12 点伤害；血煞不少于 2 层时改为 20。", image: "assets/codex/gu/heart-devour-gu.webp",
   },
   {
     id: "gu_bloodreversal", category: "gu", cardKey: "bloodReversal",
