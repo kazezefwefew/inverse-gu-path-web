@@ -570,6 +570,125 @@ const ENEMY_LIBRARY = {
       corpseCharge: { name: "尸盘蓄势", icon: "盘", kind: "charge", bonus: 7 },
     },
   },
+/* ===== V0.9.6 第二层敌人定义（沿用现有 ENEMY_LIBRARY 结构：actions{kind,damage/bonus,playerPoison,hits,armor,lowHpExtra}、enrage、isElite/isBoss、phase2 由战斗对象承载） ===== */
+/* ---- 瘴林路线（毒/持续伤害/削弱） ---- */
+  rotleafGu: {
+    name: "腐叶蛊虫", title: "瘴林杂蛊", maxHp: 58,
+    kicker: "腐叶簌簌，毒涎滴阶",
+    intro: "腐叶蛊虫蜷在烂叶堆中，背壳渗着青黑黏液，一动便有毒雾散开。",
+    caption: "腐叶蛊虫 · 涎毒缠身",
+    actions: {
+      leafGnaw: { name: "腐叶啃噬", icon: "啃", kind: "attack", damage: 7, playerPoison: 2 },
+      sporeSpray: { name: "孢毒喷吐", icon: "孢", kind: "attack", damage: 4, playerPoison: 3 },
+      miasmaCoil: { name: "蓄瘴", icon: "瘴", kind: "charge", bonus: 5 },
+    },
+  },
+  miasmaParasite: {
+    name: "青瘴寄生", title: "附骨之瘴", maxHp: 60,
+    kicker: "青瘴附骨，越缠越深",
+    intro: "青瘴寄生半透的躯体里游着幽绿瘴气，专挑中毒者下口。",
+    caption: "青瘴寄生 · 噬毒愈凶",
+    actions: {
+      latchBite: { name: "附骨咬", icon: "咬", kind: "attack", damage: 8, playerPoison: 1 },
+      venomDrip: { name: "瘴息渗毒", icon: "渗", kind: "attack", damage: 5, playerPoison: 2, lowHpExtra: 4 },
+      curlGuard: { name: "缩壳蓄瘴", icon: "壳", kind: "charge", bonus: 4, armor: 6 },
+    },
+  },
+  poisonVineCorpse: {
+    name: "毒藤尸", title: "藤缠腐尸", maxHp: 64,
+    kicker: "毒藤穿尸，腐手拖泥",
+    intro: "毒藤尸被瘴藤贯穿提起，半腐的拳头裹着倒刺毒藤砸来。",
+    caption: "毒藤尸 · 藤击拖毒",
+    actions: {
+      vineSlam: { name: "毒藤重击", icon: "藤", kind: "attack", damage: 11, playerPoison: 1 },
+      thornLash: { name: "倒刺连抽", icon: "刺", kind: "attack", damage: 4, hits: 2, playerPoison: 1 },
+      rootBrace: { name: "扎根聚毒", icon: "根", kind: "charge", bonus: 6 },
+    },
+    enrage: { threshold: 0.4, attackBonus: 3, name: "藤毒暴走" },
+  },
+  miasmaLanternEliteGu: {
+    name: "瘴林执灯者", title: "瘴林精英", maxHp: 92, isElite: true,
+    kicker: "鬼灯引瘴，林深无路",
+    intro: "瘴林执灯者提一盏青焰鬼灯缓步而来，灯过之处瘴气如潮翻涌。",
+    caption: "瘴林执灯者 · 灯引万瘴",
+    actions: {
+      lanternStrike: { name: "灯杖横扫", icon: "杖", kind: "attack", damage: 12 },
+      poisonTide: { name: "鬼灯引瘴", icon: "灯", kind: "attack", damage: 5, playerPoison: 4 },
+      greenFlameCharge: { name: "青焰蓄瘴", icon: "焰", kind: "charge", bonus: 5, armor: 5 },
+    },
+    enrage: { threshold: 0.35, attackBonus: 4, name: "鬼灯狂瘴" },
+  },
+  miasmaMotherBoss: {
+    name: "百瘴母蛊", title: "瘴林之主", maxHp: 124, isBoss: true,
+    kicker: "百瘴归巢，林木尽腐",
+    intro: "百瘴母蛊臃肿的腹囊里翻涌着上百种瘴毒，每一次蠕动都喷出新的毒雾。",
+    caption: "百瘴母蛊 · 万毒同巢",
+    actions: {
+      maternalLash: { name: "母蛊拍击", icon: "拍", kind: "attack", damage: 9, playerPoison: 2 },
+      hundredMiasma: { name: "百瘴喷涌", icon: "瘴", kind: "attack", damage: 5, playerPoison: 4 },
+      broodCharge: { name: "孕瘴蓄势", icon: "孕", kind: "charge", bonus: 7 },
+    },
+    /* phase2「瘴母苏醒」改写见 getCurrentEnemyAction 扩展 */
+  },
+/* ---- 血沼路线（血道/自损/吸血/反噬） ---- */
+  bloodLeechSwarm: {
+    name: "血蛭群", title: "血沼蛭潮", maxHp: 56,
+    kicker: "蛭群附身，吸血而肥",
+    intro: "血蛭群从沼泥里成片涌出，吸饱血的躯体油亮发红。",
+    caption: "血蛭群 · 附身吸血",
+    actions: {
+      leechBite: { name: "群蛭噬咬", icon: "蛭", kind: "attack", damage: 4, hits: 2, lifesteal: 4 },
+      bloodGorge: { name: "饱血一吸", icon: "吸", kind: "attack", damage: 8, lifesteal: 6 },
+      writhe: { name: "蠕动蓄势", icon: "蠕", kind: "charge", bonus: 5 },
+    },
+  },
+  brokenMeridianGu: {
+    name: "断脉蛊徒", title: "自戕血修", maxHp: 60,
+    kicker: "自断经脉，以血换力",
+    intro: "断脉蛊徒割开自己的腕脉，任血珠凝成赤刃，越是淌血出手越狠。",
+    caption: "断脉蛊徒 · 自损换攻",
+    actions: {
+      bloodBladeThrow: { name: "血刃掷击", icon: "刃", kind: "attack", damage: 13, selfBleed: 5 },
+      veinTap: { name: "引血加注", icon: "引", kind: "charge", bonus: 6, selfBleed: 4 },
+      crimsonSlash: { name: "赤血斩", icon: "斩", kind: "attack", damage: 8, lowHpExtra: 5 },
+    },
+  },
+  bloodMudGolem: {
+    name: "血泥傀", title: "沼底血傀", maxHp: 66,
+    kicker: "血泥成傀，越打越凝",
+    intro: "血泥傀由凝结的血泥堆塑而成，受创的伤口会再吸沼血补回。",
+    caption: "血泥傀 · 血泥自补",
+    actions: {
+      mudPound: { name: "血泥猛砸", icon: "砸", kind: "attack", damage: 11 },
+      gather: { name: "凝泥固身", icon: "凝", kind: "charge", bonus: 5, armor: 8 },
+      bloodMend: { name: "吸沼回血", icon: "愈", kind: "attack", damage: 6, lifesteal: 8 },
+    },
+    enrage: { threshold: 0.4, attackBonus: 3, name: "血泥暴凝" },
+  },
+  bloodRobePriestEliteGu: {
+    name: "血衣祭蛊者", title: "血沼精英", maxHp: 96, isElite: true,
+    kicker: "血衣加身，以命饲蛊",
+    intro: "血衣祭蛊者披一件浸透鲜血的法袍，每一次挥洒都先割开自己。",
+    caption: "血衣祭蛊者 · 血祭压迫",
+    actions: {
+      sacrificeStrike: { name: "血祭挥击", icon: "祭", kind: "attack", damage: 13, selfBleed: 6, lowHpExtra: 6 },
+      sanguineWard: { name: "血衣护体", icon: "衣", kind: "charge", bonus: 5, armor: 6, lifesteal: 6 },
+      crimsonRain: { name: "血雨连击", icon: "雨", kind: "attack", damage: 5, hits: 2 },
+    },
+    enrage: { threshold: 0.35, attackBonus: 4, name: "血祭狂涌" },
+  },
+  bloodRobeMotherBoss: {
+    name: "血衣蛊母", title: "血沼之主", maxHp: 128, isBoss: true,
+    kicker: "血衣覆世，血债同偿",
+    intro: "血衣蛊母端坐于血池之上，周身血衣无风自动，越是搏杀她越亢奋。",
+    caption: "血衣蛊母 · 血债血偿",
+    actions: {
+      robeLash: { name: "血衣绞击", icon: "绞", kind: "attack", damage: 10, lifesteal: 5 },
+      bloodOffering: { name: "血祭重击", icon: "祭", kind: "attack", damage: 14, selfBleed: 6, lowHpExtra: 6 },
+      crimsonGather: { name: "聚血蓄势", icon: "聚", kind: "charge", bonus: 7, lifesteal: 6 },
+    },
+    /* phase2「血衣覆身」改写见 getCurrentEnemyAction 扩展 */
+  },
 };
 
 const NORMAL_ENEMY_IDS = ["shanxiao", "bloodwolf", "beeswarm", "rottenShanxiao", "redManeBloodwolf", "wildBeeTide"];
@@ -739,7 +858,7 @@ const LORE_SKIP_ANIMATION_STORAGE_KEY = "reverseGu.lore.skipAnimation";
 const RECORDING_MODE_STORAGE_KEY = "reverseGu.recordingMode.enabled";
 const TRIAL_MODE_STORAGE_KEY = "reverseGu.trial.mode";
 const TRIAL_SEED_STORAGE_KEY = "reverseGu.trial.seedDraft";
-const GAME_VERSION = "V0.9.5.2 万蛊录任务预埋版";
+const GAME_VERSION = "V0.9.6 第二层生态关卡预览版";
 // TODO: 后续多幕路线扩展时继续抽象 finalNode / bossNode，避免固定四段流程继续扩散。
 const MAX_ROUTE_STEP = 4;
 const BOSS_ROUTE_STEP = 4;
@@ -916,6 +1035,9 @@ function createRunStats() {
     bossPoisonSuppressedLayers: 0,
     bossHighestPoison: 0,
     bossPhase2Triggered: false,
+    layer2Entered: false,
+    layer2Route: "",
+    layer2BossDefeated: false,
     stableRefines: 0,
     mutations: 0,
     backlashes: 0,
@@ -2654,9 +2776,344 @@ function removeRandomBasicCard() {
   return removeDeckEntryById(target.instanceId);
 }
 
+/* ============================================================
+ * V0.9.6 第二层「生态关卡」最小可玩流程（加性·不重构地图）
+ * 设计：不进入 mapState 分段引擎，单独用 runState.layer2 线性推进，
+ *       每个节点临时写入 runState.currentNode（合成节点）后复用现有
+ *       startFloorBattle / openChanceEvent / openShopNode / openRestNode，
+ *       战斗/事件完成回到 layer2 调度而非 completeCurrentNodeAndReturnMap。
+ * ============================================================ */
+
+/* 两条路线定义：介绍/推荐流派/风险/敌人序列 + 倾向奖励权重（用现有卡，不新增卡） */
+const LAYER2_ROUTES = {
+  miasma: {
+    id: "miasma",
+    name: "瘴林深径",
+    icon: "瘴",
+    intro: "瘴气终年不散的腐林，毒越积越深。久战者烂，速攻者亦难全身而退。",
+    recommend: "推荐流派：毒道 / 虫群（叠毒滚雪球）",
+    risk: "风险：敌人持续施毒，毒层越高其伤越重；拖延越久越危险。",
+    enemiesPreview: "可能遭遇：腐叶蛊虫 · 青瘴寄生 · 毒藤尸 · 瘴林执灯者 · 百瘴母蛊",
+    /* 节点链：普通→普通→三选一→精英→奖励→Boss（结构最小、复用现有节点类型） */
+    nodes: [
+      { kind: "battle", enemyId: "rotleafGu", name: "腐叶林径" },
+      { kind: "battle", enemyId: "miasmaParasite", name: "青瘴湿洼", enemyHpMultiplier: 1.05 },
+      { kind: "branch", name: "瘴径分岔" },
+      { kind: "elite", enemyId: "miasmaLanternEliteGu", name: "执灯者" },
+      { kind: "reward", name: "瘴林残卷" },
+      { kind: "boss", enemyId: "miasmaMotherBoss", name: "百瘴巢穴" },
+    ],
+    bossId: "miasmaMotherBoss",
+    /* 倾向奖励：在现有牌池里加权这些 key（不改池、不新增卡） */
+    favoredCardKeys: ["greenMiasma", "poisonReturn", "insectSwarm", "heartEater"],
+    loreId: "unfinished", /* 复用现有残卷页解锁，不新增残卷数据 */
+    codexTaskId: "codex_miasmaProbe",
+    bossTaskId: "codex_miasmaName",
+  },
+  bloodmarsh: {
+    id: "bloodmarsh",
+    name: "血沼沉渊",
+    icon: "血",
+    intro: "尸血淤积的深沼，血道蛊修在此以命饲蛊。你越虚弱，沼中之物越亢奋。",
+    recommend: "推荐流派：血道（以血煞爆发收割）",
+    risk: "风险：敌人自损换攻、吸血续命；你血量越低，它们压迫越强。",
+    enemiesPreview: "可能遭遇：血蛭群 · 断脉蛊徒 · 血泥傀 · 血衣祭蛊者 · 血衣蛊母",
+    nodes: [
+      { kind: "battle", enemyId: "bloodLeechSwarm", name: "蛭潮浅滩" },
+      { kind: "battle", enemyId: "brokenMeridianGu", name: "断脉血径", enemyHpMultiplier: 1.05 },
+      { kind: "branch", name: "血沼分岔" },
+      { kind: "elite", enemyId: "bloodRobePriestEliteGu", name: "血衣祭坛" },
+      { kind: "reward", name: "血道残谱" },
+      { kind: "boss", enemyId: "bloodRobeMotherBoss", name: "血池深渊" },
+    ],
+    bossId: "bloodRobeMotherBoss",
+    favoredCardKeys: ["bloodBlade", "bloodReversal", "burningEssence", "heartEater"],
+    loreId: "unfinished",
+    codexTaskId: "codex_bloodmarshProbe",
+    bossTaskId: "codex_bloodRobeName",
+  },
+};
+
+/* 第二层进度持久化（仅供图鉴任务 count() 只读展示，不发奖） */
+const LAYER2_PROGRESS_KEY = "nmg.layer2.progress";
+function layer2LoadProgress() {
+  try { const r = localStorage.getItem(LAYER2_PROGRESS_KEY); const o = r ? JSON.parse(r) : {}; return (o && typeof o === "object") ? o : {}; }
+  catch (err) { return {}; }
+}
+function layer2SaveProgress(o) {
+  try { localStorage.setItem(LAYER2_PROGRESS_KEY, JSON.stringify(o && typeof o === "object" ? o : {})); } catch (err) { /* 忽略 */ }
+}
+function layer2MarkProgress(field) {
+  const o = layer2LoadProgress();
+  o[field] = (o[field] | 0) + 1;
+  layer2SaveProgress(o);
+}
+
+/* 第二层万蛊录解锁：enemy/boss 条目无 cardKey，单独用持久集合记“已遭遇” */
+const LAYER2_BESTIARY_KEY = "nmg.layer2.bestiary";
+function layer2LoadBestiary() {
+  try { const r = localStorage.getItem(LAYER2_BESTIARY_KEY); const a = r ? JSON.parse(r) : []; return new Set(Array.isArray(a) ? a : []); }
+  catch (err) { return new Set(); }
+}
+function layer2MarkBestiary(enemyId) {
+  if (!enemyId) return;
+  const set = layer2LoadBestiary();
+  if (set.has(enemyId)) return;
+  set.add(enemyId);
+  try { localStorage.setItem(LAYER2_BESTIARY_KEY, JSON.stringify([...set])); } catch (err) { /* 忽略 */ }
+}
+
+/* ===== 命途未尽：一层 Boss 胜利后的选择面板（结算 / 深入） ===== */
+function showUnfinishedPathChoice() {
+  /* 复用 result-overlay 与两个现成按钮，不新增 index.html DOM */
+  dom.cardRewardPanel.classList.add("hidden");
+  dom.materialRewardPanel?.classList.add("hidden");
+  dom.refinePanel.classList.add("hidden");
+  dom.furnacePanel?.classList.add("hidden");
+  dom.eventPanel?.classList.add("hidden");
+  dom.shopPanel?.classList.add("hidden");
+  dom.eliteConfirmPanel?.classList.add("hidden");
+  dom.runSummary?.classList.add("hidden");
+  dom.resultOverlay.querySelector(".result-card").className = "result-card map-result unfinished-path-result";
+  dom.resultSeal.textContent = "途";
+  dom.resultEyebrow.textContent = "命途未尽 · 塔顶之上";
+  dom.resultTitle.textContent = "尸盘已破，去路未尽";
+  dom.resultDescription.textContent = "尸盘监守倒下，塔顶裂开一道向下的暗径——瘴气与血腥自深处涌上。就此收功，抑或踏入更深的生态？";
+  dom.resultDeckButton?.classList.remove("hidden");
+  dom.resultStatsButton?.classList.remove("hidden");
+  dom.resultLoreButton?.classList.remove("hidden");
+  dom.resultFeedbackButton?.classList.add("hidden");
+  dom.resultPrimaryButton.textContent = "继续深入";
+  dom.resultPrimaryButton.dataset.action = "enterLayer2";
+  dom.resultPrimaryButton.classList.remove("hidden");
+  dom.resultSecondaryButton.textContent = "就此结算";
+  dom.resultSecondaryButton.dataset.action = "settleLayer1";
+  dom.resultSecondaryButton.classList.remove("hidden");
+  dom.resultOverlay.classList.remove("hidden");
+  document.body.classList.add("modal-open");
+  refreshModalLock();
+}
+
+/* 选择「就此结算」：走原结算流程 */
+function settleAtLayer1() {
+  runState.status = "cleared";
+  dom.resultSecondaryButton.dataset.action = "";
+  dom.resultSecondaryButton.classList.add("hidden");
+  showRunConclusion(true);
+}
+
+/* ===== 路线选择面板 ===== */
+function showLayer2RouteSelect() {
+  dom.runSummary?.classList.add("hidden");
+  dom.resultOverlay.querySelector(".result-card").className = "result-card map-result layer2-route-result";
+  dom.resultSeal.textContent = "径";
+  dom.resultEyebrow.textContent = "第二层 · 生态分岔";
+  dom.resultTitle.textContent = "择一径深入";
+  dom.resultDescription.textContent = "两条生态歧路在脚下展开，择定便难回头。";
+  /* 用 runSummary 容器铺两张路线卡（复用其滚动样式） */
+  const card = (r) => `
+    <button type="button" class="layer2-route-card" data-layer2-route="${r.id}">
+      <span class="layer2-route-icon">${r.icon}</span>
+      <strong class="layer2-route-name">${r.name}</strong>
+      <p class="layer2-route-intro">${r.intro}</p>
+      <p class="layer2-route-line layer2-route-rec">${r.recommend}</p>
+      <p class="layer2-route-line layer2-route-risk">${r.risk}</p>
+      <p class="layer2-route-line layer2-route-foes">${r.enemiesPreview}</p>
+    </button>`;
+  dom.runSummary.innerHTML = `<div class="layer2-route-grid">${card(LAYER2_ROUTES.miasma)}${card(LAYER2_ROUTES.bloodmarsh)}</div>`;
+  dom.runSummary.classList.remove("hidden");
+  dom.resultPrimaryButton.classList.add("hidden");
+  dom.resultSecondaryButton.classList.add("hidden");
+  dom.resultOverlay.classList.remove("hidden");
+  refreshModalLock();
+  /* 委托点击：在 bindEvents 已加 runSummary 监听 */
+}
+
+/* 选定路线，初始化 layer2 状态并推进首个节点 */
+function chooseLayer2Route(routeId) {
+  const route = LAYER2_ROUTES[routeId];
+  if (!route || !runState) return;
+  runState.layer2 = {
+    active: true,
+    routeId,
+    routeName: route.name,
+    nodeIndex: 0,
+    branchChoice: "",
+    bossDefeated: false,
+    nodesCleared: 0,
+    lastNodeName: "第二层入口",
+  };
+  layer2MarkProgress(routeId === "miasma" ? "miasmaEntered" : "bloodmarshEntered");
+  getRunStats().layer2Entered = true;
+  getRunStats().layer2Route = route.name;
+  unlockLorePage(route.codexTaskId === "codex_miasmaProbe" ? "unfinished" : "unfinished");
+  addJourneyLog(`命途未尽：你踏入第二层「${route.name}」。`, "important");
+  dom.runSummary.classList.add("hidden");
+  layer2Advance();
+}
+
+/* 第二层调度：依 nodeIndex 取节点，写入合成 currentNode，复用现有节点入口 */
+function layer2Advance() {
+  const st = runState?.layer2;
+  if (!st || !st.active) return;
+  const route = LAYER2_ROUTES[st.routeId];
+  const node = route.nodes[st.nodeIndex];
+  if (!node) { showLayer2Conclusion(true); return; }
+  st.lastNodeName = `${route.name}·${node.name}`;
+  if (node.kind === "branch") { showLayer2Branch(node); return; }
+  if (node.kind === "reward") { openLayer2Reward(node); return; }
+  /* battle / elite / boss：写合成节点后复用 startFloorBattle */
+  const synthType = node.kind === "boss" ? "boss" : (node.kind === "elite" ? "elite" : "battle");
+  runState.currentNode = {
+    id: `layer2-${st.routeId}-${st.nodeIndex}`,
+    step: MAX_ROUTE_STEP, /* 让 startFloorBattle 不误判普通层进度；层级判断改走 layer2.active */
+    type: synthType,
+    enemyId: node.enemyId,
+    enemyHpMultiplier: node.enemyHpMultiplier || (synthType === "boss" ? 1 : 1),
+    icon: synthType === "boss" ? "盘" : (synthType === "elite" ? "煞" : "兽"),
+    name: node.name,
+    description: synthType === "boss" ? "生态之主，破之深行。" : (synthType === "elite" ? "生态精英，厚利藏险。" : "生态凶影，胜后取蛊。"),
+    layer2: true,
+  };
+  layer2MarkBestiary(node.enemyId);
+  dom.resultOverlay.classList.add("hidden");
+  refreshModalLock();
+  startFloorBattle();
+}
+
+/* 第二层节点完成后推进（被 finishBattle 胜利分支 / 奖励完成 / 事件完成调用） */
+function layer2OnNodeCleared() {
+  const st = runState?.layer2;
+  if (!st || !st.active) return false;
+  const route = LAYER2_ROUTES[st.routeId];
+  const node = route.nodes[st.nodeIndex];
+  st.nodesCleared += 1;
+  if (node && node.kind === "boss") {
+    st.bossDefeated = true;
+    getRunStats().layer2BossDefeated = true;
+    layer2MarkProgress(st.routeId === "miasma" ? "miasmaBossDefeated" : "bloodmarshBossDefeated");
+    st.nodeIndex += 1;
+    showLayer2Conclusion(true);
+    return true;
+  }
+  st.nodeIndex += 1;
+  layer2Advance();
+  return true;
+}
+
+/* 三选一分岔：普通战 / 休整 / 蛊坊（复用现有事件、休整、蛊坊入口） */
+function showLayer2Branch(node) {
+  const st = runState.layer2;
+  const route = LAYER2_ROUTES[st.routeId];
+  dom.resultOverlay.querySelector(".result-card").className = "result-card map-result layer2-branch-result";
+  dom.cardRewardPanel.classList.add("hidden");
+  dom.runSummary?.classList.add("hidden");
+  dom.resultSeal.textContent = "岔";
+  dom.resultEyebrow.textContent = `第二层 · ${route.name}`;
+  dom.resultTitle.textContent = node.name;
+  dom.resultDescription.textContent = "三念定局，择一而行。";
+  dom.runSummary.innerHTML = `<div class="layer2-branch-grid">
+    <button type="button" class="layer2-branch-card" data-layer2-branch="event"><strong>探秘机缘</strong><small>触发一次生态机缘事件</small></button>
+    <button type="button" class="layer2-branch-card" data-layer2-branch="rest"><strong>沼隙休整</strong><small>回血或固本，养息一息</small></button>
+    <button type="button" class="layer2-branch-card" data-layer2-branch="shop"><strong>残灯蛊坊</strong><small>以蛊石易牌与炼化机会</small></button>
+  </div>`;
+  dom.runSummary.classList.remove("hidden");
+  dom.resultPrimaryButton.classList.add("hidden");
+  dom.resultSecondaryButton.classList.add("hidden");
+  dom.resultOverlay.classList.remove("hidden");
+  refreshModalLock();
+}
+
+/* 选定分岔类型：复用现有非战斗节点入口；完成回调统一走 layer2 */
+function chooseLayer2Branch(kind) {
+  const st = runState?.layer2;
+  if (!st || !st.active) return;
+  st.branchChoice = kind;
+  dom.runSummary.classList.add("hidden");
+  runState.currentNode = {
+    id: `layer2-${st.routeId}-${st.nodeIndex}`,
+    step: MAX_ROUTE_STEP, type: kind,
+    icon: kind === "event" ? "缘" : (kind === "rest" ? "息" : "坊"),
+    name: kind === "event" ? "生态机缘" : (kind === "rest" ? "沼隙休整" : "残灯蛊坊"),
+    description: MAP_NODE_DESCRIPTIONS[kind] || "", layer2: true,
+  };
+  dom.resultOverlay.classList.add("hidden");
+  refreshModalLock();
+  if (kind === "event") openChanceEvent();
+  else if (kind === "rest") openRestNode();
+  else if (kind === "shop") openShopNode();
+}
+
+/* 第二层奖励节点：在现有牌奖励池上对该路线倾向 key 加权（不改池、不新增卡） */
+function openLayer2Reward(node) {
+  const st = runState.layer2;
+  const route = LAYER2_ROUTES[st.routeId];
+  unlockLorePage(route.loreId); /* 复用现成残卷页，作“路线残卷”露出 */
+  runState.layer2.rewardResolved = false;
+  /* 复用 openCardReward 的展示，但用倾向选牌覆盖候选 */
+  const choices = generateLayer2RewardChoices(route);
+  runState.pendingRewardKeys = choices;
+  dom.resultOverlay.querySelector(".result-card").className = "result-card";
+  dom.resultSeal.textContent = "获";
+  dom.resultEyebrow.textContent = `第二层 · ${route.name} 残卷`;
+  dom.resultTitle.textContent = "生态收获";
+  dom.resultDescription.textContent = "生态深处遗落的蛊卵，倾向此径之道。三选其一，或舍弃前行。";
+  dom.runSummary?.classList.add("hidden");
+  dom.cardRewardChoices.innerHTML = choices.map((key) => {
+    const item = CARD_LIBRARY[key];
+    return `<button class="reward-card" type="button" data-reward-card="${key}">
+      <span class="reward-card-glyph">${item.glyph}</span><strong>${item.name}</strong>
+      <small>${item.typeName} · ${item.cost} 真元</small><p>${getCardEffect(key, 0)}</p>
+    </button>`;
+  }).join("");
+  dom.skipRewardButton.disabled = false;
+  dom.cardRewardPanel.classList.remove("hidden");
+  dom.refinePanel.classList.add("hidden");
+  dom.resultPrimaryButton.classList.add("hidden");
+  dom.resultSecondaryButton.classList.add("hidden");
+  dom.resultOverlay.classList.remove("hidden");
+  refreshModalLock();
+}
+
+/* 倾向加权选牌：优先从 favoredCardKeys 取，余位用现有通用池补（去重） */
+function generateLayer2RewardChoices(route) {
+  const used = new Set();
+  const out = [];
+  const favored = (route.favoredCardKeys || []).filter((k) => CARD_LIBRARY[k]);
+  while (out.length < 2 && favored.length) {
+    const k = takeUniqueRandom(favored, used);
+    if (!k) break;
+    out.push(k); used.add(k);
+  }
+  while (out.length < 3) {
+    const k = getRandomRewardCardKey({ rare: Math.random() < 0.35 });
+    if (!k) break;
+    if (!used.has(k)) { out.push(k); used.add(k); }
+    if (used.size > 30) break;
+  }
+  return out.slice(0, 3);
+}
+
+/* 第二层结算页：扩展显示（是否进入二层/路线/Boss/节点/新增条目数） */
+function showLayer2Conclusion(cleared) {
+  const st = runState.layer2 || {};
+  runState.status = "cleared";
+  /* 把二层结果并入现有 showRunConclusion；统计字段已在 getRunStats 写入 */
+  showRunConclusion(true);
+  /* 在结算 summary 顶部补一段第二层信息（DOM 追加，不改 showRunConclusion 主体） */
+  const route = LAYER2_ROUTES[st.routeId];
+  const extra = document.createElement("div");
+  extra.className = "run-summary-item wide layer2-summary-block";
+  extra.innerHTML = `<span>第二层 · ${route ? route.name : "未进入"}</span><strong>` +
+    `Boss「${route ? LAYER2_ROUTES[st.routeId].name : "-"}」${st.bossDefeated ? "已破" : "未破"} · ` +
+    `推进 ${st.nodesCleared || 0} 节点 · 终点「${st.lastNodeName || "-"}」</strong>`;
+  dom.runSummary?.prepend(extra);
+}
+
 function completeOverlayNode() {
   dom.resultOverlay.classList.add("hidden");
   refreshModalLock();
+  if (runState?.layer2?.active) { layer2OnNodeCleared(); return; }
   completeCurrentNodeAndReturnMap();
 }
 
@@ -3603,10 +4060,26 @@ function chooseEnemyIntent() {
 function getCurrentEnemyAction() {
   const action = game.enemy.definition.actions[game.enemy.intent];
   if (!action) return {};
-  if (game.enemy.id !== "corpsepuppet" || !game.enemy.phase2) return action;
-  if (game.enemy.intent === "corpseClaw") return { ...action, damage: 12 };
-  if (game.enemy.intent === "guFireBreath") return { ...action, damage: 8, playerPoison: 3 };
-  if (game.enemy.intent === "corpseCharge") return { ...action, bonus: 9 };
+  if (game.enemy.phase2) {
+    // 尸盘监守（一层 Boss）相位改写，保持原值不动
+    if (game.enemy.id === "corpsepuppet") {
+      if (game.enemy.intent === "corpseClaw") return { ...action, damage: 12 };
+      if (game.enemy.intent === "guFireBreath") return { ...action, damage: 8, playerPoison: 3 };
+      if (game.enemy.intent === "corpseCharge") return { ...action, bonus: 9 };
+    }
+    // 第二层 Boss · 百瘴母蛊「瘴母苏醒」：毒更猛
+    if (game.enemy.id === "miasmaMotherBoss") {
+      if (game.enemy.intent === "maternalLash") return { ...action, damage: 11, playerPoison: 3 };
+      if (game.enemy.intent === "hundredMiasma") return { ...action, damage: 7, playerPoison: 6 };
+      if (game.enemy.intent === "broodCharge") return { ...action, bonus: 9 };
+    }
+    // 第二层 Boss · 血衣蛊母「血衣覆身」：吸血与压迫更强
+    if (game.enemy.id === "bloodRobeMotherBoss") {
+      if (game.enemy.intent === "robeLash") return { ...action, damage: 12, lifesteal: 7 };
+      if (game.enemy.intent === "bloodOffering") return { ...action, damage: 17, lowHpExtra: 8 };
+      if (game.enemy.intent === "crimsonGather") return { ...action, bonus: 9, lifesteal: 8 };
+    }
+  }
   return action;
 }
 
@@ -3793,6 +4266,13 @@ function playCardSfx(card) {
 
 // 更新公告（只记正式版本；最新的放最前）。
 const UPDATE_LOG = [
+  { v: "V0.9.6", title: "第二层生态关卡预览", notes: [
+    "一层 Boss 后新增「命途未尽」：可就此结算，或继续深入第二层",
+    "第二层两条生态路线：瘴林深径（毒道）与血沼沉渊（血道），各含普通/三选一/精英/奖励/Boss",
+    "新增 10 名生态敌人与 2 名生态 Boss（百瘴母蛊 / 血衣蛊母，皆有半血相位）",
+    "万蛊录开放「敌怪图谱」「首领残卷」「生态」条目，遭遇即录、无立绘走暗色占位",
+    "图鉴任务预埋瘴林初探/血沼初探/百瘴留名/血衣未散；结算与反馈新增第二层信息",
+  ] },
   { v: "V0.9.4", title: "战斗手感与卡牌预览", notes: [
     "敌人意图新增「预计掉 X 血（已算护甲）」，大威胁时意图框红光警示",
     "出牌、受击加入轻微振动反馈（手机）",
@@ -3842,8 +4322,8 @@ const GU_CATEGORIES = [
   { id: "task", label: "图鉴任务", ready: true },
   { id: "lore", label: "命蛊残卷", ready: true },
   { id: "eco", label: "生态·未实装", ready: true },
-  { id: "enemy", label: "敌怪图谱", ready: false },
-  { id: "boss", label: "首领残卷", ready: false },
+  { id: "enemy", label: "敌怪图谱", ready: true },
+  { id: "boss", label: "首领残卷", ready: true },
   { id: "anecdote", label: "命途异闻", ready: false },
   { id: "faction", label: "流派源流", ready: false },
 ];
@@ -3960,13 +4440,18 @@ function renderWanGuLu() {
 function renderGuList(catId) {
   catId = catId || "gu";
   const isEco = catId === "eco";
+  const isBestiary = catId === "enemy" || catId === "boss";
   const items = (window.GU_CATALOG || []).filter((it) => it.category === catId);
   const discovered = getDiscoveredGuKeys();
-  const isOpen = (it) => isEco ? true : isGuUnlocked(it, discovered);
+  const bestiary = isBestiary ? layer2LoadBestiary() : null;
+  const isOpen = (it) => isEco ? true : (isBestiary ? (it.enemyId ? bestiary.has(it.enemyId) : true) : isGuUnlocked(it, discovered));
   let head = "";
   let shown = items;
   if (isEco) {
     head = '<p class="wangulu-counter">生态图鉴 · 共 ' + items.length + ' 种（暂未实装为战斗蛊牌）</p>';
+  } else if (isBestiary) {
+    const seen = items.filter((it) => isOpen(it)).length;
+    head = '<p class="wangulu-counter">' + (catId === "boss" ? "首领残卷" : "敌怪图谱") + ' · 已遇 ' + seen + ' / ' + items.length + '（遭遇即录）</p>';
   } else {
     const filter = GU_FILTERS.find((f) => f.id === wanGuLuState.filter) || GU_FILTERS[0];
     shown = items.filter((it) => filter.test(it, discovered));
@@ -3981,9 +4466,10 @@ function renderGuList(catId) {
   if (!shown.length) { grid += '<div class="wangulu-empty">无符此筛之蛊。</div>'; }
   shown.forEach((it) => {
     if (isOpen(it)) {
+      const pendingFace = (isEco || isBestiary) ? false : true;
       const face = it.image
         ? '<span class="wangulu-item-glyph wangulu-item-thumb"><img src="' + escGu(it.image) + '" alt="' + escGu(it.name) + '" loading="lazy"></span>'
-        : '<span class="wangulu-item-glyph' + (isEco ? '' : ' wangulu-glyph-pending') + '">' + escGu(guGlyphFor(it)) + (isEco ? '' : '<i class="wangulu-pending-corner">待补</i>') + '</span>';
+        : '<span class="wangulu-item-glyph' + (pendingFace ? ' wangulu-glyph-pending' : '') + (isBestiary ? ' wangulu-glyph-foe' : '') + '">' + escGu(guGlyphFor(it)) + (pendingFace ? '<i class="wangulu-pending-corner">待补</i>' : '') + '</span>';
       const tag = isEco
         ? '<span class="wangulu-item-rarity wangulu-eco-badge">未实装</span>'
         : '<span class="wangulu-item-rarity wangulu-r-' + escGu(it.rarity) + '">' + escGu(it.rarity) + '</span>';
@@ -4005,7 +4491,7 @@ function renderGuDetail(id) {
   const it = (window.GU_CATALOG || []).find((x) => x.id === id);
   if (!it) return '<div class="wangulu-empty">残页佚失。</div>';
   const discovered = getDiscoveredGuKeys();
-  if (it.category !== "eco" && !isGuUnlocked(it, discovered)) { wanGuLuState.detailId = null; return renderGuList(wanGuLuState.tab); }
+  if (it.category !== "eco" && it.category !== "enemy" && it.category !== "boss" && !isGuUnlocked(it, discovered)) { wanGuLuState.detailId = null; return renderGuList(wanGuLuState.tab); }
   const glyph = guGlyphFor(it);
   const artHtml = it.image
     ? '<img class="wangulu-art-img" src="' + escGu(it.image) + '" alt="' + escGu(it.name) + '" loading="lazy">'
@@ -4119,6 +4605,30 @@ const CODEX_TASKS = [
       try { return (typeof LORE_PAGES !== "undefined" ? LORE_PAGES : []).filter((p) => isLoreUnlocked(p.id)).length; }
       catch (err) { return 0; }
     },
+  },
+  { id: "codex_miasmaProbe", name: "瘴林初探", target: 1,
+    condition: "进入第二层「瘴林深径」1 次。",
+    rewardPreview: "后续版本：解锁毒道特殊蛊机会。",
+    status: "seed", note: "预埋·后续版本开放",
+    count: () => { try { return (layer2LoadProgress().miasmaEntered | 0) > 0 ? 1 : 0; } catch (err) { return 0; } },
+  },
+  { id: "codex_bloodmarshProbe", name: "血沼初探", target: 1,
+    condition: "进入第二层「血沼沉渊」1 次。",
+    rewardPreview: "后续版本：解锁血道特殊蛊机会。",
+    status: "seed", note: "预埋·后续版本开放",
+    count: () => { try { return (layer2LoadProgress().bloodmarshEntered | 0) > 0 ? 1 : 0; } catch (err) { return 0; } },
+  },
+  { id: "codex_miasmaName", name: "百瘴留名", target: 1,
+    condition: "击败第二层 Boss「百瘴母蛊」。",
+    rewardPreview: "后续版本：解锁瘴林残卷。",
+    status: "seed", note: "预埋·后续版本开放",
+    count: () => { try { return (layer2LoadProgress().miasmaBossDefeated | 0) > 0 ? 1 : 0; } catch (err) { return 0; } },
+  },
+  { id: "codex_bloodRobeName", name: "血衣未散", target: 1,
+    condition: "击败第二层 Boss「血衣蛊母」。",
+    rewardPreview: "后续版本：解锁血道残谱。",
+    status: "seed", note: "预埋·后续版本开放",
+    count: () => { try { return (layer2LoadProgress().bloodmarshBossDefeated | 0) > 0 ? 1 : 0; } catch (err) { return 0; } },
   },
 ];
 function codexTaskById(id) { return CODEX_TASKS.find((t) => t.id === id) || null; }
@@ -4826,6 +5336,29 @@ function isCorpseDiskBoss() {
   return Boolean(game?.enemy?.definition?.isBoss && game.enemy.id === "corpsepuppet");
 }
 
+// 第二层 Boss 半血相位：复用尸盘监守的检测/触发结构，仅换 id 与文案
+function isLayer2PhaseBoss() {
+  return Boolean(game?.enemy?.definition?.isBoss && (game.enemy.id === "miasmaMotherBoss" || game.enemy.id === "bloodRobeMotherBoss"));
+}
+function checkLayer2BossPhase2() {
+  if (!isLayer2PhaseBoss()) return false;
+  if (game.enemy.phase2 || game.enemy.hp <= 0) return false;
+  if (game.enemy.hp > game.enemy.maxHp * 0.5) return false;
+  game.enemy.phase2 = true;
+  getRunStats().bossPhase2Triggered = true;
+  const isMiasma = game.enemy.id === "miasmaMotherBoss";
+  const title = isMiasma ? "瘴母苏醒" : "血衣覆身";
+  const desc = isMiasma ? "百瘴翻涌，毒雾遮天，杀意暴涨。" : "血衣无风自动，血债加倍偿还。";
+  addLog(`${title}：${desc}`, "boss-log");
+  setBattleMessage(`${title}：${desc}`);
+  showTurnBanner(title, desc);
+  renderEnemyPortrait();
+  renderEnemyStatuses();
+  renderIntent();
+  document.querySelector(".enemy-panel")?.classList.add("phase2-mode");
+  return true;
+}
+
 function recordBossPoisonPeak() {
   if (!isCorpseDiskBoss()) return;
   const stats = getRunStats();
@@ -4887,6 +5420,7 @@ function resolveAttack(card, baseDamage, detail = "") {
   }
   playAttackEffect(card);
   checkCorpseDiskPhase2();
+  checkLayer2BossPhase2();
   return realDamage;
 }
 
@@ -4991,6 +5525,7 @@ function resolvePoisonAtEnemyTurnEnd() {
   if (damage <= 0) return;
   game.enemy.hp = Math.max(0, game.enemy.hp - damage);
   recordPoisonDamage(damage);
+  checkLayer2BossPhase2();
   addLog(`毒性发作，对${game.enemy.definition.name}造成 ${damage} 点伤害。`, "poison-log");
   setBattleMessage(`毒蛊侵入经络，${game.enemy.definition.name}受到 ${damage} 点毒性伤害！`);
   spawnFloatText(dom.enemyPortrait, `毒 -${damage}`, "poison-float");
@@ -5113,11 +5648,22 @@ function finishBattle(victory) {
       runState.lastBattleRewards = { type: "battle", stones: 10, materialId: null, furnace: false };
     }
     // TODO: 后续多幕路线扩展时抽象 finalNode / bossNode。
+    if (runState.layer2?.active) {
+      // 第二层战斗：胜利后交由第二层调度（Boss→二层结算，其余→下一节点）
+      dom.resultTurns.textContent = game.turn;
+      dom.resultHp.textContent = game.player.hp;
+      layer2OnNodeCleared();
+      return;
+    }
     if (runState.currentNode?.type === "boss" || runState.floor === MAX_ROUTE_STEP) {
       unlockLorePage("unfinished");
-      runState.status = "cleared";
       completeCurrentBattleNode();
-      showRunConclusion(true);
+      // 一层 Boss 胜利不再强制结算：先弹「命途未尽」让玩家选结算/深入
+      dom.resultTurns.textContent = game.turn;
+      dom.resultHp.textContent = game.player.hp;
+      showUnfinishedPathChoice();
+      render();
+      return;
     } else {
       openCardReward();
     }
@@ -5816,6 +6362,7 @@ function advanceToNextFloor() {
   if (runState.currentNode?.type === "elite" && !runState.furnaceResolved) return;
   dom.resultOverlay.classList.add("hidden");
   refreshModalLock();
+  if (runState?.layer2?.active) { layer2OnNodeCleared(); return; }
   completeCurrentNodeAndReturnMap();
 }
 
@@ -6006,6 +6553,11 @@ function getRunStatsCopyText(cleared = runState?.status === "cleared") {
     `角色：${hero}`,
     `本命遗物：${relic}`,
     `路线：${getRouteSummaryText()}`,
+    `是否进入第二层：${runState.layer2?.active ? "是" : "否"}`,
+    `第二层路线：${runState.layer2?.active ? safeFeedbackText(runState.layer2.routeName) : "未进入"}`,
+    `第二层Boss击败：${runState.layer2?.bossDefeated ? "是" : (runState.layer2?.active ? "否" : "未进入")}`,
+    `第二层终点节点：${runState.layer2?.active ? safeFeedbackText(runState.layer2.lastNodeName) : "无"}`,
+    `新增万蛊录条目（已遇敌怪/首领）：${(typeof layer2LoadBestiary === "function" ? layer2LoadBestiary().size : 0)}`,
     `第 3 段选择：${getThirdStepChoiceSummary()}`,
     `休整结果：${getRestResultSummary()}`,
     `是否通关：${cleared ? "是" : "否"}`,
@@ -6080,6 +6632,11 @@ function getFeedbackInfoText(cleared = runState?.status === "cleared") {
     `是否通关：${cleared ? "是" : "否"}`,
     `死亡节点：${cleared ? "无" : safeFeedbackText(stats.deathNode || runState.currentNode?.name)}`,
     `路线：${getRouteSummaryText()}`,
+    `是否进入第二层：${runState.layer2?.active ? "是" : "否"}`,
+    `第二层路线：${runState.layer2?.active ? safeFeedbackText(runState.layer2.routeName) : "未进入"}`,
+    `第二层Boss击败：${runState.layer2?.bossDefeated ? "是" : (runState.layer2?.active ? "否" : "未进入")}`,
+    `第二层终点节点：${runState.layer2?.active ? safeFeedbackText(runState.layer2.lastNodeName) : "无"}`,
+    `新增万蛊录条目（已遇敌怪/首领）：${(typeof layer2LoadBestiary === "function" ? layer2LoadBestiary().size : 0)}`,
     `第 3 段选择：${getThirdStepChoiceSummary()}`,
     `休整结果：${getRestResultSummary()}`,
     `最终生命：${safeFeedbackText(`${runState.currentHp} / ${runState.maxHp}`)}`,
@@ -6177,6 +6734,8 @@ function showRunConclusion(cleared) {
     ${cleared ? "" : `<div class="run-summary-item"><span>最后承伤</span><strong>${lastBattleSummary?.enemyDamage || 0}</strong></div>`}
     <div class="run-summary-item wide"><span>获得遗物</span><strong>${relicText}</strong></div>
     <div class="run-summary-item wide"><span>走过路线</span><strong>${routeText}</strong></div>
+    <div class="run-summary-item wide"><span>第二层</span><strong>${runState.layer2?.active ? `${runState.layer2.routeName} · Boss${runState.layer2.bossDefeated ? "已破" : "未破"} · 终点「${runState.layer2.lastNodeName || "-"}」` : "未进入"}</strong></div>
+    <div class="run-summary-item wide"><span>新增万蛊录</span><strong>已遇敌怪/首领 ${(typeof layer2LoadBestiary === "function" ? layer2LoadBestiary().size : 0)} 条</strong></div>
     <div class="run-summary-item wide resource-block"><span>材料与蛊石</span><strong>${materialText} · 蛊石 ${runState.guStones}</strong></div>
     <div class="run-summary-item wide"><span>${cleared ? "击败敌人" : `抵达第 ${runState.floor} 段 · 已击败`}</span><strong>${defeated}</strong></div>
     ${cleared ? "" : `<div class="run-summary-item wide"><span>死亡节点</span><strong>${deathStepText} · ${stats.deathNode || runState.currentNode?.name || "命途未明"} · ${stats.deathEnemy || "未知敌人"}</strong></div>`}
@@ -7587,7 +8146,8 @@ function bindEvents() {
   dom.resultPrimaryButton.addEventListener("click", () => {
     playUiSfx();
     const action = dom.resultPrimaryButton.dataset.action;
-    if (action === "nextFloor") advanceToNextFloor();
+    if (action === "enterLayer2") { showLayer2RouteSelect(); return; }
+    else if (action === "nextFloor") advanceToNextFloor();
     else if (action === "completeNode") {
       if (runState?.currentNode?.type === "event" || runState?.currentNode?.type === "shop" || runState?.currentNode?.type === "rest") completeOverlayNode();
       else advanceToNextFloor();
@@ -7596,7 +8156,14 @@ function bindEvents() {
   });
   dom.resultSecondaryButton.addEventListener("click", () => {
     playUiSfx();
+    if (dom.resultSecondaryButton.dataset.action === "settleLayer1") { settleAtLayer1(); return; }
     resetRunToTitle();
+  });
+  dom.runSummary?.addEventListener("click", (event) => {
+    const routeBtn = event.target.closest("[data-layer2-route]");
+    if (routeBtn) { playUiSfx(); chooseLayer2Route(routeBtn.dataset.layer2Route); return; }
+    const branchBtn = event.target.closest("[data-layer2-branch]");
+    if (branchBtn) { playUiSfx(); chooseLayer2Branch(branchBtn.dataset.layer2Branch); return; }
   });
 }
 
