@@ -7607,3 +7607,8 @@ body.mobile-combat-safe.compact-low-height .enemy-status-list { max-height: clam
   .wangulu-row { flex-direction: column; gap: 2px; }
   .wangulu-row-k { flex: none; }
 }
+
+/* 命蛊残卷（收进万蛊录的标签） */
+.wangulu-lore-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; margin-top: 4px; }
+.wangulu-lore-detail { margin-top: 6px; }
+@media (max-width: 920px), (max-height: 520px) { .wangulu-lore-grid { grid-template-columns: 1fr; } }

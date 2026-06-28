@@ -3814,6 +3814,7 @@ function isGuUnlocked(item, discovered) {
 // 万蛊录分类：第一版仅「蛊虫」实装，其余占位「即将开放」。
 const GU_CATEGORIES = [
   { id: "gu", label: "蛊虫秘录", ready: true },
+  { id: "lore", label: "命蛊残卷", ready: true },
   { id: "enemy", label: "敌怪图谱", ready: false },
   { id: "boss", label: "首领残卷", ready: false },
   { id: "anecdote", label: "命途异闻", ready: false },
@@ -3856,6 +3857,7 @@ function openWanGuLu() {
   }
   wanGuLuState.detailId = null;
   wanGuLuState.filterOpen = false;
+  selectedLoreId = "";
   renderWanGuLu();
   wanGuLuEl.classList.remove("hidden");
   const content = wanGuLuEl.querySelector(".wangulu-content");
@@ -3867,9 +3869,29 @@ function onWanGuLuClick(event) {
   const tabBtn = event.target.closest("[data-gu-tab]");
   if (tabBtn) {
     const cat = GU_CATEGORIES.find((c) => c.id === tabBtn.dataset.guTab);
-    if (cat && cat.ready) { wanGuLuState.tab = cat.id; wanGuLuState.detailId = null; renderWanGuLu(); }
+    if (cat && cat.ready) { wanGuLuState.tab = cat.id; wanGuLuState.detailId = null; selectedLoreId = ""; renderWanGuLu(); }
     return;
   }
+  const loreOpenBtn = event.target.closest("[data-lore-open]");
+  if (loreOpenBtn) {
+    if (isLoreUnlocked(loreOpenBtn.dataset.loreOpen)) {
+      selectedLoreId = loreOpenBtn.dataset.loreOpen;
+      renderWanGuLu();
+      const c = wanGuLuEl.querySelector(".wangulu-content");
+      if (c) c.scrollTop = 0;
+    }
+    return;
+  }
+  const loreBackBtn = event.target.closest("[data-lore-back]");
+  if (loreBackBtn) {
+    selectedLoreId = "";
+    renderWanGuLu();
+    const c = wanGuLuEl.querySelector(".wangulu-content");
+    if (c) c.scrollTop = 0;
+    return;
+  }
+  const loreCopyBtn = event.target.closest("[data-lore-copy]");
+  if (loreCopyBtn) { copyLoreQuote(loreCopyBtn.dataset.loreCopy); return; }
   const filterToggle = event.target.closest("[data-gu-filter-toggle]");
   if (filterToggle) { wanGuLuState.filterOpen = !wanGuLuState.filterOpen; renderWanGuLu(); return; }
   const filterBtn = event.target.closest("[data-gu-filter]");
@@ -3901,6 +3923,7 @@ function renderWanGuLu() {
   const content = wanGuLuEl.querySelector(".wangulu-content");
   const cat = GU_CATEGORIES.find((c) => c.id === wanGuLuState.tab);
   if (!cat || !cat.ready) { content.innerHTML = '<div class="wangulu-empty">此卷尚封，墨迹未干。<br><span>敌怪 · 首领 · 异闻 · 流派，即将开放。</span></div>'; return; }
+  if (cat.id === "lore") { content.innerHTML = renderWanGuLuLore(); return; }
   if (wanGuLuState.detailId) { content.innerHTML = renderGuDetail(wanGuLuState.detailId); return; }
   content.innerHTML = renderGuList();
 }
@@ -3961,6 +3984,16 @@ function renderGuDetail(id) {
     + '<section class="wangulu-sec"><h4>来历异闻</h4><p class="wangulu-lore">' + escGu(it.descriptionLore) + '</p>' + row("出处", it.dropsFrom) + row("录入", it.unlockCondition) + '</section>'
     + '<section class="wangulu-sec"><h4>组合克制</h4>' + row("演化", it.evolution) + row("相济", it.synergy) + row("相克", it.counteredBy) + '</section>'
     + '</article>';
+}
+
+// 命蛊残卷收进万蛊录：复用 LORE_PAGES 与现成的目录/详情渲染，点击经 onWanGuLuClick 委托。
+function renderWanGuLuLore() {
+  const unlockedCount = LORE_PAGES.filter((p) => isLoreUnlocked(p.id)).length;
+  const counter = '<p class="wangulu-counter">命蛊残卷 · 已显 ' + unlockedCount + ' / ' + LORE_PAGES.length + ' 页</p>';
+  if (selectedLoreId) {
+    return counter + '<div class="wangulu-lore-detail">' + renderLoreDetail(selectedLoreId) + '</div>';
+  }
+  return counter + '<div class="wangulu-lore-grid">' + renderLoreDirectory() + '</div>';
 }
 
 let updateLogEl = null;
