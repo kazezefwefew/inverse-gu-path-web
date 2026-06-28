@@ -715,7 +715,7 @@ const LORE_SKIP_ANIMATION_STORAGE_KEY = "reverseGu.lore.skipAnimation";
 const RECORDING_MODE_STORAGE_KEY = "reverseGu.recordingMode.enabled";
 const TRIAL_MODE_STORAGE_KEY = "reverseGu.trial.mode";
 const TRIAL_SEED_STORAGE_KEY = "reverseGu.trial.seedDraft";
-const GAME_VERSION = "V0.9.4 战斗手感与卡牌预览";
+const GAME_VERSION = "V0.9.5 万蛊录基础版";
 // TODO: 后续多幕路线扩展时继续抽象 finalNode / bossNode，避免固定四段流程继续扩散。
 const MAX_ROUTE_STEP = 4;
 const BOSS_ROUTE_STEP = 4;
@@ -1653,6 +1653,7 @@ function addRunDeckCard(key) {
   const entry = createDeckEntry(key);
   runState.deckCards.push(entry);
   syncRunDeckKeys();
+  markGuDiscovered(key);
   return entry;
 }
 
@@ -2060,6 +2061,7 @@ function createRunState() {
   const relicId = progression.selectedRelicId;
   const starterDeck = buildStarterDeckKeys(progression.selectedHeroId);
   const deckCards = starterDeck.keys.map(createDeckEntry);
+  starterDeck.keys.forEach((key) => markGuDiscovered(key));
   const maxHp = hero.maxHp + (relicId === "jadeMarrow" ? 8 : 0);
   const seed = getSeedForNextRun();
   const mode = trialMode;
@@ -3779,6 +3781,188 @@ const UPDATE_LOG = [
     "每局开战加入发牌动画；背景音乐与立绘大幅压缩，加载更快",
   ] },
 ];
+/* ===================== 万蛊录（图鉴系统）===================== */
+/* 可扩展：分类由 GU_CATEGORIES 驱动，未来加敌怪/Boss/异闻/流派只需放数据 + 在此置 ready:true。 */
+const GU_DISCOVERED_KEY = "niming.discoveredGu";
+function loadDiscoveredGu() {
+  try {
+    const raw = localStorage.getItem(GU_DISCOVERED_KEY);
+    const arr = raw ? JSON.parse(raw) : [];
+    return new Set(Array.isArray(arr) ? arr : []);
+  } catch (err) { return new Set(); }
+}
+function saveDiscoveredGu(set) {
+  try { localStorage.setItem(GU_DISCOVERED_KEY, JSON.stringify([...set])); } catch (err) { /* 忽略 */ }
+}
+function markGuDiscovered(cardKey) {
+  if (!cardKey) return;
+  const set = loadDiscoveredGu();
+  if (set.has(cardKey)) return;
+  set.add(cardKey);
+  saveDiscoveredGu(set);
+}
+// 已解锁 = localStorage 持久集合 ∪ 当前局牌组中的卡键。
+function getDiscoveredGuKeys() {
+  const set = loadDiscoveredGu();
+  (runState?.deckCards || []).forEach((entry) => { if (entry?.key) set.add(entry.key); });
+  return set;
+}
+function isGuUnlocked(item, discovered) {
+  return Boolean(item && item.cardKey && discovered.has(item.cardKey));
+}
+
+// 万蛊录分类：第一版仅「蛊虫」实装，其余占位「即将开放」。
+const GU_CATEGORIES = [
+  { id: "gu", label: "蛊虫秘录", ready: true },
+  { id: "enemy", label: "敌怪图谱", ready: false },
+  { id: "boss", label: "首领残卷", ready: false },
+  { id: "anecdote", label: "命途异闻", ready: false },
+  { id: "faction", label: "流派源流", ready: false },
+];
+// 蛊虫列表筛选标签：按 type / faction / rarity 过滤。
+const GU_FILTERS = [
+  { id: "all", label: "全部", test: () => true },
+  { id: "unlocked", label: "已悟", test: (it, d) => isGuUnlocked(it, d) },
+  { id: "locked", label: "未悟", test: (it, d) => !isGuUnlocked(it, d) },
+  { id: "attack", label: "攻击", test: (it) => it.type === "攻击" },
+  { id: "defense", label: "防御", test: (it) => it.type === "防御" },
+  { id: "support", label: "辅助", test: (it) => it.type === "辅助" || it.type === "状态" },
+  { id: "poison", label: "毒道", test: (it) => it.faction === "毒道" },
+  { id: "blood", label: "血道", test: (it) => it.faction === "血道" },
+  { id: "bone", label: "骨道", test: (it) => it.faction === "骨道" },
+  { id: "rare", label: "异蛊", test: (it) => it.rarity === "异蛊" },
+  { id: "king", label: "王蛊", test: (it) => it.rarity === "王蛊" },
+];
+let wanGuLuEl = null;
+let wanGuLuState = { tab: "gu", filter: "all", detailId: null, filterOpen: false };
+
+function guGlyphFor(item) {
+  const card = item.cardKey ? CARD_LIBRARY[item.cardKey] : null;
+  return (card && card.glyph) || (item.name ? item.name.charAt(0) : "蛊");
+}
+function escGu(s) {
+  return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\"/g, "&quot;");
+}
+
+function openWanGuLu() {
+  if (!wanGuLuEl) {
+    wanGuLuEl = document.createElement("div");
+    wanGuLuEl.className = "wangulu-overlay hidden";
+    wanGuLuEl.innerHTML = '<div class="wangulu-backdrop"></div><div class="wangulu-panel" role="dialog" aria-modal="true" aria-label="万蛊录"><div class="wangulu-head"><h2>万蛊录</h2><span class="wangulu-sub">残卷所录，皆曾入囊之物</span><button type="button" class="wangulu-close" aria-label="关闭">×</button></div><div class="wangulu-tabs"></div><div class="wangulu-content"></div></div>';
+    document.body.appendChild(wanGuLuEl);
+    wanGuLuEl.querySelector(".wangulu-backdrop").addEventListener("click", closeWanGuLu);
+    wanGuLuEl.querySelector(".wangulu-close").addEventListener("click", closeWanGuLu);
+    wanGuLuEl.addEventListener("click", onWanGuLuClick);
+  }
+  wanGuLuState.detailId = null;
+  wanGuLuState.filterOpen = false;
+  renderWanGuLu();
+  wanGuLuEl.classList.remove("hidden");
+  const content = wanGuLuEl.querySelector(".wangulu-content");
+  if (content) content.scrollTop = 0;
+}
+function closeWanGuLu() { if (wanGuLuEl) wanGuLuEl.classList.add("hidden"); }
+
+function onWanGuLuClick(event) {
+  const tabBtn = event.target.closest("[data-gu-tab]");
+  if (tabBtn) {
+    const cat = GU_CATEGORIES.find((c) => c.id === tabBtn.dataset.guTab);
+    if (cat && cat.ready) { wanGuLuState.tab = cat.id; wanGuLuState.detailId = null; renderWanGuLu(); }
+    return;
+  }
+  const filterToggle = event.target.closest("[data-gu-filter-toggle]");
+  if (filterToggle) { wanGuLuState.filterOpen = !wanGuLuState.filterOpen; renderWanGuLu(); return; }
+  const filterBtn = event.target.closest("[data-gu-filter]");
+  if (filterBtn) { wanGuLuState.filter = filterBtn.dataset.guFilter; renderWanGuLu(); return; }
+  const card = event.target.closest("[data-gu-id]");
+  if (card) {
+    if (card.classList.contains("is-locked")) return;
+    wanGuLuState.detailId = card.dataset.guId; renderWanGuLu();
+    const content = wanGuLuEl.querySelector(".wangulu-content");
+    if (content) content.scrollTop = 0;
+    return;
+  }
+  const back = event.target.closest("[data-gu-back]");
+  if (back) {
+    wanGuLuState.detailId = null; renderWanGuLu();
+    const content = wanGuLuEl.querySelector(".wangulu-content");
+    if (content) content.scrollTop = 0;
+  }
+}
+
+function renderWanGuLu() {
+  if (!wanGuLuEl) return;
+  const tabsEl = wanGuLuEl.querySelector(".wangulu-tabs");
+  tabsEl.innerHTML = GU_CATEGORIES.map((c) => {
+    const cls = "wangulu-tab" + (c.id === wanGuLuState.tab ? " is-active" : "") + (c.ready ? "" : " is-soon");
+    const soon = c.ready ? "" : '<i class="wangulu-soon">即将开放</i>';
+    return '<button type="button" class="' + cls + '" data-gu-tab="' + c.id + '"' + (c.ready ? "" : " disabled") + '>' + escGu(c.label) + soon + '</button>';
+  }).join("");
+  const content = wanGuLuEl.querySelector(".wangulu-content");
+  const cat = GU_CATEGORIES.find((c) => c.id === wanGuLuState.tab);
+  if (!cat || !cat.ready) { content.innerHTML = '<div class="wangulu-empty">此卷尚封，墨迹未干。<br><span>敌怪 · 首领 · 异闻 · 流派，即将开放。</span></div>'; return; }
+  if (wanGuLuState.detailId) { content.innerHTML = renderGuDetail(wanGuLuState.detailId); return; }
+  content.innerHTML = renderGuList();
+}
+
+function renderGuList() {
+  const items = (window.GU_CATALOG || []).filter((it) => it.category === "gu");
+  const discovered = getDiscoveredGuKeys();
+  const filter = GU_FILTERS.find((f) => f.id === wanGuLuState.filter) || GU_FILTERS[0];
+  const shown = items.filter((it) => filter.test(it, discovered));
+  const unlockedCount = items.filter((it) => isGuUnlocked(it, discovered)).length;
+  const chips = GU_FILTERS.map((f) => '<button type="button" class="wangulu-chip' + (f.id === wanGuLuState.filter ? " is-active" : "") + '" data-gu-filter="' + f.id + '">' + escGu(f.label) + '</button>').join("");
+  const filterBar = '<div class="wangulu-filterbar' + (wanGuLuState.filterOpen ? " is-open" : "") + '">'
+    + '<button type="button" class="wangulu-filter-toggle" data-gu-filter-toggle aria-expanded="' + (wanGuLuState.filterOpen ? "true" : "false") + '">筛选 · ' + escGu(filter.label) + '</button>'
+    + '<div class="wangulu-chips">' + chips + '</div></div>';
+  const counter = '<p class="wangulu-counter">已悟 ' + unlockedCount + ' / ' + items.length + ' 蛊</p>';
+  let grid = '<div class="wangulu-grid">';
+  if (!shown.length) { grid += '<div class="wangulu-empty">无符此筛之蛊。</div>'; }
+  shown.forEach((it) => {
+    const unlocked = isGuUnlocked(it, discovered);
+    if (unlocked) {
+      grid += '<button type="button" class="wangulu-item" data-gu-id="' + it.id + '">'
+        + '<span class="wangulu-item-glyph">' + escGu(guGlyphFor(it)) + '</span>'
+        + '<span class="wangulu-item-name">' + escGu(it.name) + '</span>'
+        + '<span class="wangulu-item-rarity wangulu-r-' + escGu(it.rarity) + '">' + escGu(it.rarity) + '</span>'
+        + '</button>';
+    } else {
+      grid += '<button type="button" class="wangulu-item is-locked" data-gu-id="' + it.id + '" aria-disabled="true">'
+        + '<span class="wangulu-item-glyph wangulu-silhouette">?</span>'
+        + '<span class="wangulu-item-name">？？？</span>'
+        + '<span class="wangulu-item-rarity">未悟</span>'
+        + '</button>';
+    }
+  });
+  grid += '</div>';
+  return filterBar + counter + grid;
+}
+
+function renderGuDetail(id) {
+  const it = (window.GU_CATALOG || []).find((x) => x.id === id);
+  if (!it) return '<div class="wangulu-empty">残页佚失。</div>';
+  const discovered = getDiscoveredGuKeys();
+  if (!isGuUnlocked(it, discovered)) { wanGuLuState.detailId = null; return renderGuList(); }
+  const glyph = guGlyphFor(it);
+  const artHtml = it.image
+    ? '<img class="wangulu-art-img" src="' + escGu(it.image) + '" alt="' + escGu(it.name) + '" loading="lazy">'
+    : '<span class="wangulu-art-glyph">' + escGu(glyph) + '</span>';
+  const row = (label, val) => val ? '<div class="wangulu-row"><span class="wangulu-row-k">' + escGu(label) + '</span><span class="wangulu-row-v">' + escGu(val) + '</span></div>' : "";
+  return '<button type="button" class="wangulu-back" data-gu-back>‹ 返回蛊录</button>'
+    + '<article class="wangulu-detail">'
+    + '<header class="wangulu-detail-head"><h3>' + escGu(it.name) + '</h3>'
+    + '<p class="wangulu-detail-alias">' + escGu(it.alias || "") + '</p>'
+    + '<div class="wangulu-tags"><span class="wangulu-r-' + escGu(it.rarity) + '">' + escGu(it.rarity) + '</span>'
+    + '<span>' + escGu(it.faction) + '</span><span>' + escGu(it.type) + '</span></div></header>'
+    + '<section class="wangulu-sec"><h4>立绘</h4><div class="wangulu-art">' + artHtml + '<i class="wangulu-art-stage">' + escGu(it.stage || "") + '</i></div></section>'
+    + '<section class="wangulu-sec"><h4>基本信息</h4>' + row("别名", it.alias) + row("品阶", it.rarity) + row("道脉", it.faction) + row("类型", it.type) + row("形态", it.stage) + '</section>'
+    + '<section class="wangulu-sec"><h4>战斗效果</h4><p class="wangulu-effect">' + escGu(it.gameplayEffect) + '</p><p class="wangulu-short">' + escGu(it.descriptionShort) + '</p></section>'
+    + '<section class="wangulu-sec"><h4>生态习性</h4>' + row("栖息", it.habitat) + row("食性", it.feeding) + row("秉性", it.temperament) + '</section>'
+    + '<section class="wangulu-sec"><h4>来历异闻</h4><p class="wangulu-lore">' + escGu(it.descriptionLore) + '</p>' + row("出处", it.dropsFrom) + row("录入", it.unlockCondition) + '</section>'
+    + '<section class="wangulu-sec"><h4>组合克制</h4>' + row("演化", it.evolution) + row("相济", it.synergy) + row("相克", it.counteredBy) + '</section>'
+    + '</article>';
+}
+
 let updateLogEl = null;
 function showUpdateLog() {
   if (!updateLogEl) {
@@ -6709,6 +6893,10 @@ function bindEvents() {
   document.getElementById("updateLogButton")?.addEventListener("click", () => {
     playUiSfx();
     showUpdateLog();
+  });
+  document.getElementById("wanGuLuButton")?.addEventListener("click", () => {
+    playUiSfx();
+    openWanGuLu();
   });
   maybeAutoShowUpdateLog();
   dom.loreOpenButton?.addEventListener("click", () => {

@@ -1,4 +1,4 @@
-﻿:root {
+:root {
   --ink: #080b09;
   --ink-soft: #101511;
   --panel: rgba(13, 19, 15, 0.92);
@@ -7522,4 +7522,88 @@ body.mobile-combat-safe.compact-low-height .enemy-status-list { max-height: clam
   border-radius: 8px;
   background: rgba(20, 26, 18, 0.96);
   color: #d8c79a;
+}
+
+/* ===================== 万蛊录（图鉴）===================== */
+/* 整层块级滚动容器：与更新公告同款稳滚动，顶对齐、横向居中，避免 flex+margin:auto 在部分手机不触发触摸滚动 */
+.wangulu-overlay { position: fixed; inset: 0; z-index: 230; overflow-y: scroll; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; touch-action: pan-y; padding: 16px 12px; box-sizing: border-box; }
+.wangulu-overlay.hidden { display: none; }
+.wangulu-backdrop { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.7); }
+.wangulu-panel { position: relative; z-index: 1; margin: 0 auto; width: 100%; max-width: 760px; background: radial-gradient(ellipse at 50% 0%, rgba(74, 104, 84, 0.15), rgba(10, 13, 10, 0) 62%), repeating-linear-gradient(135deg, rgba(189, 162, 109, 0.045) 0 2px, transparent 2px 11px), #0d110b; border: 1px solid #bda26d; border-radius: 14px; padding: 16px 18px 22px; color: #e8e2d0; box-shadow: 0 16px 50px rgba(0, 0, 0, 0.6); display: flex; flex-direction: column; max-height: none; }
+.wangulu-head { position: relative; display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; padding-bottom: 10px; border-bottom: 1px solid rgba(189, 162, 109, 0.22); }
+.wangulu-head h2 { margin: 0; font: 700 24px "KaiTi", "STKaiti", serif; color: #cbb27a; letter-spacing: 0.12em; }
+.wangulu-sub { font-family: "KaiTi", "STKaiti", serif; font-size: 13px; color: #8a8064; letter-spacing: 0.06em; }
+.wangulu-close { position: absolute; right: 0; top: -2px; width: 34px; height: 34px; font-size: 22px; line-height: 1; border: 1px solid rgba(189, 162, 109, 0.4); border-radius: 8px; background: rgba(20, 26, 18, 0.92); color: #cbb27a; cursor: pointer; }
+
+/* 分类 tab */
+.wangulu-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 4px; }
+.wangulu-tab { position: relative; padding: 7px 14px; font: 600 14px "KaiTi", "STKaiti", serif; letter-spacing: 0.06em; border: 1px solid rgba(189, 162, 109, 0.4); border-radius: 8px; background: rgba(20, 26, 18, 0.85); color: #b9b099; cursor: pointer; }
+.wangulu-tab.is-active { background: rgba(111, 143, 95, 0.22); border-color: #8fae6e; color: #e8e2d0; box-shadow: inset 0 0 12px rgba(143, 174, 110, 0.18); }
+.wangulu-tab.is-soon { color: #6f6a58; cursor: default; }
+.wangulu-soon { display: inline-block; margin-left: 6px; font-style: normal; font-size: 10px; color: #9a7d3f; border: 1px solid rgba(189, 162, 109, 0.35); border-radius: 6px; padding: 0 4px; letter-spacing: 0.04em; }
+
+.wangulu-content { margin-top: 8px; }
+.wangulu-empty { padding: 48px 16px; text-align: center; font-family: "KaiTi", "STKaiti", serif; font-size: 16px; line-height: 2; color: #8a8064; }
+.wangulu-empty span { font-size: 13px; color: #6f6a58; }
+
+/* 筛选条 */
+.wangulu-filterbar { margin-bottom: 8px; }
+.wangulu-filter-toggle { display: none; padding: 7px 14px; font: 600 13px "KaiTi", "STKaiti", serif; border: 1px solid rgba(189, 162, 109, 0.4); border-radius: 8px; background: rgba(20, 26, 18, 0.9); color: #cbb27a; cursor: pointer; }
+.wangulu-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.wangulu-chip { padding: 5px 11px; font-size: 12.5px; border: 1px solid rgba(189, 162, 109, 0.32); border-radius: 999px; background: rgba(17, 22, 15, 0.8); color: #aaa088; cursor: pointer; }
+.wangulu-chip.is-active { background: rgba(143, 174, 110, 0.2); border-color: #8fae6e; color: #e8e2d0; }
+.wangulu-counter { margin: 6px 2px 10px; font: 600 12.5px "KaiTi", "STKaiti", serif; color: #8a8064; letter-spacing: 0.05em; }
+
+/* 蛊虫网格 */
+.wangulu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; }
+.wangulu-item { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 14px 8px 10px; border: 1px solid rgba(189, 162, 109, 0.32); border-radius: 12px; background: radial-gradient(ellipse at 50% 18%, rgba(74, 104, 84, 0.16), rgba(13, 17, 11, 0) 70%), #11160f; color: #e8e2d0; cursor: pointer; transition: border-color 0.18s, transform 0.18s; }
+.wangulu-item:hover { border-color: #bda26d; transform: translateY(-2px); }
+.wangulu-item-glyph { display: flex; align-items: center; justify-content: center; width: 56px; height: 56px; font: 700 30px "KaiTi", "STKaiti", serif; color: #d8c79a; border: 1px solid rgba(189, 162, 109, 0.5); border-radius: 50%; background: radial-gradient(circle at 50% 35%, rgba(143, 174, 110, 0.18), rgba(10, 13, 10, 0) 72%); box-shadow: inset 0 0 14px rgba(0, 0, 0, 0.5); }
+.wangulu-item-name { font: 600 14px "KaiTi", "STKaiti", serif; letter-spacing: 0.05em; color: #d8d2c0; }
+.wangulu-item-rarity { font-size: 11px; color: #8a8064; letter-spacing: 0.04em; }
+/* 未解锁：黑影剪影 + ??? */
+.wangulu-item.is-locked { cursor: default; background: #0b0e0a; border-color: rgba(120, 120, 110, 0.18); }
+.wangulu-item.is-locked:hover { transform: none; border-color: rgba(120, 120, 110, 0.18); }
+.wangulu-item.is-locked .wangulu-item-name { color: #5b5648; }
+.wangulu-silhouette { color: #1c211a !important; background: #141a12 !important; border-color: rgba(90, 90, 82, 0.3) !important; text-shadow: 0 0 8px rgba(0, 0, 0, 0.8); box-shadow: inset 0 0 18px rgba(0, 0, 0, 0.8); }
+
+/* 品阶配色 */
+.wangulu-r-凡蛊 { color: #9aa088; }
+.wangulu-r-灵蛊 { color: #8fae6e; }
+.wangulu-r-异蛊 { color: #cbb27a; }
+.wangulu-r-王蛊 { color: #d74135; }
+
+/* 详情 */
+.wangulu-back { margin: 2px 0 12px; padding: 7px 14px; font: 600 14px "KaiTi", "STKaiti", serif; border: 1px solid rgba(189, 162, 109, 0.4); border-radius: 8px; background: rgba(20, 26, 18, 0.9); color: #cbb27a; cursor: pointer; }
+.wangulu-detail-head h3 { margin: 0; font: 700 24px "KaiTi", "STKaiti", serif; color: #d8c79a; letter-spacing: 0.1em; }
+.wangulu-detail-alias { margin: 4px 0 8px; font-family: "KaiTi", "STKaiti", serif; font-size: 14px; color: #8a8064; letter-spacing: 0.08em; }
+.wangulu-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.wangulu-tags span { font-size: 12px; padding: 3px 10px; border: 1px solid rgba(189, 162, 109, 0.3); border-radius: 999px; background: rgba(17, 22, 15, 0.8); color: #b9b099; }
+.wangulu-sec { margin-top: 16px; padding-top: 12px; border-top: 1px solid rgba(189, 162, 109, 0.16); }
+.wangulu-sec h4 { margin: 0 0 8px; font: 700 15px "KaiTi", "STKaiti", serif; color: #8fae6e; letter-spacing: 0.1em; }
+.wangulu-row { display: flex; gap: 10px; padding: 4px 0; font-size: 14px; line-height: 1.6; }
+.wangulu-row-k { flex: 0 0 56px; color: #8a8064; font-family: "KaiTi", "STKaiti", serif; }
+.wangulu-row-v { flex: 1; color: #d0caba; }
+.wangulu-effect { margin: 0 0 6px; font-size: 15px; line-height: 1.7; color: #d8c79a; }
+.wangulu-short { margin: 0; font-size: 13.5px; color: #9a9078; }
+.wangulu-lore { margin: 0 0 8px; font-family: "KaiTi", "STKaiti", serif; font-size: 15px; line-height: 1.9; color: #c8c2b0; letter-spacing: 0.02em; }
+/* 立绘框（暂用 glyph 单字） */
+.wangulu-art { position: relative; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 20px; border: 1px solid rgba(189, 162, 109, 0.35); border-radius: 12px; background: radial-gradient(ellipse at 50% 30%, rgba(74, 104, 84, 0.2), rgba(10, 13, 10, 0) 72%), repeating-linear-gradient(135deg, rgba(189, 162, 109, 0.05) 0 2px, transparent 2px 12px), #0d110b; }
+.wangulu-art-glyph { font: 700 88px "KaiTi", "STKaiti", serif; color: #d8c79a; text-shadow: 0 0 24px rgba(143, 174, 110, 0.3), 0 2px 6px rgba(0, 0, 0, 0.7); }
+.wangulu-art-img { max-width: 100%; max-height: 240px; border-radius: 8px; }
+.wangulu-art-stage { font-style: normal; font-family: "KaiTi", "STKaiti", serif; font-size: 13px; color: #8a8064; letter-spacing: 0.1em; }
+
+/* 手机横屏：详情上下排布、立绘优先完整、文本不挤、筛选可折叠 */
+@media (max-width: 920px), (max-height: 520px) {
+  .wangulu-panel { max-width: 100%; padding: 14px 14px 20px; }
+  .wangulu-head h2 { font-size: 21px; }
+  .wangulu-grid { grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 8px; }
+  .wangulu-item-glyph { width: 48px; height: 48px; font-size: 26px; }
+  .wangulu-filter-toggle { display: inline-flex; }
+  .wangulu-filterbar .wangulu-chips { display: none; }
+  .wangulu-filterbar.is-open .wangulu-chips { display: flex; margin-top: 8px; }
+  .wangulu-art-glyph { font-size: 64px; }
+  .wangulu-art-img { max-height: 180px; }
+  .wangulu-row { flex-direction: column; gap: 2px; }
+  .wangulu-row-k { flex: none; }
 }
