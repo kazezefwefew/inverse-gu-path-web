@@ -868,7 +868,7 @@ const LORE_SKIP_ANIMATION_STORAGE_KEY = "reverseGu.lore.skipAnimation";
 const RECORDING_MODE_STORAGE_KEY = "reverseGu.recordingMode.enabled";
 const TRIAL_MODE_STORAGE_KEY = "reverseGu.trial.mode";
 const TRIAL_SEED_STORAGE_KEY = "reverseGu.trial.seedDraft";
-const GAME_VERSION = "V0.9.6.1 第二层地图化+敌人状态说明";
+const GAME_VERSION = "V0.9.6.2 开发者测试面板（preview）";
 // TODO: 后续多幕路线扩展时继续抽象 finalNode / bossNode，避免固定四段流程继续扩散。
 const MAX_ROUTE_STEP = 4;
 const BOSS_ROUTE_STEP = 4;
@@ -8412,6 +8412,314 @@ function bindEvents() {
   });
 }
 
+/* ===================== DEV MODE 开发者测试面板 · V0.9.6.2 ===================== */
+/* 纯加性：仅 preview 路径 + ?dev=kaan 时注入。正式入口 root 即便带 ?dev=kaan 也绝不启用。 */
+/* 不改 CARD_LIBRARY / 初始卡组 / 敌人 / Boss 数值 / 音频状态机 / 手机战斗 HUD。 */
+function isDevMode() {
+  try {
+    return location.pathname.includes("/preview/") &&
+      new URLSearchParams(location.search).get("dev") === "kaan";
+  } catch (err) { return false; }
+}
+
+function devNotify(msg, cls = "system-log") {
+  // 战斗中走战斗日志，否则走旅程日志，无则 console
+  try {
+    if (typeof game !== "undefined" && game && typeof addLog === "function") { addLog(`[DEV] ${msg}`, cls); return; }
+    if (typeof addJourneyLog === "function") { addJourneyLog(`[DEV] ${msg}`, cls); return; }
+  } catch (err) {}
+  console.log(`[DEV] ${msg}`);
+}
+
+function devRender() { try { if (typeof render === "function") render(); } catch (err) { console.warn("[DEV] render 失败", err); } }
+
+function devRequireBattle() {
+  if (typeof game === "undefined" || !game || !game.player || !game.enemy) {
+    devNotify("当前不在战斗中，此操作无效。", "damage-log");
+    return false;
+  }
+  return true;
+}
+
+function devRequireRun() {
+  if (typeof runState === "undefined" || !runState) {
+    devNotify("当前无命途状态（未开始游戏）。", "damage-log");
+    return false;
+  }
+  return true;
+}
+
+/* 测试套牌：只往当前 runState.deckCards 临时加现有 CARD_LIBRARY 卡；不存在跳过 + console.warn */
+function devAddTestDeck(label, keys) {
+  if (!devRequireRun()) return;
+  if (typeof addRunDeckCard !== "function" || typeof CARD_LIBRARY === "undefined") {
+    devNotify("加卡函数/卡库不可用。", "damage-log"); return;
+  }
+  let added = 0;
+  keys.forEach((k) => {
+    if (CARD_LIBRARY[k]) { addRunDeckCard(k); added += 1; }
+    else console.warn(`[DEV] 测试套牌跳过：CARD_LIBRARY 中无 key "${k}"`);
+  });
+  devNotify(`已加入${label}测试套牌 ${added}/${keys.length} 张。`, "positive-log");
+  devRender();
+}
+
+/* 万蛊录：解锁全部条目（卡 + 二层敌人/Boss + 残卷）。仅 dev 模式、用户主动点击时写 localStorage。 */
+function devUnlockAllCodex() {
+  let cardN = 0;
+  if (typeof window !== "undefined" && Array.isArray(window.GU_CATALOG) && typeof markGuDiscovered === "function") {
+    window.GU_CATALOG.forEach((item) => { if (item && item.cardKey) { markGuDiscovered(item.cardKey); cardN += 1; } });
+  }
+  // 兜底：把当前 CARD_LIBRARY 全部 key 也写入发现集合
+  if (typeof CARD_LIBRARY !== "undefined" && typeof markGuDiscovered === "function") {
+    Object.keys(CARD_LIBRARY).forEach((k) => markGuDiscovered(k));
+  }
+  // 二层敌人/Boss
+  const L2_ENEMIES = ["rotleafGu", "miasmaParasite", "miasmaLanternEliteGu", "miasmaMotherBoss",
+    "bloodLeechSwarm", "brokenMeridianGu", "bloodRobePriestEliteGu", "bloodRobeMotherBoss"];
+  if (typeof layer2MarkBestiary === "function") L2_ENEMIES.forEach((id) => layer2MarkBestiary(id));
+  // 残卷
+  if (typeof LORE_PAGES !== "undefined" && Array.isArray(LORE_PAGES) && typeof unlockLorePage === "function") {
+    LORE_PAGES.forEach((p) => { if (p && p.id) unlockLorePage(p.id, { silent: true }); });
+  }
+  devNotify(`已解锁全部万蛊录：卡 ${cardN} 条 + 二层敌人/Boss + 残卷。`, "positive-log");
+  devRender();
+}
+
+function devResetCodex() {
+  try { localStorage.removeItem("niming.discoveredGu"); } catch (err) {}
+  try { if (typeof LAYER2_BESTIARY_KEY !== "undefined") localStorage.removeItem(LAYER2_BESTIARY_KEY); } catch (err) {}
+  try { localStorage.removeItem("nmg.layer2.progress"); } catch (err) {}
+  try { if (typeof resetLoreUnlocks === "function") resetLoreUnlocks(); } catch (err) {}
+  devNotify("已重置万蛊录发现数据（卡/二层敌人/二层进度/残卷）。", "important");
+  devRender();
+}
+
+function devMarkLayer2Enemies() {
+  const L2_ENEMIES = ["rotleafGu", "miasmaParasite", "miasmaLanternEliteGu", "miasmaMotherBoss",
+    "bloodLeechSwarm", "brokenMeridianGu", "bloodRobePriestEliteGu", "bloodRobeMotherBoss"];
+  if (typeof layer2MarkBestiary !== "function") { devNotify("layer2MarkBestiary 不可用。", "damage-log"); return; }
+  L2_ENEMIES.forEach((id) => layer2MarkBestiary(id));
+  devNotify("已标记第二层敌人/Boss 为已遭遇。", "positive-log");
+  devRender();
+}
+
+function devMarkLayer2BossDefeated() {
+  if (!devRequireRun()) return;
+  if (runState.layer2 && runState.layer2.active) {
+    runState.layer2.bossDefeated = true;
+    const rid = runState.layer2.routeId;
+    if (typeof layer2MarkProgress === "function") {
+      layer2MarkProgress(rid === "miasma" ? "miasmaBossDefeated" : "bloodmarshBossDefeated");
+    }
+    devNotify("已标记第二层 Boss 已击败。", "positive-log");
+  } else {
+    devNotify("当前不在第二层，无法标记 Boss 击败。", "damage-log");
+  }
+  devRender();
+}
+
+/* 跳转：直接开一层/二层 Boss 战。设置 currentNode 后 startFloorBattle()（createBattleState 优先读 currentNode.enemyId）。 */
+function devJumpBoss(opts) {
+  if (!devRequireRun()) return;
+  if (opts.layer2) {
+    runState.layer = 2;
+    runState.layer2 = { active: true, routeId: opts.routeId, routeName: opts.routeName || "", theme: opts.routeId,
+      branchChoice: "", bossDefeated: false, nodesCleared: 0, lastNodeName: "DEV-Boss直跳" };
+  } else {
+    runState.floor = (typeof MAX_ROUTE_STEP !== "undefined") ? MAX_ROUTE_STEP : 4;
+  }
+  runState.routeHistory = runState.routeHistory || []; runState.completedNodes = runState.completedNodes || [];
+  runState.currentNode = { id: "dev-boss", type: "boss", enemyId: opts.enemyId, name: opts.name, step: runState.floor };
+  devNotify(`跳转至 Boss：${opts.name}`, "important");
+  if (typeof startFloorBattle === "function") startFloorBattle();
+}
+
+function devCopyToClipboard(label, obj) {
+  let text;
+  try { text = JSON.stringify(obj, null, 2); } catch (err) { text = String(obj); }
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text)
+      .then(() => devNotify(`${label} 已复制到剪贴板。`, "system-log"))
+      .catch((err) => { console.warn("[DEV] 复制失败", err); console.log(`[DEV] ${label}:`, obj); devNotify(`${label} 复制失败，已打印到 console。`, "damage-log"); });
+  } else {
+    console.log(`[DEV] ${label}:`, obj);
+    devNotify(`剪贴板不可用，${label} 已打印到 console。`, "system-log");
+  }
+}
+
+/* Dev 动作映射表：id -> handler。全部调用真实游戏函数/字段后 devRender()。 */
+const DEV_ACTIONS = {
+  // —— 资源 ——
+  "stone100": () => { if (typeof gainGuStones === "function" && devRequireRun()) { gainGuStones(100, "DEV测试"); devRender(); } },
+  "stone999": () => { if (typeof gainGuStones === "function" && devRequireRun()) { gainGuStones(999, "DEV测试"); devRender(); } },
+  "healFull": () => { if (!devRequireBattle()) return; game.player.hp = game.player.maxHp; if (runState) runState.currentHp = game.player.hp; devNotify("生命已回满。", "positive-log"); devRender(); },
+  "hp1": () => { if (!devRequireBattle()) return; game.player.hp = 1; if (runState) runState.currentHp = 1; devNotify("当前生命设为 1。", "damage-log"); devRender(); },
+  "energy3": () => { if (!devRequireBattle()) return; game.player.energy += 3; devNotify("真元 +3。", "positive-log"); devRender(); },
+  "energy10": () => { if (!devRequireBattle()) return; game.player.energy += 10; devNotify("真元 +10。", "positive-log"); devRender(); },
+  // —— 战斗 ——
+  "enemyHp1": () => { if (!devRequireBattle()) return; game.enemy.hp = 1; devNotify("敌人生命降为 1。", "damage-log"); devRender(); },
+  "killEnemy": () => { if (!devRequireBattle()) return; game.enemy.hp = 0; devNotify("立刻击败当前敌人，触发胜利结算。", "important"); if (typeof checkBattleResult === "function") checkBattleResult(); else devRender(); },
+  "armor20": () => { if (!devRequireBattle()) return; if (typeof gainArmor === "function") gainArmor(20, "DEV测试"); else game.player.armor += 20; devRender(); },
+  "enemyPoison10": () => { if (!devRequireBattle()) return; if (typeof applyEnemyPoison === "function") applyEnemyPoison(10, "DEV毒性", { corrosive: false }); else game.enemy.poison += 10; devRender(); },
+  "clearPlayerDebuff": () => { if (!devRequireBattle()) return; game.player.poison = 0; devNotify("已清除玩家负面状态（毒）。", "positive-log"); devRender(); },
+  "clearEnemyState": () => { if (!devRequireBattle()) return; game.enemy.poison = 0; game.enemy.armor = 0; game.enemy.chargedBonus = 0; game.enemy.phase2 = false; devNotify("已清除敌人状态（毒/甲/蓄势/相位标记）。", "positive-log"); devRender(); },
+  // —— 跳转 ——
+  "jumpL1Boss": () => devJumpBoss({ layer2: false, enemyId: "corpsepuppet", name: "尸盘监守" }),
+  "jumpL2Miasma": () => { if (!devRequireRun()) return; if (typeof enterLayer2Map === "function") enterLayer2Map("miasma"); devNotify("跳转至第二层地图·瘴林。", "important"); },
+  "jumpL2Blood": () => { if (!devRequireRun()) return; if (typeof enterLayer2Map === "function") enterLayer2Map("bloodmarsh"); devNotify("跳转至第二层地图·血沼。", "important"); },
+  "jumpRouteSelect": () => { if (!devRequireRun()) return; if (typeof showLayer2RouteSelect === "function") showLayer2RouteSelect(); devNotify("打开第二层路线选择。", "important"); },
+  "jumpMiasmaBoss": () => devJumpBoss({ layer2: true, routeId: "miasma", routeName: "瘴林", enemyId: "miasmaMotherBoss", name: "百瘴母蛊" }),
+  "jumpBloodBoss": () => devJumpBoss({ layer2: true, routeId: "bloodmarsh", routeName: "血沼", enemyId: "bloodRobeMotherBoss", name: "血衣蛊母" }),
+  "showConclusion": () => { if (!devRequireRun()) return; if (typeof showRunConclusion === "function") { showRunConclusion(true); devNotify("打开结算页（通关）。", "important"); } },
+  // —— 卡牌测试 ——
+  "draw3": () => { if (!devRequireBattle()) return; if (typeof drawCards === "function") drawCards(3); devNotify("抽 3 张牌。", "system-log"); devRender(); },
+  "rewardRandom": () => { if (!devRequireRun()) return; if (typeof getRandomRewardCardKey === "function" && typeof addRunDeckCard === "function") { const k = getRandomRewardCardKey(); addRunDeckCard(k); devNotify(`获得随机奖励牌：${k}`, "positive-log"); devRender(); } },
+  "openReward": () => { if (!devRequireRun()) return; if (typeof openCardReward === "function") openCardReward(); },
+  "deckPoison": () => devAddTestDeck("毒道", ["greenMiasma", "poisonReturn", "insectSwarm", "moltingShell"]),
+  "deckBlood": () => devAddTestDeck("血道", ["bloodBlade", "bloodReversal", "burningEssence", "heartEater"]),
+  "deckFate": () => devAddTestDeck("命势", ["fateThread", "reversePath", "fixedFate", "lifeLamp"]),
+  "deckArmor": () => devAddTestDeck("护甲", ["ironSkin", "mysticCarapace", "shellRemnant", "moltedArmor"]),
+  // —— 万蛊录 ——
+  "codexUnlockAll": devUnlockAllCodex,
+  "codexReset": devResetCodex,
+  "codexMarkL2": devMarkLayer2Enemies,
+  "codexMarkBoss": devMarkLayer2BossDefeated,
+  // —— 调试 ——
+  "copyRun": () => { if (!devRequireRun()) return; devCopyToClipboard("runState", runState); },
+  "copyGame": () => { if (!devRequireBattle()) return; devCopyToClipboard("game", game); },
+  "copyMap": () => { if (!devRequireRun()) return; devCopyToClipboard("mapState", runState.mapState); },
+  "logState": () => { console.log("=== DEV runState ===", typeof runState !== "undefined" ? runState : null); console.log("=== DEV game ===", typeof game !== "undefined" ? game : null); console.log("=== DEV mapState ===", (typeof runState !== "undefined" && runState) ? runState.mapState : null); devNotify("已打印 runState/game/mapState 到 console（F12）。", "system-log"); },
+  "showVersion": () => { const v = (typeof GAME_VERSION !== "undefined") ? GAME_VERSION : "-"; const b = (typeof window !== "undefined" && window.__NMG_BUILD__) ? window.__NMG_BUILD__ : "-"; devNotify(`版本：${v} | Build：${b}`, "system-log"); console.log(`[DEV] 版本：${v} | Build：${b}`); devRender(); },
+};
+
+/* 面板分类结构（按钮文案 + action id） */
+const DEV_PANEL_GROUPS = [
+  { title: "资源", buttons: [
+    ["蛊石 +100", "stone100"], ["蛊石 +999", "stone999"],
+    ["回满生命", "healFull"], ["生命设为1", "hp1"],
+    ["真元 +3", "energy3"], ["真元 +10", "energy10"],
+  ] },
+  { title: "战斗（需战斗中）", buttons: [
+    ["敌血降为1", "enemyHp1"], ["立刻击败敌人", "killEnemy"],
+    ["自身 +20护甲", "armor20"], ["敌人 +10毒", "enemyPoison10"],
+    ["清玩家负面", "clearPlayerDebuff"], ["清敌人状态", "clearEnemyState"],
+  ] },
+  { title: "跳转", buttons: [
+    ["一层Boss·尸盘监守", "jumpL1Boss"],
+    ["二层地图·瘴林", "jumpL2Miasma"], ["二层地图·血沼", "jumpL2Blood"],
+    ["二层路线选择", "jumpRouteSelect"],
+    ["百瘴母蛊(开战)", "jumpMiasmaBoss"], ["血衣蛊母(开战)", "jumpBloodBoss"],
+    ["打开结算页", "showConclusion"],
+  ] },
+  { title: "卡牌测试", buttons: [
+    ["抽3张牌", "draw3"], ["随机奖励牌", "rewardRandom"],
+    ["打开选牌奖励", "openReward"],
+    ["加毒道套牌", "deckPoison"], ["加血道套牌", "deckBlood"],
+    ["加命势套牌", "deckFate"], ["加护甲套牌", "deckArmor"],
+  ] },
+  { title: "万蛊录", buttons: [
+    ["解锁全部条目", "codexUnlockAll"], ["重置发现数据", "codexReset"],
+    ["标记二层敌人已见", "codexMarkL2"], ["标记二层Boss已击败", "codexMarkBoss"],
+  ] },
+  { title: "调试", buttons: [
+    ["复制 runState", "copyRun"], ["复制 game", "copyGame"],
+    ["复制 mapState", "copyMap"], ["打印到 console", "logState"],
+    ["显示版本+build", "showVersion"],
+  ] },
+];
+
+let __devPanelBuilt = false;
+
+function buildDevPanelDom() {
+  if (__devPanelBuilt) return;
+  __devPanelBuilt = true;
+
+  // 角落 DEV MODE 小标识
+  const badge = document.createElement("div");
+  badge.className = "dev-mode-badge";
+  badge.textContent = "DEV MODE";
+  document.body.appendChild(badge);
+
+  // 右下角 DEV 开关按钮
+  const toggleBtn = document.createElement("button");
+  toggleBtn.type = "button";
+  toggleBtn.className = "dev-mode-button";
+  toggleBtn.textContent = "DEV";
+  document.body.appendChild(toggleBtn);
+
+  // 面板
+  const panel = document.createElement("div");
+  panel.className = "dev-panel hidden";
+  panel.setAttribute("role", "dialog");
+  panel.setAttribute("aria-label", "开发者测试模式");
+
+  const header = document.createElement("div");
+  header.className = "dev-panel-header";
+  header.innerHTML =
+    '<div class="dev-panel-titles">' +
+    '<strong class="dev-panel-title">开发者测试模式</strong>' +
+    '<span class="dev-panel-sub">仅用于作者调试、录屏、平衡测试。当前数据不代表正式玩家体验。</span>' +
+    '</div>';
+  const closeBtn = document.createElement("button");
+  closeBtn.type = "button";
+  closeBtn.className = "dev-panel-close";
+  closeBtn.textContent = "×";
+  closeBtn.setAttribute("aria-label", "关闭");
+  header.appendChild(closeBtn);
+  panel.appendChild(header);
+
+  const body = document.createElement("div");
+  body.className = "dev-panel-body";
+  DEV_PANEL_GROUPS.forEach((group) => {
+    const sec = document.createElement("section");
+    sec.className = "dev-group";
+    const gh = document.createElement("button");
+    gh.type = "button";
+    gh.className = "dev-group-header";
+    gh.innerHTML = `<span>${group.title}</span><i class="dev-group-caret">▾</i>`;
+    const grid = document.createElement("div");
+    grid.className = "dev-group-grid";
+    group.buttons.forEach(([label, action]) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "dev-action-btn";
+      b.textContent = label;
+      b.dataset.devAction = action;
+      grid.appendChild(b);
+    });
+    gh.addEventListener("click", () => { sec.classList.toggle("collapsed"); });
+    sec.appendChild(gh);
+    sec.appendChild(grid);
+    body.appendChild(sec);
+  });
+  panel.appendChild(body);
+  document.body.appendChild(panel);
+
+  // 开关
+  toggleBtn.addEventListener("click", () => { panel.classList.toggle("hidden"); });
+  closeBtn.addEventListener("click", () => { panel.classList.add("hidden"); });
+
+  // 事件委托：所有 action 按钮
+  body.addEventListener("click", (event) => {
+    const btn = event.target.closest("[data-dev-action]");
+    if (!btn) return;
+    const action = btn.dataset.devAction;
+    const handler = DEV_ACTIONS[action];
+    if (typeof handler !== "function") { console.warn(`[DEV] 未知 action：${action}`); return; }
+    try { handler(); }
+    catch (err) { console.error(`[DEV] action "${action}" 执行出错`, err); devNotify(`操作出错：${action}（见 console）`, "damage-log"); }
+  });
+}
+
+function initDevMode() {
+  if (!isDevMode()) return; // 门控不满足：不注入任何 DOM / 按钮
+  document.body.classList.add("dev-mode-on");
+  buildDevPanelDom();
+  console.log("[DEV] 开发者测试模式已启用（preview + dev=kaan）。");
+}
+/* =================== /DEV MODE =================== */
+
 document.addEventListener("DOMContentLoaded", () => {
   cacheDom();
   initLoreSystem();
@@ -8422,4 +8730,5 @@ document.addEventListener("DOMContentLoaded", () => {
   bindEvents();
   updateMobileViewportState();
   showStartScreen();
+  initDevMode();
 });
