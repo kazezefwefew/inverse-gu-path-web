@@ -522,6 +522,23 @@
     return playScene(scene, options);
   }
 
+  // 预热(只下载进浏览器缓存、不播放)：用独立隐藏通道把指定场景 BGM 拉进缓存，
+  // 之后真正切到该场景即可快速起播。完全独立于播放通道与换曲状态机，不改变任何播放逻辑。
+  const warmPool = {};
+  function warmScene(sceneKey) {
+    try {
+      const scene = SCENES[sceneKey];
+      if (!scene || !scene.src || warmPool[scene.src]) return;
+      const warm = document.createElement("audio");
+      warm.preload = "auto";
+      warm.muted = true;
+      warm.loop = false;
+      warm.src = scene.src;
+      try { warm.load(); } catch (warmErr) { /* 忽略 */ }
+      warmPool[scene.src] = warm;
+    } catch (err) { /* 预热失败忽略，不影响按需播放 */ }
+  }
+
   global.AudioManager = Object.freeze({
     init,
     playScene,
@@ -535,6 +552,7 @@
     resumeBgm,
     stopBgm,
     getState,
+    warmScene,
   });
   document.addEventListener("DOMContentLoaded", init);
 }(window));

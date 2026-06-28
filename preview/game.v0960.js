@@ -419,6 +419,30 @@ const PORTRAIT_PATHS = Object.freeze({
   },
 });
 
+// 开局后预加载战斗资源(只在首次开局触发一次)：敌人立绘小图 + 预热战斗/首领 BGM，
+// 避免开战那一刻才现拉、导致音乐慢半拍、立绘闪一下。纯加载时机优化，不改音频状态机与美术。
+let battleAssetsPreloaded = false;
+function preloadBattleAssets() {
+  if (battleAssetsPreloaded) return;
+  battleAssetsPreloaded = true;
+  try {
+    const seen = {};
+    Object.values(PORTRAIT_PATHS.enemies).forEach((src) => {
+      if (!src || seen[src]) return;
+      seen[src] = true;
+      const img = new Image();
+      img.decoding = "async";
+      img.src = src;
+    });
+  } catch (imgErr) { /* 立绘预加载失败忽略 */ }
+  try {
+    if (window.AudioManager && typeof window.AudioManager.warmScene === "function") {
+      window.AudioManager.warmScene("battle");
+      window.AudioManager.warmScene("boss");
+    }
+  } catch (audioErr) { /* BGM 预热失败忽略 */ }
+}
+
 const HEROES = {
   fate: {
     name: "无名逆命者", role: "命势流蛊修", glyph: "命", maxHp: 60, energy: 3, lifespan: 23,
@@ -7315,6 +7339,7 @@ function bindEvents() {
   });
   dom.startBattleButton.addEventListener("click", () => {
     playUiSfx();
+    preloadBattleAssets();
     startNewRun();
   });
   dom.deckViewButton?.addEventListener("click", () => {
