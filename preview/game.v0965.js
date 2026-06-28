@@ -2537,7 +2537,7 @@ function getMapTransitionText(type) {
     case "shop": return "残灯下有蛊坊开门";
     case "elite": return "血煞盘踞，退路已断";
     case "rest": return "塔隙微明，可暂整蛊息";
-    case "boss": return "尸盘转动，守关者苏醒";
+    case "boss": return runState?.layer2?.active ? "生态之主盘踞，杀机已现" : "尸盘转动，守关者苏醒";
     default: return "命途流转";
   }
 }
@@ -7345,7 +7345,7 @@ function playBossWakeEffect() {
   if (!effectsAllowed()) return;
   pulseElement(document.querySelector(".enemy-panel"), "boss-awake", 940);
   spawnEffectAt(dom.enemyPortrait, "effect-boss-mist", { duration: 940 });
-  spawnCenterEffect("effect-boss-title", "尸盘监守苏醒", 980);
+  spawnCenterEffect("effect-boss-title", `${game.enemy?.definition?.name || "守关者"}苏醒`, 980);
 }
 
 function playCorpseDiskPhase2Effect() {

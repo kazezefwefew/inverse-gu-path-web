@@ -182,7 +182,7 @@ window.GU_CATALOG = [
   /* ===== V0.9.6 第二层 · 敌怪图谱（category:"enemy"，带 enemyId 供「已遇」解锁，无立绘走暗色占位） ===== */
   {
     id: "enemy_rotleaf", category: "enemy", cardKey: "", enemyId: "rotleafGu",
-    name: "腐叶蛊虫", alias: "涎毒蜗", rarity: "凡蛊", faction: "毒道", type: "敌怪", stage: "瘴林·杂蛊",
+    name: "腐叶蛊虫", alias: "涎毒蜗", rarity: "普通", faction: "毒道", type: "敌怪", stage: "瘴林·杂蛊",
     descriptionShort: "蜷于烂叶、啃噬带毒的瘴林杂蛊。",
     descriptionLore: "瘴林录：腐叶蛊虫终日埋首腐叶，背壳一层薄薄青黏，所过之处叶脉尽黑。单只不足为患，可瘴林之中从无单只——它们以毒铺路，等你慢慢烂下去。",
     habitat: "栖于瘴林腐叶堆、终年不见日的湿沟。", feeding: "啃腐叶、吸瘴气，越湿越肥。", temperament: "蛰伏怯战，受激则成片涌出。",
@@ -192,7 +192,7 @@ window.GU_CATALOG = [
   },
   {
     id: "enemy_miasmaparasite", category: "enemy", cardKey: "", enemyId: "miasmaParasite",
-    name: "青瘴寄生", alias: "附骨瘴", rarity: "凡蛊", faction: "毒道", type: "敌怪", stage: "瘴林·寄生",
+    name: "青瘴寄生", alias: "附骨瘴", rarity: "普通", faction: "毒道", type: "敌怪", stage: "瘴林·寄生",
     descriptionShort: "附骨噬毒、专挑中毒者下口的瘴蛊。",
     descriptionLore: "瘴林录：青瘴寄生半透的躯体里游着幽绿，它不爱鲜活，只爱已经中毒、正在腐烂的血肉——你身上的毒越深，它咬得越欢。",
     habitat: "潜伏瘴林湿洼、毒藤盘结的阴处。", feeding: "噬中毒之血肉，借毒滋养。", temperament: "阴忍善缠，毒发无声。",
@@ -202,7 +202,7 @@ window.GU_CATALOG = [
   },
   {
     id: "enemy_poisonvinecorpse", category: "enemy", cardKey: "", enemyId: "poisonVineCorpse",
-    name: "毒藤尸", alias: "藤缠腐尸", rarity: "凡蛊", faction: "毒道", type: "敌怪", stage: "瘴林·尸傀",
+    name: "毒藤尸", alias: "藤缠腐尸", rarity: "普通", faction: "毒道", type: "敌怪", stage: "瘴林·尸傀",
     descriptionShort: "被毒藤贯穿、挥拳带毒的腐尸傀。",
     descriptionLore: "瘴林录：毒藤尸本是误入瘴林的活人，被瘴藤贯体提起，化作半藤半尸的傀儡。它残存的拳力裹着倒刺毒藤，伤重时反而暴走。",
     habitat: "立于瘴林深径、藤网密结之地。", feeding: "由寄主毒藤汲养，无须进食。", temperament: "迟缓而凶，受创愈狂。",
@@ -212,7 +212,7 @@ window.GU_CATALOG = [
   },
   {
     id: "enemy_miasmalantern", category: "enemy", cardKey: "", enemyId: "miasmaLanternEliteGu",
-    name: "瘴林执灯者", alias: "鬼灯瘴使", rarity: "灵蛊", faction: "毒道", type: "敌怪·精英", stage: "瘴林·精英",
+    name: "瘴林执灯者", alias: "鬼灯瘴使", rarity: "精英", faction: "毒道", type: "敌怪·精英", stage: "瘴林·精英",
     descriptionShort: "提鬼灯引瘴、灯过成毒的瘴林精英。",
     descriptionLore: "瘴林录：执灯者提一盏青焰鬼灯巡行瘴林，灯火所照，瘴气如潮翻涌。传言灯中燃的是迷途者的魂，魂尽则瘴散——而瘴从未散过。",
     habitat: "巡行瘴林深处，灯不离手。", feeding: "焚魂引瘴，以瘴为食。", temperament: "冷峻执拗，逼近则狂瘴四溢。",
@@ -222,7 +222,7 @@ window.GU_CATALOG = [
   },
   {
     id: "enemy_bloodleech", category: "enemy", cardKey: "", enemyId: "bloodLeechSwarm",
-    name: "血蛭群", alias: "饱血潮", rarity: "凡蛊", faction: "血道", type: "敌怪", stage: "血沼·蛭群",
+    name: "血蛭群", alias: "饱血潮", rarity: "普通", faction: "血道", type: "敌怪", stage: "血沼·蛭群",
     descriptionShort: "成片涌出、吸血回身的血沼蛭潮。",
     descriptionLore: "血沼录：血蛭群从沼泥成片钻出，吸饱血的躯体油亮发红。它们不求一击毙命，只求附身吸血——你流的每一滴，都成了它们的命。",
     habitat: "潜伏血沼浅滩、尸血淤积的泥层。", feeding: "吸活血而肥，越腥越聚。", temperament: "无主而贪，势成则倾巢。",
@@ -232,7 +232,7 @@ window.GU_CATALOG = [
   },
   {
     id: "enemy_brokenmeridian", category: "enemy", cardKey: "", enemyId: "brokenMeridianGu",
-    name: "断脉蛊徒", alias: "自戕血修", rarity: "凡蛊", faction: "血道", type: "敌怪", stage: "血沼·血修",
+    name: "断脉蛊徒", alias: "自戕血修", rarity: "普通", faction: "血道", type: "敌怪", stage: "血沼·血修",
     descriptionShort: "自断经脉、以血换力的血道蛊徒。",
     descriptionLore: "血沼录：断脉蛊徒割开自己的腕脉，任血珠凝成赤刃。他越是淌血，出手越狠——血道一脉的疯，从这一刀自戕里就看得分明。",
     habitat: "游荡血沼血径、血祭遗坛附近。", feeding: "以自身之血饲蛊换力。", temperament: "亢奋自残，血少则更凶。",
@@ -242,7 +242,7 @@ window.GU_CATALOG = [
   },
   {
     id: "enemy_bloodmudgolem", category: "enemy", cardKey: "", enemyId: "bloodMudGolem",
-    name: "血泥傀", alias: "沼底血傀", rarity: "凡蛊", faction: "血道", type: "敌怪", stage: "血沼·泥傀",
+    name: "血泥傀", alias: "沼底血傀", rarity: "普通", faction: "血道", type: "敌怪", stage: "血沼·泥傀",
     descriptionShort: "血泥成形、吸沼自补的血沼傀儡。",
     descriptionLore: "血沼录：血泥傀由凝结的血泥层层堆塑，受创的缺口会再吸沼底浊血补回。它笨重而执拗，最是磨人——你劈开的，它一并吸回去。",
     habitat: "盘踞血沼深处、血泥淤积之地。", feeding: "吸沼血自补，受创愈贪。", temperament: "迟缓固执，残血则暴凝。",
@@ -252,7 +252,7 @@ window.GU_CATALOG = [
   },
   {
     id: "enemy_bloodrobepriest", category: "enemy", cardKey: "", enemyId: "bloodRobePriestEliteGu",
-    name: "血衣祭蛊者", alias: "血祭司", rarity: "灵蛊", faction: "血道", type: "敌怪·精英", stage: "血沼·精英",
+    name: "血衣祭蛊者", alias: "血祭司", rarity: "精英", faction: "血道", type: "敌怪·精英", stage: "血沼·精英",
     descriptionShort: "披血衣、以命饲蛊的血沼精英。",
     descriptionLore: "血沼录：血衣祭蛊者披一件浸透鲜血的法袍，每挥洒一击都先割开自己。他视痛楚为祭品，你越虚弱，他的血祭便压得越狠。",
     habitat: "守在血沼血祭坛前，血衣不离身。", feeding: "以自身与祭品之血饲蛊。", temperament: "狂信自残，逼近则血祭狂涌。",
@@ -264,7 +264,7 @@ window.GU_CATALOG = [
   /* ===== V0.9.6 第二层 · 首领残卷（category:"boss"，带 enemyId） ===== */
   {
     id: "boss_miasmamother", category: "boss", cardKey: "", enemyId: "miasmaMotherBoss",
-    name: "百瘴母蛊", alias: "万毒同巢", rarity: "异蛊", faction: "毒道", type: "首领", stage: "瘴林·之主",
+    name: "百瘴母蛊", alias: "万毒同巢", rarity: "首领", faction: "毒道", type: "首领", stage: "瘴林·之主",
     descriptionShort: "腹孕百瘴、半血苏醒的瘴林之主。",
     descriptionLore: "瘴林残卷：百瘴母蛊是整片瘴林的源头，臃肿的腹囊里翻涌上百种瘴毒。它平日昏沉，唯有命悬一线时「瘴母苏醒」，毒雾遮天，誓要与来犯者同烂于此。",
     habitat: "盘踞瘴林最深的母蛊巢穴。", feeding: "吞噬一切腐物与瘴气孕育新毒。", temperament: "慵懒贪睡，半血则暴怒苏醒。",
@@ -274,7 +274,7 @@ window.GU_CATALOG = [
   },
   {
     id: "boss_bloodrobemother", category: "boss", cardKey: "", enemyId: "bloodRobeMotherBoss",
-    name: "血衣蛊母", alias: "血债血偿", rarity: "异蛊", faction: "血道", type: "首领", stage: "血沼·之主",
+    name: "血衣蛊母", alias: "血债血偿", rarity: "首领", faction: "血道", type: "首领", stage: "血沼·之主",
     descriptionShort: "血衣覆身、越战越亢的血沼之主。",
     descriptionLore: "血沼残谱：血衣蛊母端坐血池之上，周身血衣无风自动。她以搏杀为飨，你越是拼命，她越是亢奋；半血时「血衣覆身」，血债加倍奉还。",
     habitat: "端坐血沼深渊的血池之心。", feeding: "饮搏杀之血、纳祭蛊者之命。", temperament: "亢奋嗜战，半血则血衣覆身。",
