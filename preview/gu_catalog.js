@@ -45,7 +45,7 @@ window.GU_CATALOG = [
     habitat: "盘踞古战场尸血浸透的黑土深处。", feeding: "唯饮主血与战场残煞，不食他物。", temperament: "狂而贪，喂之愈急、索之愈狠。",
     evolution: "煞积成形可蜕「血月蛊」，月圆煞涌。", synergy: "与「噬心蛊」「逆血蛊」结血煞循环，越战越凶。", counteredBy: "惧疗血断煞之术；主血枯则蛊自噬反伤。",
     dropsFrom: "绛妄起手蛊囊、血道蛊奖励。", unlockCondition: "蛊囊中曾收容此蛊即录入。",
-    gameplayEffect: "失去 3 点生命，造成 13 + 当前血煞 点伤害，获得 1 层血煞。", image: "",
+    gameplayEffect: "失去 3 点生命，造成 13 + 当前血煞 点伤害，获得 1 层血煞。", image: "assets/codex/gu/bloodblade-gu.webp",
   },
   {
     id: "gu_greenmiasma", category: "gu", cardKey: "greenMiasma",
@@ -75,7 +75,7 @@ window.GU_CATALOG = [
     habitat: "无定所，唯附于气运纠缠、生死交错之人。", feeding: "不食血肉，唯汲主之「命势」而长。", temperament: "灵而傲，势弱则蛰伏，势盛则锋出。",
     evolution: "势数圆融，可与「定数蛊」共结命势循环。", synergy: "攻守交替积势，与「逆途蛊」相济，势满则命线一击加倍利。", counteredBy: "惧夺势断流之扰，命势一散则丝软无力。",
     dropsFrom: "无名逆命者起手蛊囊、命势流蛊奖励。", unlockCondition: "蛊囊中曾收容此蛊即录入。",
-    gameplayEffect: "造成 8 点伤害；命势不少于 2 层时额外造成 6 点伤害。", image: "",
+    gameplayEffect: "造成 8 点伤害；命势不少于 2 层时额外造成 6 点伤害。", image: "assets/codex/gu/fate-thread-gu.webp",
   },
   {
     id: "gu_burningessence", category: "gu", cardKey: "burningEssence",
@@ -105,7 +105,7 @@ window.GU_CATALOG = [
     habitat: "生于血脉逆乱、横死不甘者的残骸。", feeding: "饮逆流之血与翻涌的旧煞。", temperament: "暴烈难驯，喂则索更多，稍纵即反噬。",
     evolution: "逆煞难收，常自行崩解或并入更凶的血道异蛊。", synergy: "与「血刃蛊」「噬心蛊」同囊，煞越厚逆血越猛。", counteredBy: "极耗主血，连出则力竭；惧疗血与速决。",
     dropsFrom: "通用进阶牌池(战后奖励)、血道蛊奖励。", unlockCondition: "蛊囊中曾收容此蛊即录入。",
-    gameplayEffect: "失去 5 点生命，造成 16 + 血煞×2 点伤害，获得 1 层血煞。", image: "",
+    gameplayEffect: "失去 5 点生命，造成 16 + 血煞×2 点伤害，获得 1 层血煞。", image: "assets/codex/gu/reverse-blood-gu.webp",
   },
   {
     id: "gu_shellremnant", category: "gu", cardKey: "shellRemnant",
@@ -115,7 +115,7 @@ window.GU_CATALOG = [
     habitat: "栖于蜕壳堆、败甲废铠的残骸之间。", feeding: "啃食破碎旧甲与蜕壳。", temperament: "倔而韧，受激则盛，安逸则懒。",
     evolution: "可炼为「蜕甲蛊」，弃旧迎新、甲随蜕生。", synergy: "与「铁皮蛊」「蜕壳蛊」叠甲，受创循环愈厚。", counteredBy: "未受创时所得有限；惧蚀甲与破甲连击。",
     dropsFrom: "通用构筑牌(奖励与蛊坊)。", unlockCondition: "蛊囊中曾收容此蛊即录入。",
-    gameplayEffect: "获得 6 点防御；若本回合已受伤，额外获得 6 点防御。", image: "",
+    gameplayEffect: "获得 6 点防御；若本回合已受伤，额外获得 6 点防御。", image: "assets/codex/gu/broken-shell-gu.webp",
   },
   {
     id: "gu_reversepath", category: "gu", cardKey: "reversePath",

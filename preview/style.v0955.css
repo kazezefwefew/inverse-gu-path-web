@@ -7526,23 +7526,23 @@ body.mobile-combat-safe.compact-low-height .enemy-status-list { max-height: clam
 
 /* ===================== 万蛊录（图鉴）===================== */
 /* 整层块级滚动容器：与更新公告同款稳滚动，顶对齐、横向居中，避免 flex+margin:auto 在部分手机不触发触摸滚动 */
-.wangulu-overlay { position: fixed; inset: 0; z-index: 230; overflow-y: scroll; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; touch-action: pan-y; padding: 16px 12px; box-sizing: border-box; }
+.wangulu-overlay { position: fixed; inset: 0; z-index: 230; display: flex; align-items: center; justify-content: center; padding: 16px 12px; box-sizing: border-box; }
 .wangulu-overlay.hidden { display: none; }
 .wangulu-backdrop { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.7); }
-.wangulu-panel { position: relative; z-index: 1; margin: 0 auto; width: 100%; max-width: 760px; background: radial-gradient(ellipse at 50% 0%, rgba(74, 104, 84, 0.15), rgba(10, 13, 10, 0) 62%), repeating-linear-gradient(135deg, rgba(189, 162, 109, 0.045) 0 2px, transparent 2px 11px), #0d110b; border: 1px solid #bda26d; border-radius: 14px; padding: 16px 18px 22px; color: #e8e2d0; box-shadow: 0 16px 50px rgba(0, 0, 0, 0.6); display: flex; flex-direction: column; max-height: none; }
-.wangulu-head { position: relative; display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; padding-bottom: 10px; border-bottom: 1px solid rgba(189, 162, 109, 0.22); }
+.wangulu-panel { position: relative; z-index: 1; margin: 0 auto; width: 100%; max-width: 760px; max-height: 88vh; max-height: 88dvh; background: radial-gradient(ellipse at 50% 0%, rgba(74, 104, 84, 0.15), rgba(10, 13, 10, 0) 62%), repeating-linear-gradient(135deg, rgba(189, 162, 109, 0.045) 0 2px, transparent 2px 11px), #0d110b; border: 1px solid #bda26d; border-radius: 14px; padding: 0; color: #e8e2d0; box-shadow: 0 16px 50px rgba(0, 0, 0, 0.6); display: flex; flex-direction: column; overflow: hidden; }
+.wangulu-head { flex: 0 0 auto; position: relative; z-index: 3; display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; padding: 16px 18px 10px; border-bottom: 1px solid rgba(189, 162, 109, 0.22); background: #0d110b; border-radius: 14px 14px 0 0; }
 .wangulu-head h2 { margin: 0; font: 700 24px "KaiTi", "STKaiti", serif; color: #cbb27a; letter-spacing: 0.12em; }
 .wangulu-sub { font-family: "KaiTi", "STKaiti", serif; font-size: 13px; color: #8a8064; letter-spacing: 0.06em; }
-.wangulu-close { position: absolute; right: 0; top: -2px; width: 34px; height: 34px; font-size: 22px; line-height: 1; border: 1px solid rgba(189, 162, 109, 0.4); border-radius: 8px; background: rgba(20, 26, 18, 0.92); color: #cbb27a; cursor: pointer; }
+.wangulu-close { position: absolute; right: 16px; top: 13px; width: 34px; height: 34px; font-size: 22px; line-height: 1; border: 1px solid rgba(189, 162, 109, 0.4); border-radius: 8px; background: rgba(20, 26, 18, 0.92); color: #cbb27a; cursor: pointer; }
 
 /* 分类 tab */
-.wangulu-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 4px; }
+.wangulu-tabs { flex: 0 0 auto; position: relative; z-index: 3; display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 18px 8px; background: #0d110b; border-bottom: 1px solid rgba(189, 162, 109, 0.12); }
 .wangulu-tab { position: relative; padding: 7px 14px; font: 600 14px "KaiTi", "STKaiti", serif; letter-spacing: 0.06em; border: 1px solid rgba(189, 162, 109, 0.4); border-radius: 8px; background: rgba(20, 26, 18, 0.85); color: #b9b099; cursor: pointer; }
 .wangulu-tab.is-active { background: rgba(111, 143, 95, 0.22); border-color: #8fae6e; color: #e8e2d0; box-shadow: inset 0 0 12px rgba(143, 174, 110, 0.18); }
 .wangulu-tab.is-soon { color: #6f6a58; cursor: default; }
 .wangulu-soon { display: inline-block; margin-left: 6px; font-style: normal; font-size: 10px; color: #9a7d3f; border: 1px solid rgba(189, 162, 109, 0.35); border-radius: 6px; padding: 0 4px; letter-spacing: 0.04em; }
 
-.wangulu-content { margin-top: 8px; }
+.wangulu-content { flex: 1 1 auto; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; touch-action: pan-y; padding: 12px 18px 22px; }
 .wangulu-empty { padding: 48px 16px; text-align: center; font-family: "KaiTi", "STKaiti", serif; font-size: 16px; line-height: 2; color: #8a8064; }
 .wangulu-empty span { font-size: 13px; color: #6f6a58; }
 
@@ -7595,7 +7595,11 @@ body.mobile-combat-safe.compact-low-height .enemy-status-list { max-height: clam
 
 /* 手机横屏：详情上下排布、立绘优先完整、文本不挤、筛选可折叠 */
 @media (max-width: 920px), (max-height: 520px) {
-  .wangulu-panel { max-width: 100%; padding: 14px 14px 20px; }
+  .wangulu-panel { max-width: 100%; max-height: 92vh; max-height: 92dvh; }
+  .wangulu-head { padding: 12px 14px 8px; }
+  .wangulu-tabs { padding: 10px 14px 6px; }
+  .wangulu-content { padding: 10px 14px 18px; }
+  .wangulu-close { top: 10px; right: 12px; }
   .wangulu-head h2 { font-size: 21px; }
   .wangulu-grid { grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 8px; }
   .wangulu-item-glyph { width: 48px; height: 48px; font-size: 26px; }
