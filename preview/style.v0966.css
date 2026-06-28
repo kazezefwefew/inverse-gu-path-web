@@ -7960,3 +7960,14 @@ body:not(.dev-mode-on) .dev-mode-badge { display: none !important; }
   .dev-group-grid { grid-template-columns: 1fr 1fr; }
 }
 /* =================== /DEV MODE =================== */
+
+/* ===================== V0.9.6.3 二层机制状态/浮字配色（加性，缺失则回退默认） ===================== */
+.vulnerable-status { color: #f3b0b0; border-color: rgba(208, 72, 72, 0.55); background: rgba(110, 28, 28, 0.30); }
+.enemy-status.enemy-boss-phase {
+  color: #ffd9ad;
+  border-color: rgba(214, 116, 54, 0.78);
+  background: linear-gradient(160deg, rgba(120, 42, 18, 0.5), rgba(38, 12, 8, 0.42));
+  text-shadow: 0 0 8px rgba(232, 122, 50, 0.6);
+}
+.enemy-status.enemy-charge-status { color: #ffe2a0; border-color: rgba(200, 160, 60, 0.6); }
+.heal-float { color: #8fe6a8; text-shadow: 0 0 8px rgba(74, 200, 120, 0.6); }

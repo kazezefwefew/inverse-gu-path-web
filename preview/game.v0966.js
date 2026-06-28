@@ -583,7 +583,7 @@ const ENEMY_LIBRARY = {
 /* ===== V0.9.6 第二层敌人定义（沿用现有 ENEMY_LIBRARY 结构：actions{kind,damage/bonus,playerPoison,hits,armor,lowHpExtra}、enrage、isElite/isBoss、phase2 由战斗对象承载） ===== */
 /* ---- 瘴林路线（毒/持续伤害/削弱） ---- */
   rotleafGu: {
-    name: "腐叶蛊虫", title: "瘴林杂蛊", maxHp: 58,
+    name: "腐叶蛊虫", title: "瘴林杂蛊", maxHp: 58, poisonResist: 0.3,
     kicker: "腐叶簌簌，毒涎滴阶",
     intro: "腐叶蛊虫蜷在烂叶堆中，背壳渗着青黑黏液，一动便有毒雾散开。",
     caption: "腐叶蛊虫 · 涎毒缠身",
@@ -594,7 +594,7 @@ const ENEMY_LIBRARY = {
     },
   },
   miasmaParasite: {
-    name: "青瘴寄生", title: "附骨之瘴", maxHp: 60,
+    name: "青瘴寄生", title: "附骨之瘴", maxHp: 60, poisonResist: 0.2, poisonConvert: { threshold: 6, give: 3 },
     kicker: "青瘴附骨，越缠越深",
     intro: "青瘴寄生半透的躯体里游着幽绿瘴气，专挑中毒者下口。",
     caption: "青瘴寄生 · 噬毒愈凶",
@@ -605,19 +605,19 @@ const ENEMY_LIBRARY = {
     },
   },
   poisonVineCorpse: {
-    name: "毒藤尸", title: "藤缠腐尸", maxHp: 64,
+    name: "毒藤尸", title: "藤缠腐尸", maxHp: 64, poisonResist: 0.3, blockPurge: 3,
     kicker: "毒藤穿尸，腐手拖泥",
     intro: "毒藤尸被瘴藤贯穿提起，半腐的拳头裹着倒刺毒藤砸来。",
     caption: "毒藤尸 · 藤击拖毒",
     actions: {
       vineSlam: { name: "毒藤重击", icon: "藤", kind: "attack", damage: 11, playerPoison: 1 },
       thornLash: { name: "倒刺连抽", icon: "刺", kind: "attack", damage: 4, hits: 2, playerPoison: 1 },
-      rootBrace: { name: "扎根聚毒", icon: "根", kind: "charge", bonus: 6 },
+      rootBrace: { name: "扎根聚毒", icon: "根", kind: "charge", bonus: 6, armor: 6 },
     },
     enrage: { threshold: 0.4, attackBonus: 3, name: "藤毒暴走" },
   },
   miasmaLanternEliteGu: {
-    name: "瘴林执灯者", title: "瘴林精英", maxHp: 92, isElite: true,
+    name: "瘴林执灯者", title: "瘴林精英", maxHp: 92, isElite: true, poisonConvert: { threshold: 1, give: 4 },
     kicker: "鬼灯引瘴，林深无路",
     intro: "瘴林执灯者提一盏青焰鬼灯缓步而来，灯过之处瘴气如潮翻涌。",
     caption: "瘴林执灯者 · 灯引万瘴",
@@ -629,7 +629,7 @@ const ENEMY_LIBRARY = {
     enrage: { threshold: 0.35, attackBonus: 4, name: "鬼灯狂瘴" },
   },
   miasmaMotherBoss: {
-    name: "百瘴母蛊", title: "瘴林之主", maxHp: 124, isBoss: true,
+    name: "百瘴母蛊", title: "瘴林之主", maxHp: 124, isBoss: true, poisonResist: 0.3, poisonSwallow: { threshold: 12, heal: 6 },
     kicker: "百瘴归巢，林木尽腐",
     intro: "百瘴母蛊臃肿的腹囊里翻涌着上百种瘴毒，每一次蠕动都喷出新的毒雾。",
     caption: "百瘴母蛊 · 万毒同巢",
@@ -660,7 +660,7 @@ const ENEMY_LIBRARY = {
     actions: {
       bloodBladeThrow: { name: "血刃掷击", icon: "刃", kind: "attack", damage: 13, selfBleed: 5 },
       veinTap: { name: "引血加注", icon: "引", kind: "charge", bonus: 6, selfBleed: 4 },
-      crimsonSlash: { name: "赤血斩", icon: "斩", kind: "attack", damage: 8, lowHpExtra: 5 },
+      crimsonSlash: { name: "赤血斩", icon: "斩", kind: "attack", damage: 8, lowHpExtra: 5, applyVulnerable: 1 },
     },
   },
   bloodMudGolem: {
@@ -868,7 +868,7 @@ const LORE_SKIP_ANIMATION_STORAGE_KEY = "reverseGu.lore.skipAnimation";
 const RECORDING_MODE_STORAGE_KEY = "reverseGu.recordingMode.enabled";
 const TRIAL_MODE_STORAGE_KEY = "reverseGu.trial.mode";
 const TRIAL_SEED_STORAGE_KEY = "reverseGu.trial.seedDraft";
-const GAME_VERSION = "V0.9.6.2 开发者测试面板（preview）";
+const GAME_VERSION = "V0.9.6.3 第二层正式候选（preview）";
 // TODO: 后续多幕路线扩展时继续抽象 finalNode / bossNode，避免固定四段流程继续扩散。
 const MAX_ROUTE_STEP = 4;
 const BOSS_ROUTE_STEP = 4;
@@ -900,6 +900,7 @@ const KEYWORD_HELP = Object.freeze({
   炼化: "蛊牌强化为 +1 或 +2。",
   异变: "炼蛊中蛊性变化，变成新蛊。",
   反噬: "炼蛊失控产生代价。",
+  易伤: "每次受到敌方攻击伤害时，该次伤害提升 50%（向上取整）并消耗 1 层。",
 });
 
 const TUTORIAL_PAGES = Object.freeze([
@@ -2350,6 +2351,7 @@ function createBattleState() {
       lifespan: runState.lifespan,
       blood: 0,
       poison: 0,
+      vulnerable: 0,
       fateMomentum: 0,
       lastCardFlowType: null,
       doubleNextAttack: false,
@@ -2366,6 +2368,10 @@ function createBattleState() {
       poison: 0,
       intent: null,
       phase2: false,
+      enraged: false,
+      enrageName: "",
+      charging: false,
+      dmgTakenThisTurn: 0,
       towerPressure: enemyHpMultiplier > 1,
     },
     drawPile: shuffle(deck),
@@ -3053,6 +3059,31 @@ const LAYER2_NODE_TEXT = {
   boss: "生态之主盘踞末路，破之深行。",
 };
 
+/* 第二层主题文案前缀（仅用于非战斗节点 eyebrow/标题/story 包装，复用一层机制，不另写逻辑） */
+function getLayer2ThemeText(kind) {
+  const theme = runState?.layer2?.theme;
+  const isMiasma = theme === "miasma";
+  const routeName = runState?.layer2?.routeName || (isMiasma ? "瘴林深径" : "血沼沉渊");
+  const map = {
+    rest: {
+      eyebrow: `第二层 · ${routeName} · 临隙`,
+      title: isMiasma ? "瘴隙喘息" : "血泊偷生",
+      storyPrefix: isMiasma ? "瘴气低伏，腐风暂止。此处不能久留，只能择一调理。" : "血腥稍歇，沼气翻涌。喘息只此一刻，择一事便走。",
+    },
+    shop: {
+      eyebrow: `第二层 · ${routeName} · 蛊坊`,
+      title: isMiasma ? "瘴林暗坊" : "血沼残坊",
+      desc: isMiasma ? "瘴雾里蛊坊半掩，灯火将熄。买定离手，离开后本段命途即定。" : "血灯下蛊坊低伏，残货半遮。买定离手，离开后本段命途即定。",
+    },
+    event: {
+      eyebrow: `第二层 · ${routeName} · 机缘`,
+      title: isMiasma ? "瘴中异兆" : "血沼异兆",
+      desc: isMiasma ? "瘴林深处并非全是死路，但每一次伸手都要付出代价。" : "血沼之下藏机缘，亦藏杀机。每一次伸手都要付出代价。",
+    },
+  };
+  return map[kind] || null;
+}
+
 /* 抽取一个主题普通战敌人（带去重，避免一局重复太多） */
 function pickLayer2Normal(theme, used) {
   const pool = (LAYER2_THEME_POOLS[theme]?.normals || LAYER2_THEME_POOLS.miasma.normals)
@@ -3074,21 +3105,25 @@ function createLayer2MapState(theme) {
   const used = new Set();
   const n1 = pickLayer2Normal(theme, used);
   const n2 = pickLayer2Normal(theme, used);
+  const n3 = pickLayer2Normal(theme, used);
   const themeName = theme === "miasma" ? "瘴" : "血";
+  /* 段1：三路普通战分岔，择一而行其余封闭（无死路，每路都通向段2） */
   const seg1 = [
     { id: "l2-1-a", step: 1, type: "battle", enemyId: n1, layer2: true, l2theme: theme,
       icon: "兽", name: ENEMY_LIBRARY[n1]?.name || "生态凶影", description: LAYER2_NODE_TEXT.battle },
     { id: "l2-1-b", step: 1, type: "battle", enemyId: n2, layer2: true, l2theme: theme,
       icon: "兽", name: ENEMY_LIBRARY[n2]?.name || "生态凶影", description: LAYER2_NODE_TEXT.battle },
+    { id: "l2-1-c", step: 1, type: "battle", enemyId: n3, layer2: true, l2theme: theme,
+      icon: "兽", name: ENEMY_LIBRARY[n3]?.name || "生态凶影", description: LAYER2_NODE_TEXT.battle },
   ];
-  /* 段2：三条分岔——精英(高风险高奖) / 机缘事件 / 休整蛊坊（随机给到其一非战斗），保证至少 2 选 */
+  /* 段2：精英(高风险高奖，必选其一路) + 机缘事件 + 软节点(休整|蛊坊，随机其一)，三选其一，保证 ≥2 软/硬可选无死路 */
   const softNode = Math.random() < 0.5
-    ? { id: "l2-2-c", step: 2, type: "shop", layer2: true, l2theme: theme, icon: "坊", name: "残灯蛊坊", description: LAYER2_NODE_TEXT.shop }
-    : { id: "l2-2-c", step: 2, type: "rest", layer2: true, l2theme: theme, icon: "息", name: "沼隙休整", description: LAYER2_NODE_TEXT.rest };
+    ? { id: "l2-2-c", step: 2, type: "shop", layer2: true, l2theme: theme, icon: "坊", name: theme === "miasma" ? "瘴林暗坊" : "血沼残坊", description: LAYER2_NODE_TEXT.shop }
+    : { id: "l2-2-c", step: 2, type: "rest", layer2: true, l2theme: theme, icon: "息", name: theme === "miasma" ? "瘴隙喘息" : "血泊偷生", description: LAYER2_NODE_TEXT.rest };
   const seg2 = [
     { id: "l2-2-a", step: 2, type: "elite", enemyId: pool.elite, layer2: true, l2theme: theme,
       icon: "煞", name: ENEMY_LIBRARY[pool.elite]?.name || "生态精英", description: LAYER2_NODE_TEXT.elite },
-    { id: "l2-2-b", step: 2, type: "event", layer2: true, l2theme: theme, icon: "缘", name: "生态机缘", description: LAYER2_NODE_TEXT.event },
+    { id: "l2-2-b", step: 2, type: "event", layer2: true, l2theme: theme, icon: "缘", name: theme === "miasma" ? "瘴中异兆" : "血沼异兆", description: LAYER2_NODE_TEXT.event },
     softNode,
   ];
   /* 段3：生态残卷（用 reward 类型，enterMapNode 走专门入口） */
@@ -3232,9 +3267,9 @@ function chooseLayer2Branch(kind) {
 
 /* 第二层奖励节点：在现有牌奖励池上对该路线倾向 key 加权（不改池、不新增卡） */
 function openLayer2Reward(node) {
-  const st = runState.layer2;
-  const route = LAYER2_ROUTES[st.routeId];
-  unlockLorePage(route.loreId); /* 复用现成残卷页，作“路线残卷”露出 */
+  const st = runState.layer2 || {};
+  const route = LAYER2_ROUTES[st.routeId] || { name: st.routeName || "生态深径", loreId: "unfinished", favoredCardKeys: [] };
+  if (route.loreId) unlockLorePage(route.loreId); /* 复用现成残卷页，作“路线残卷”露出 */
   runState.layer2.rewardResolved = false;
   runState.rewardResolved = false;
   runState.materialRewardResolved = false;
@@ -3243,9 +3278,11 @@ function openLayer2Reward(node) {
   runState.pendingRewardKeys = choices;
   dom.resultOverlay.querySelector(".result-card").className = "result-card";
   dom.resultSeal.textContent = "获";
-  dom.resultEyebrow.textContent = `第二层 · ${route.name} 残卷`;
+  dom.resultEyebrow.textContent = `第二层 · ${route.name || "生态深径"} 残卷`;
   dom.resultTitle.textContent = "生态收获";
-  dom.resultDescription.textContent = "生态深处遗落的蛊卵，倾向此径之道。三选其一，或舍弃前行。";
+  dom.resultDescription.textContent = node?.name
+    ? `${node.name}遗落生态深处的蛊卵，倾向此径之道。三选其一，或舍弃前行。`
+    : "生态深处遗落的蛊卵，倾向此径之道。三选其一，或舍弃前行。";
   dom.runSummary?.classList.add("hidden");
   dom.cardRewardChoices.innerHTML = choices.map((key) => {
     const item = CARD_LIBRARY[key];
@@ -3267,8 +3304,9 @@ function openLayer2Reward(node) {
 function generateLayer2RewardChoices(route) {
   const used = new Set();
   const out = [];
-  const favored = (route.favoredCardKeys || []).filter((k) => CARD_LIBRARY[k]);
-  while (out.length < 2 && favored.length) {
+  const favored = ((route && route.favoredCardKeys) || []).filter((k) => CARD_LIBRARY[k]);
+  /* 主题卡优先填满到 3 张（favored 充足时整页主题卡；不足则余位走通用池） */
+  while (out.length < 3 && favored.length) {
     const k = takeUniqueRandom(favored, used);
     if (!k) break;
     out.push(k); used.add(k);
@@ -3289,12 +3327,16 @@ function showLayer2Conclusion(cleared) {
   /* 把二层结果并入现有 showRunConclusion；统计字段已在 getRunStats 写入 */
   showRunConclusion(true);
   /* 在结算 summary 顶部补一段第二层信息（DOM 追加，不改 showRunConclusion 主体） */
-  const route = LAYER2_ROUTES[st.routeId];
+  const route = LAYER2_ROUTES[st.routeId] || null;
+  const routeName = route?.name || st.routeName || "未进入";
+  const bossName = (route && typeof ENEMY_LIBRARY !== "undefined" && ENEMY_LIBRARY[route.bossId]?.name) || "生态之主";
+  const bestiaryCount = (typeof layer2LoadBestiary === "function" ? layer2LoadBestiary().size : 0);
   const extra = document.createElement("div");
   extra.className = "run-summary-item wide layer2-summary-block";
-  extra.innerHTML = `<span>第二层 · ${route ? route.name : "未进入"}</span><strong>` +
-    `Boss「${route ? LAYER2_ROUTES[st.routeId].name : "-"}」${st.bossDefeated ? "已破" : "未破"} · ` +
-    `推进 ${st.nodesCleared || 0} 节点 · 终点「${st.lastNodeName || "-"}」</strong>`;
+  extra.innerHTML = `<span>第二层 · ${routeName}</span><strong>` +
+    `Boss「${bossName}」${st.bossDefeated ? "已破" : "未破"} · ` +
+    `推进 ${st.nodesCleared || 0} 节点 · 终点「${st.lastNodeName || "-"}」 · ` +
+    `万蛊录新增 ${bestiaryCount} 条</strong>`;
   dom.runSummary?.prepend(extra);
   // 关键：finishBattle 的二层分支提前 return，不会走到通用的显示遮罩处，这里自己显示，避免 Boss 胜利后卡住。
   dom.resultOverlay.classList.remove("hidden");
@@ -3340,10 +3382,11 @@ function openChanceEvent() {
   dom.mapScreen?.classList.add("hidden");
   dom.resultOverlay.querySelector(".result-card").className = "result-card map-result";
   hideRewardPanels();
+  const __l2Event = runState.layer2?.active ? getLayer2ThemeText("event") : null;
   dom.resultSeal.textContent = "缘";
-  dom.resultEyebrow.textContent = "命途分岔 · 机缘";
-  dom.resultTitle.textContent = "机缘入局";
-  dom.resultDescription.textContent = "这不是战斗，但每一次伸手都要付出代价。";
+  dom.resultEyebrow.textContent = __l2Event ? __l2Event.eyebrow : "命途分岔 · 机缘";
+  dom.resultTitle.textContent = __l2Event ? __l2Event.title : "机缘入局";
+  dom.resultDescription.textContent = __l2Event ? __l2Event.desc : "这不是战斗，但每一次伸手都要付出代价。";
   dom.resultTurns.textContent = "—";
   dom.resultHp.textContent = runState.currentHp;
   dom.eventName.textContent = event.name;
@@ -3525,14 +3568,15 @@ function openRestNode() {
   dom.mapScreen?.classList.add("hidden");
   dom.resultOverlay.querySelector(".result-card").className = "result-card map-result rest-result";
   hideRewardPanels();
+  const __l2Rest = runState.layer2?.active ? getLayer2ThemeText("rest") : null;
   dom.resultSeal.textContent = "息";
-  dom.resultEyebrow.textContent = `第 ${REST_ROUTE_STEP} 段 · 临门分岔`;
-  dom.resultTitle.textContent = node?.name || "休整节点";
+  dom.resultEyebrow.textContent = __l2Rest ? __l2Rest.eyebrow : `第 ${REST_ROUTE_STEP} 段 · 临门分岔`;
+  dom.resultTitle.textContent = node?.name || (__l2Rest ? __l2Rest.title : "休整节点");
   dom.resultDescription.textContent = "塔隙只容一息。选一件事，便继续前行。";
   dom.resultTurns.textContent = "—";
   dom.resultHp.textContent = runState.currentHp;
-  dom.eventName.textContent = node?.name || "休整";
-  dom.eventStory.textContent = "腐风暂止，蛊火低伏。此处不能久留，只能择一调理。";
+  dom.eventName.textContent = node?.name || (__l2Rest ? __l2Rest.title : "休整");
+  dom.eventStory.textContent = __l2Rest ? __l2Rest.storyPrefix : "腐风暂止，蛊火低伏。此处不能久留，只能择一调理。";
   const canRemove = runState.deckCards.length > 6;
   dom.eventChoices.innerHTML = `
     <button class="event-choice steady" type="button" data-rest-choice="heal">
@@ -3666,10 +3710,11 @@ function openShopNode() {
   dom.mapScreen?.classList.add("hidden");
   dom.resultOverlay.querySelector(".result-card").className = "result-card map-result shop-result";
   hideRewardPanels();
+  const __l2Shop = runState.layer2?.active ? getLayer2ThemeText("shop") : null;
   dom.resultSeal.textContent = "坊";
-  dom.resultEyebrow.textContent = "命途分岔 · 蛊坊";
-  dom.resultTitle.textContent = "暗灯蛊坊";
-  dom.resultDescription.textContent = "蛊坊只开一刻。买定离手，离开后本段命途即定。";
+  dom.resultEyebrow.textContent = __l2Shop ? __l2Shop.eyebrow : "命途分岔 · 蛊坊";
+  dom.resultTitle.textContent = __l2Shop ? __l2Shop.title : "暗灯蛊坊";
+  dom.resultDescription.textContent = __l2Shop ? __l2Shop.desc : "蛊坊只开一刻。买定离手，离开后本段命途即定。";
   dom.resultTurns.textContent = "—";
   dom.resultHp.textContent = runState.currentHp;
   dom.shopPanel.classList.remove("hidden");
@@ -5504,6 +5549,15 @@ function gainFateMomentum(amount) {
 
 function applyEnemyPoison(amount, sourceName, { corrosive = true, forceCorrosion = false, logClass = "poison-log" } = {}) {
   if (amount <= 0) return;
+  // V0.9.6.3 二层毒抗：def.poisonResist (0~1) 折算实得毒层，向上取整保底 1（仍留可构筑空间）。
+  const poisonResist = game.enemy.definition.poisonResist || 0;
+  if (poisonResist > 0) {
+    const reduced = Math.max(1, Math.ceil(amount * (1 - poisonResist)));
+    if (reduced < amount) {
+      addLog(`${game.enemy.definition.name}毒抗削弱，实得 ${reduced} 层（原 ${amount}）。`, "enemy-log");
+      amount = reduced;
+    }
+  }
   const wasPoisoned = game.enemy.poison > 0;
   game.enemy.poison += amount;
   recordBossPoisonPeak();
@@ -5592,6 +5646,8 @@ function resolveAttack(card, baseDamage, detail = "") {
   const realDamage = Math.max(0, damage - enemyBlocked);
   game.enemy.armor = Math.max(0, (game.enemy.armor || 0) - damage);
   game.enemy.hp = Math.max(0, game.enemy.hp - realDamage);
+  // V0.9.6.3 蓄力打断计数：本玩家回合对敌累计伤害（每玩家回合 beginNextTurn 归零）。
+  game.enemy.dmgTakenThisTurn = (game.enemy.dmgTakenThisTurn || 0) + realDamage;
 
   const notes = [];
   if (detail) notes.push(detail);
@@ -5649,10 +5705,39 @@ function resolveEnemyTurn() {
     if (action.armor) {
       game.enemy.armor = (game.enemy.armor || 0) + action.armor;
       spawnFloatText(dom.enemyPortrait, `+${action.armor} 防御`, "defense-float");
+      // V0.9.6.3 凝甲蚀毒：def.blockPurge —— 获甲时额外清掉自身 N 层毒（毒藤尸）。
+      const purge = game.enemy.definition.blockPurge || 0;
+      if (purge > 0 && game.enemy.poison > 0) {
+        const removed = Math.min(purge, game.enemy.poison);
+        game.enemy.poison = Math.max(0, game.enemy.poison - removed);
+        game.pendingEnemyPoisonPulse = true;
+        addLog(`${enemyName}凝甲蚀毒，压去自身 ${removed} 层毒性。`, enemyLogClass);
+        spawnDelayedFloatText(dom.enemyPortrait, `凝甲蚀毒 -${removed}`, "poison-float", 60);
+      }
     }
     addLog(`${enemyName}使用${action.name}，下一次攻击将额外造成 ${action.bonus} 点伤害${action.armor ? `，并获得 ${action.armor} 点防御` : ""}。`, enemyLogClass);
     setBattleMessage(`${enemyName}压低身形，危险气息正在聚拢……`);
     spawnFloatText(dom.enemyPortrait, `蓄势 +${action.bonus}`, "resource-float");
+    // V0.9.6.3 蓄势动作携带的吸血/自损（veinTap 自损 / sanguineWard·crimsonGather 吸血）。蓄势无伤害，lifesteal 直接按上限回血。
+    if (action.lifesteal) {
+      const chargeHealed = Math.min(action.lifesteal, game.enemy.maxHp - game.enemy.hp);
+      if (chargeHealed > 0) {
+        game.enemy.hp += chargeHealed;
+        addLog(`${enemyName}噬血回复 ${chargeHealed} 点生命。`, enemyLogClass);
+        spawnDelayedFloatText(dom.enemyPortrait, `回血 +${chargeHealed}`, "heal-float", 120);
+      }
+    }
+    if (action.selfBleed) {
+      const chargeBefore = game.enemy.hp;
+      game.enemy.hp = Math.max(0, game.enemy.hp - action.selfBleed);
+      if (game.enemy.hp < chargeBefore) {
+        addLog(`${enemyName}以${action.name}割伤自身，自损 ${action.selfBleed} 点。`, enemyLogClass);
+        spawnDelayedFloatText(dom.enemyPortrait, `-${action.selfBleed} 自损`, "", 160);
+        animateHit(dom.enemyPortrait);
+        checkLayer2BossPhase2();
+        checkCorpseDiskPhase2();
+      }
+    }
   } else {
     const hitCount = action.hits || 1;
     const lowHpBonus = action.lowHpExtra && game.player.hp < game.player.maxHp / 2 ? action.lowHpExtra : 0;
@@ -5660,7 +5745,14 @@ function resolveEnemyTurn() {
       ? game.enemy.definition.enrage.attackBonus
       : 0;
     const routeBonus = game.enemyAttackBonus || 0;
-    const rawDamage = action.damage * hitCount + game.enemy.chargedBonus + lowHpBonus + enrageBonus + routeBonus;
+    let rawDamage = action.damage * hitCount + game.enemy.chargedBonus + lowHpBonus + enrageBonus + routeBonus;
+    // V0.9.6.3 易伤：玩家 vulnerable>0 时本次受到的攻击伤害 *1.5（向上取整）并消耗 1 层。
+    let vulnerableApplied = 0;
+    if (game.player.vulnerable > 0 && rawDamage > 0) {
+      rawDamage = Math.ceil(rawDamage * 1.5);
+      game.player.vulnerable = Math.max(0, game.player.vulnerable - 1);
+      vulnerableApplied = 1;
+    }
     const bonus = game.enemy.chargedBonus;
     const blocked = Math.min(game.player.armor, rawDamage);
     const received = Math.max(0, rawDamage - game.player.armor);
@@ -5673,8 +5765,9 @@ function resolveEnemyTurn() {
       hitCount > 1 ? `${hitCount} 次连击` : "",
       bonus > 0 ? `蓄势 +${bonus}` : "",
       lowHpBonus > 0 ? `追魂 +${lowHpBonus}` : "",
-      enrageBonus > 0 ? `血纹狂化 +${enrageBonus}` : "",
+      enrageBonus > 0 ? `${(game.enemy.definition.enrage && game.enemy.definition.enrage.name) || "狂怒"} +${enrageBonus}` : "",
       routeBonus > 0 ? `岔路恶果 +${routeBonus}` : "",
+      vulnerableApplied > 0 ? "易伤 ×1.5" : "",
     ].filter(Boolean).join("，");
     addLog(`${enemyName}使用${action.name}，造成 ${rawDamage} 点伤害${detail ? `（${detail}）` : ""}；防御抵挡 ${blocked} 点，你受到 ${received} 点伤害。`, enemyLogClass);
 
@@ -5705,6 +5798,33 @@ function resolveEnemyTurn() {
       spawnFloatText(dom.playerPortrait, `+${action.playerPoison} 毒性`, "resource-float");
       spawnEffectAt(dom.playerPortrait, "effect-poison-mist", { duration: 620 });
     }
+    // V0.9.6.3 易伤：action.applyVulnerable 给玩家叠易伤（断脉蛊徒等）。
+    if (action.applyVulnerable) {
+      game.player.vulnerable = (game.player.vulnerable || 0) + action.applyVulnerable;
+      addLog(`${action.name}撕裂你的护蛊：易伤 +${action.applyVulnerable}。`, "damage-log");
+      spawnFloatText(dom.playerPortrait, `+${action.applyVulnerable} 易伤`, "resource-float");
+    }
+    // V0.9.6.3 吸血：action.lifesteal —— 命中（received>0）后回复，最多补满 maxHp。
+    if (action.lifesteal && received > 0) {
+      const healed = Math.min(action.lifesteal, game.enemy.maxHp - game.enemy.hp);
+      if (healed > 0) {
+        game.enemy.hp += healed;
+        addLog(`${enemyName}噬血回复 ${healed} 点生命。`, enemyLogClass);
+        spawnDelayedFloatText(dom.enemyPortrait, `回血 +${healed}`, "heal-float", 120);
+      }
+    }
+    // V0.9.6.3 自损：action.selfBleed —— 结算后扣自身生命；扣血后补一次半血相位/狂怒判定（不重复）。
+    if (action.selfBleed) {
+      const before = game.enemy.hp;
+      game.enemy.hp = Math.max(0, game.enemy.hp - action.selfBleed);
+      if (game.enemy.hp < before) {
+        addLog(`${enemyName}以${action.name}割伤自身，自损 ${action.selfBleed} 点。`, enemyLogClass);
+        spawnDelayedFloatText(dom.enemyPortrait, `-${action.selfBleed} 自损`, "", 160);
+        animateHit(dom.enemyPortrait);
+        checkLayer2BossPhase2();
+        checkCorpseDiskPhase2();
+      }
+    }
   }
 
   // 防御在敌方行动完成后清零，既符合回合规则，也能真正抵挡本回合意图。
@@ -5715,7 +5835,48 @@ function resolveEnemyTurn() {
   enemyTurnTimer = window.setTimeout(beginNextTurn, 360);
 }
 
+/* === V0.9.6.3 新增独立函数：二层敌人毒性机制(吞毒/转毒) + 敌人动作 flag 检测 === */
+
+// 二层敌人毒性机制：吞毒（达阈值清空回血、抵消本回合毒伤）/转毒（达阈值减半并反施玩家毒）。
+// 仅二层敌人有对应 def 字段，其余敌人此函数零副作用。在 resolvePoisonAtEnemyTurnEnd 毒伤结算之前调用。
+function checkLayer2EnemyPoisonMechanics() {
+  if (!game || !game.enemy || game.enemy.hp <= 0) return;
+  const def = game.enemy.definition;
+  // 吞毒：enemy.poison >= threshold -> 清空毒、回血，抵消本回合毒伤。
+  if (def.poisonSwallow && game.enemy.poison >= def.poisonSwallow.threshold) {
+    const swallowed = game.enemy.poison;
+    game.enemy.poison = 0;
+    const healed = Math.min(def.poisonSwallow.heal, game.enemy.maxHp - game.enemy.hp);
+    if (healed > 0) game.enemy.hp += healed;
+    game.pendingEnemyPoisonPulse = true;
+    addLog(`${def.name}吞毒：吞噬 ${swallowed} 层毒性${healed > 0 ? `，回复 ${healed} 点生命` : ""}，本回合毒伤被化解。`, "boss-log");
+    spawnFloatText(dom.enemyPortrait, `吞毒 -${swallowed}`, "poison-float");
+    if (healed > 0) spawnDelayedFloatText(dom.enemyPortrait, `回血 +${healed}`, "heal-float", 140);
+    return; // 已清空，无需再判转毒
+  }
+  // 转毒/吐毒：enemy.poison >= threshold -> 自身毒减半、玩家获得 give 层毒。
+  if (def.poisonConvert && game.enemy.poison >= def.poisonConvert.threshold) {
+    const before = game.enemy.poison;
+    game.enemy.poison = Math.floor(before / 2);
+    game.pendingEnemyPoisonPulse = true;
+    game.player.poison += def.poisonConvert.give;
+    addLog(`${def.name}吐毒：反施 ${def.poisonConvert.give} 层毒性于你，自身毒减半（${before}→${game.enemy.poison}）。`, "enemy-log");
+    spawnFloatText(dom.playerPortrait, `+${def.poisonConvert.give} 毒性`, "resource-float");
+    spawnDelayedFloatText(dom.enemyPortrait, `吐毒 -${before - game.enemy.poison}`, "poison-float", 60);
+  }
+}
+
+// 辅助：当前敌人 actions 中是否存在某 flag 字段（用于状态栏推 吸血/自损 标记）。
+function enemyHasActionFlag(flag) {
+  const actions = game.enemy?.definition?.actions;
+  if (!actions) return false;
+  return Object.values(actions).some((a) => a && a[flag]);
+}
+
 function resolvePoisonAtEnemyTurnEnd() {
+  if (game.enemy.poison <= 0) return;
+  // V0.9.6.3 二层吞毒/转毒：在毒伤结算前判定，吞毒可清空抵消本回合毒伤。
+  checkLayer2EnemyPoisonMechanics();
   if (game.enemy.poison <= 0) return;
   recordBossPoisonPeak();
   applyCorpseDiskPoisonSuppression();
@@ -5764,6 +5925,7 @@ function beginNextTurn() {
   game.cardsPlayedThisTurn = 0;
   game.lastCardCategoryThisTurn = null;
   game.fateGainedThisTurn = false;
+  if (game.enemy) game.enemy.dmgTakenThisTurn = 0;
   game.supportDrawPrimed = 0;
   if (game.combatRelic) game.combatRelic.bloodJadeHealsThisTurn = 0;
 
@@ -5870,6 +6032,13 @@ function finishBattle(victory) {
     playDefeatEffect();
     addLog("你的生命归零，道途断绝。", "damage-log");
     runState.status = "failed";
+    // V0.9.6.3：二层阵亡需在结算前记录节点/敌名（layer2 失败分支不会清 currentNode，但保险起见在此即时取）
+    if (runState.layer2?.active) {
+      const __l2Node = runState.currentNode?.name || "未知节点";
+      const __l2Enemy = game.enemy?.definition?.name || "未知敌人";
+      getRunStats().deathNode = `第二层 · ${runState.layer2.routeName || "生态深径"} · ${__l2Node}`;
+      getRunStats().deathEnemy = __l2Enemy;
+    }
     showRunConclusion(false);
   }
 
@@ -7487,6 +7656,7 @@ function renderBuffs() {
     });
   }
   if (game.player.poison > 0) buffs.push({ label: `中毒：${game.player.poison} 层`, title: "敌方回合结束后受到等同层数的伤害，随后衰减 1 层。", className: "poison-status", keyword: "毒性" });
+  if (game.player.vulnerable > 0) buffs.push({ label: `易伤：${game.player.vulnerable} 层`, title: "每次受到敌方攻击伤害时该次伤害 ×1.5（向上取整）并消耗 1 层。", className: "vulnerable-status", keyword: "易伤" });
   runState.refinements.forEach((id) => buffs.push({ label: `炼蛊：${REFINEMENTS[id].name}`, title: REFINEMENTS[id].description, className: "refinement-status", keyword: "炼化" }));
   dom.buffList.innerHTML = buffs.length
     ? buffs.map((buff) => `<span class="buff-tag ${buff.className || ""}" ${buff.keyword ? keywordAttr(buff.keyword) : `title="${escapeAttribute(buff.title)}"`}>${buff.label}</span>`).join(" ")
@@ -7677,6 +7847,14 @@ const ENEMY_STATUS_HELP = {
   吸血: "命中后回复等量生命，续战不退。",
   蓄势: "本回合蓄力，下次攻击附加额外伤害。",
   护体: "覆一层血衣/护甲，先抵挡伤害后清零。",
+  毒抗: "对毒性有抗性：你施加的毒层会被削减（向上取整保底 1 层）。",
+  转毒: "自身毒性达阈值时，吐出部分毒性反施给你，自身毒减半。",
+  吐毒: "自身毒性达阈值时，吐出部分毒性反施给你，自身毒减半。",
+  吞毒: "自身毒性达阈值时，回合末吞噬毒性回复生命，并抵消该回合毒伤。",
+  凝甲蚀毒: "获得护甲时清除自身部分毒性。",
+  蓄力: "正在蓄力重击；本玩家回合对它打出足够伤害可打断。",
+  瘴母苏醒: "生命过半后进入二阶，瘴毒更猛、杀意暴涨。",
+  血衣覆身: "生命过半后进入二阶，血债加倍、吸血压迫更强。",
 };
 
 /* 生成敌人状态的 tooltip 属性：优先 KEYWORD_HELP，其次 ENEMY_STATUS_HELP，
@@ -7696,8 +7874,28 @@ function renderEnemyStatuses() {
       statuses.push(`<span class="enemy-status enemy-boss-phase"${enemyStatusAttr("尸盘转轮")}>尸盘转轮</span>`);
     }
   }
-  /* 第二层敌人狂怒相位（V0.9.6 enrage）可查询 */
-  if (game.enemy.enraged) statuses.push(`<span class="enemy-status enemy-enrage-status"${enemyStatusAttr(game.enemy.enrageName || "狂怒", "生命低于阈值后狂怒，攻击提升。")}>${game.enemy.enrageName || "狂怒"}</span>`);
+  /* 第二层敌人狂怒相位（V0.9.6 enrage）可查询：改读 def.enrage 阈值即时判定，并同步 enraged/enrageName 供日志/显示一致。 */
+  const def = game.enemy.definition;
+  const enrageActive = Boolean(def.enrage) && game.enemy.hp <= game.enemy.maxHp * def.enrage.threshold && game.enemy.hp > 0;
+  game.enemy.enraged = enrageActive;
+  game.enemy.enrageName = enrageActive ? (def.enrage.name || "狂怒") : "";
+  if (enrageActive) {
+    const enrageLabel = def.enrage.name || "狂怒";
+    statuses.push(`<span class="enemy-status enemy-enrage-status"${enemyStatusAttr(enrageLabel, "生命低于阈值后狂怒，攻击提升。")}>${enrageLabel}</span>`);
+  }
+  /* 二层半血相位标记（瘴母苏醒 / 血衣覆身） */
+  if (game.enemy.phase2 && def.isBoss) {
+    if (game.enemy.id === "miasmaMotherBoss") statuses.push(`<span class="enemy-status enemy-boss-phase"${enemyStatusAttr("瘴母苏醒")}>瘴母苏醒</span>`);
+    else if (game.enemy.id === "bloodRobeMotherBoss") statuses.push(`<span class="enemy-status enemy-boss-phase"${enemyStatusAttr("血衣覆身")}>血衣覆身</span>`);
+  }
+  /* 二层敌人机制标记（毒抗/转毒/吞毒/吸血/自损/蓄力），按 def/action 推送，全部接 tooltip。 */
+  if (def.poisonResist > 0) { const pct = Math.round(def.poisonResist * 100); statuses.push(`<span class="enemy-status"${enemyStatusAttr("毒抗", `受到的毒层削减约 ${pct}%（向上取整保底 1）。`)}>毒抗 ${pct}%</span>`); }
+  if (def.poisonSwallow) statuses.push(`<span class="enemy-status"${enemyStatusAttr("吞毒")}>吞毒</span>`);
+  if (def.poisonConvert) statuses.push(`<span class="enemy-status"${enemyStatusAttr("转毒")}>转毒</span>`);
+  if (def.blockPurge) statuses.push(`<span class="enemy-status"${enemyStatusAttr("凝甲蚀毒", "获甲时清除自身部分毒性。")}>凝甲蚀毒</span>`);
+  if (enemyHasActionFlag("lifesteal")) statuses.push(`<span class="enemy-status"${enemyStatusAttr("吸血")}>吸血</span>`);
+  if (enemyHasActionFlag("selfBleed")) statuses.push(`<span class="enemy-status"${enemyStatusAttr("自损")}>自损</span>`);
+  if (game.enemy.charging) statuses.push(`<span class="enemy-status enemy-charge-status"${enemyStatusAttr("蓄力")}>蓄力</span>`);
   if (game.enemy.towerPressure) statuses.push(`<span class="enemy-status"${enemyStatusAttr("塔压")}>塔压</span>`);
   if ((game.enemy.armor || 0) > 0) statuses.push(`<span class="enemy-status enemy-armor-status"${enemyStatusAttr("防御")}>防御 <strong>${game.enemy.armor}</strong></span>`);
   if (game.enemy.poison > 0) statuses.push(`<span class="enemy-status enemy-poison-status"${enemyStatusAttr("毒性")}>毒性 <strong>${game.enemy.poison}</strong></span>`);
@@ -7714,7 +7912,10 @@ function renderIntent() {
   dom.intentIcon.textContent = action.icon;
   dom.intentName.textContent = action.name;
   if (action.kind === "charge") {
-    dom.intentDescription.textContent = `本回合不攻击；下一次攻击 +${action.bonus}${action.armor ? `，获得 ${action.armor} 防御` : ""}`;
+    const chargeExtras = [];
+    if (action.lifesteal) chargeExtras.push(`吸血 ${action.lifesteal}`);
+    if (action.selfBleed) chargeExtras.push(`自损 ${action.selfBleed}`);
+    dom.intentDescription.textContent = `本回合不攻击；下一次攻击 +${action.bonus}${action.armor ? `，获得 ${action.armor} 防御` : ""}${chargeExtras.length ? `（本回合${chargeExtras.join("，")}）` : ""}`;
     updateIntentThreat(0);
   } else {
     const hitCount = action.hits || 1;
@@ -7728,11 +7929,16 @@ function renderIntent() {
     if (hitCount > 1) extras.push(`${hitCount} 次连击`);
     if (game.enemy.chargedBonus > 0) extras.push("蓄势已计入");
     if (lowHpBonus > 0) extras.push(`追魂 +${lowHpBonus}`);
-    if (enrageBonus > 0) extras.push("血纹狂化");
+    if (enrageBonus > 0) extras.push((game.enemy.definition.enrage && game.enemy.definition.enrage.name) || "狂怒");
     if (routeBonus > 0) extras.push(`岔路恶果 +${routeBonus}`);
     if (action.lifespanDamage) extras.push(`另损 ${action.lifespanDamage} 寿元`);
     if (action.energyDrain) extras.push(`下回合少 ${action.energyDrain} 真元`);
     if (action.playerPoison) extras.push(`施加 ${action.playerPoison} 层毒性`);
+    if (action.lifesteal) extras.push(`吸血 ${action.lifesteal}`);
+    if (action.selfBleed) extras.push(`自损 ${action.selfBleed}`);
+    if (action.applyVulnerable) extras.push(`施易伤 ${action.applyVulnerable}`);
+    if ((game.enemy.definition.poisonResist || 0) > 0) extras.push(`${Math.round(game.enemy.definition.poisonResist * 100)}% 毒抗`);
+    if (action.charge) extras.push(`蓄力·受 ${action.charge.interruptThreshold} 伤可打断`);
     dom.intentDescription.textContent = `将造成 ${totalDamage} 点伤害${extras.length ? `（${extras.join("，")}）` : ""}`;
     // 净伤宣示：护甲一次性全量抵消（与 resolveEnemyTurn 同逻辑），预计掉血 = max(0, 总伤 - 当前护甲)。
     const netDamage = Math.max(0, totalDamage - (game.player.armor || 0));
