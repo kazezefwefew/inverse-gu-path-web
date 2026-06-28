@@ -125,7 +125,7 @@ window.GU_CATALOG = [
     habitat: "无定所，附于不肯认命、屡败屡起之人。", feeding: "不食血肉，汲主攻守交替间漏出的命势。", temperament: "沉静而执，势弱不弃，步步为营。",
     evolution: "势数纯熟可与「断命蛊」「定数蛊」共结命势环。", synergy: "与「命线蛊」相济：先以逆途积势，再以命线收割。", counteredBy: "本身无伤无防峰值，惧被速攻打断节奏。",
     dropsFrom: "无名逆命者起手蛊囊、命势流蛊奖励。", unlockCondition: "蛊囊中曾收容此蛊即录入。",
-    gameplayEffect: "获得 3 点防御，并获得 1 层命势。", image: "",
+    gameplayEffect: "获得 3 点防御，并获得 1 层命势。", image: "assets/codex/gu/inverse-path-gu.webp",
   },
   {
     id: "gu_moltingshell", category: "gu", cardKey: "moltingShell",
@@ -135,7 +135,7 @@ window.GU_CATALOG = [
     habitat: "潜居瘴泽蜕壳、毒藤盘结之处。", feeding: "食蜕壳，亦从中毒之敌身上汲毒为养。", temperament: "阴而稳，善守善退，不喜强攻。",
     evolution: "可与「腐瘴蛊」共生，蜕中带毒、守中藏蚀。", synergy: "与「青瘴蛊」「虫群蛊」铺毒在前，蜕壳愈从容。", counteredBy: "敌不中毒时只是寻常护甲；惧破甲与净毒。",
     dropsFrom: "青蟒起手蛊囊、毒道蛊奖励。", unlockCondition: "蛊囊中曾收容此蛊即录入。",
-    gameplayEffect: "获得 8 点防御；若敌人已中毒，抽 1 张牌。", image: "",
+    gameplayEffect: "获得 8 点防御；若敌人已中毒，抽 1 张牌。", image: "assets/codex/gu/molting-shell-gu.webp",
   },
   {
     id: "gu_poisonreturn", category: "gu", cardKey: "poisonReturn",
@@ -168,16 +168,6 @@ window.GU_CATALOG = [
     evolution: "（未实装；其成潮之相见敌怪「乱蜂蛊潮」。）", synergy: "（未实装，暂无战斗联动。）", counteredBy: "（未实装。）",
     dropsFrom: "桌面立绘已备；游戏内现以敌怪「乱蜂蛊潮」登场，尚无玩家蛊牌。", unlockCondition: "暂未实装为战斗蛊牌。",
     gameplayEffect: "", image: "assets/codex/gu/chaos-bee-gu.webp",
-  },
-  {
-    id: "eco_snakeshell", category: "eco", cardKey: "",
-    name: "蛇壳蛊", alias: "鳞缠盘", rarity: "灵蛊", faction: "毒道", type: "生态", stage: "灵蛊·蛇形",
-    descriptionShort: "鳞甲缠身、盘踞御毒的蛇形生态蛊。",
-    descriptionLore: "毒道异闻：此蛊托身于蜕下的巨蛇之壳，鳞片层叠如甲，盘绕一团便是一座活的毒障。它不主动伤人，只把自己缠成铜墙，逼来犯者先碰一身鳞毒。立绘题作「毒道·防御蛊」，惜游戏内尚未成牌。",
-    habitat: "栖于蛇蜕岩窟、毒藤盘结的湿暗深处。", feeding: "吞蛇蜕与鳞间积毒，喜阴恶光。", temperament: "沉静自守，非犯不动，一动则缠死。",
-    evolution: "（未实装，防御演化路线待考。）", synergy: "（未实装，暂无战斗联动。）", counteredBy: "（未实装。）",
-    dropsFrom: "桌面立绘已备，游戏内尚无对应蛊牌(注：游戏另有「蜕壳蛊」，非同一只)。", unlockCondition: "暂未实装为战斗蛊牌。",
-    gameplayEffect: "", image: "assets/codex/gu/snake-shell-gu.webp",
   },
   {
     id: "eco_bloodmarsh", category: "eco", cardKey: "",
