@@ -43,7 +43,7 @@ window.GU_CATALOG = [
     dropsFrom: "命途初阶、无名逆命者起手蛊囊。",
     unlockCondition: "蛊囊中曾收容此蛊即录入。",
     gameplayEffect: "对敌人造成 6 点伤害。",
-    image: "",
+    image: "assets/codex/gu/moonblade-gu.webp",
   },
   {
     id: "gu_ironskin",
@@ -67,7 +67,7 @@ window.GU_CATALOG = [
     dropsFrom: "命途初阶、各蛊修起手蛊囊。",
     unlockCondition: "蛊囊中曾收容此蛊即录入。",
     gameplayEffect: "获得 7 点防御。",
-    image: "",
+    image: "assets/codex/gu/iron-shell-gu.webp",
   },
   {
     id: "gu_wineworm",
@@ -91,7 +91,7 @@ window.GU_CATALOG = [
     dropsFrom: "命途辅助蛊奖励、燃命流起手蛊囊。",
     unlockCondition: "蛊囊中曾收容此蛊即录入。",
     gameplayEffect: "下一张攻击蛊的伤害翻倍。",
-    image: "",
+    image: "assets/codex/gu/wineworm-gu.webp",
   },
   {
     id: "gu_bloodblade",
@@ -139,7 +139,7 @@ window.GU_CATALOG = [
     dropsFrom: "青蟒起手蛊囊、毒道蛊奖励。",
     unlockCondition: "蛊囊中曾收容此蛊即录入。",
     gameplayEffect: "施加 4 层毒性。",
-    image: "",
+    image: "assets/codex/gu/green-miasma-gu.webp",
   },
   {
     id: "gu_insectswarm",
@@ -163,7 +163,7 @@ window.GU_CATALOG = [
     dropsFrom: "青蟒流毒道蛊奖励、命途虫群事件。",
     unlockCondition: "蛊囊中曾收容此蛊即录入。",
     gameplayEffect: "造成 4 点伤害，并施加 4 层毒性。",
-    image: "",
+    image: "assets/codex/gu/swarm-gu.webp",
   },
   {
     id: "gu_fatethread",
@@ -211,6 +211,6 @@ window.GU_CATALOG = [
     dropsFrom: "燃命流起手蛊囊、命途真元事件。",
     unlockCondition: "蛊囊中曾收容此蛊即录入。",
     gameplayEffect: "获得 1 点真元，但失去 2 点生命。",
-    image: "",
+    image: "assets/codex/gu/burning-yuan-gu.webp",
   },
 ];
