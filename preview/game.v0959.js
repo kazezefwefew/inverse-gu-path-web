@@ -715,7 +715,7 @@ const LORE_SKIP_ANIMATION_STORAGE_KEY = "reverseGu.lore.skipAnimation";
 const RECORDING_MODE_STORAGE_KEY = "reverseGu.recordingMode.enabled";
 const TRIAL_MODE_STORAGE_KEY = "reverseGu.trial.mode";
 const TRIAL_SEED_STORAGE_KEY = "reverseGu.trial.seedDraft";
-const GAME_VERSION = "V0.9.5.1 万蛊录基础版热修";
+const GAME_VERSION = "V0.9.5.2 万蛊录任务预埋版";
 // TODO: 后续多幕路线扩展时继续抽象 finalNode / bossNode，避免固定四段流程继续扩散。
 const MAX_ROUTE_STEP = 4;
 const BOSS_ROUTE_STEP = 4;
@@ -3813,7 +3813,9 @@ function isGuUnlocked(item, discovered) {
 
 // 万蛊录分类：第一版仅「蛊虫」实装，其余占位「即将开放」。
 const GU_CATEGORIES = [
+  { id: "overview", label: "总览", ready: true },
   { id: "gu", label: "蛊虫秘录", ready: true },
+  { id: "task", label: "图鉴任务", ready: true },
   { id: "lore", label: "命蛊残卷", ready: true },
   { id: "eco", label: "生态·未实装", ready: true },
   { id: "enemy", label: "敌怪图谱", ready: false },
@@ -3924,6 +3926,8 @@ function renderWanGuLu() {
   const content = wanGuLuEl.querySelector(".wangulu-content");
   const cat = GU_CATEGORIES.find((c) => c.id === wanGuLuState.tab);
   if (!cat || !cat.ready) { content.innerHTML = '<div class="wangulu-empty">此卷尚封，墨迹未干。<br><span>敌怪 · 首领 · 异闻 · 流派，即将开放。</span></div>'; return; }
+  if (cat.id === "overview") { content.innerHTML = renderCodexOverview(); return; }
+  if (cat.id === "task") { content.innerHTML = renderCodexTasks(); return; }
   if (cat.id === "lore") { content.innerHTML = renderWanGuLuLore(); return; }
   if (wanGuLuState.detailId) { content.innerHTML = renderGuDetail(wanGuLuState.detailId); return; }
   content.innerHTML = renderGuList(cat.id);
@@ -3999,6 +4003,7 @@ function renderGuDetail(id) {
     + '<section class="wangulu-sec"><h4>生态习性</h4>' + row("栖息", it.habitat) + row("食性", it.feeding) + row("秉性", it.temperament) + '</section>'
     + '<section class="wangulu-sec"><h4>来历异闻</h4><p class="wangulu-lore">' + escGu(it.descriptionLore) + '</p>' + row("出处", it.dropsFrom) + row("录入", it.unlockCondition) + '</section>'
     + '<section class="wangulu-sec"><h4>组合克制</h4>' + row("演化", it.evolution) + row("相济", it.synergy) + row("相克", it.counteredBy) + '</section>'
+    + renderGuTaskLink(it)
     + '</article>';
 }
 
@@ -4012,6 +4017,194 @@ function renderWanGuLuLore() {
   return counter + '<div class="wangulu-lore-grid">' + renderLoreDirectory() + '</div>';
 }
 
+
+/* ===================== 万蛊录 · 图鉴任务预埋（V0.9.5.2）=====================
+   纯展示：进度只读计算，绝不发奖励、不碰 CARD_LIBRARY / 初始卡组 / 战斗逻辑。
+   所有任务/奖励恒标「预埋·后续版本开放」。新老玩家无数据均不报错。 */
+
+/* localStorage 预留存根：只记录「展示状态」(如是否看过任务介绍)，绝不碰战斗存档/设置。 */
+const CODEX_TASKS_KEY = "nmg.codex.tasks";
+const CODEX_DISCOVERY_KEY = "nmg.codex.discovery";
+function codexLoad(key) {
+  try {
+    const raw = localStorage.getItem(key);
+    const obj = raw ? JSON.parse(raw) : null;
+    return obj && typeof obj === "object" && !Array.isArray(obj) ? obj : {};
+  } catch (err) { return {}; }
+}
+function codexSave(key, obj) {
+  try { localStorage.setItem(key, JSON.stringify(obj && typeof obj === "object" ? obj : {})); } catch (err) { /* 忽略 */ }
+}
+function codexResetStub() { try { localStorage.removeItem(CODEX_TASKS_KEY); localStorage.removeItem(CODEX_DISCOVERY_KEY); } catch (err) { /* 忽略 */ } }
+function codexMarkSeen(taskId) {
+  if (!taskId) return;
+  const data = codexLoad(CODEX_TASKS_KEY);
+  if (!data.seen || typeof data.seen !== "object") data.seen = {};
+  data.seen[taskId] = true;
+  codexSave(CODEX_TASKS_KEY, data);
+}
+
+/* 图鉴任务数据：5 个，纯预埋。count() 只读真实进度，状态恒「预埋·后续版本开放」。 */
+const CODEX_TASKS = [
+  {
+    id: "codex_baigu", name: "百蛊初识", target: 8,
+    condition: "发现 8 种战斗蛊。",
+    rewardPreview: "后续版本：通用特殊蛊将得入战后奖励池。",
+    status: "seed", note: "预埋·后续版本开放",
+    count: () => {
+      const d = getDiscoveredGuKeys();
+      return (window.GU_CATALOG || []).filter((it) => it.category === "gu" && isGuUnlocked(it, d)).length;
+    },
+  },
+  {
+    id: "codex_dudao", name: "毒道入门", target: 5,
+    condition: "发现 5 种毒道蛊（含虫群相关）。",
+    rewardPreview: "后续版本：开放毒道特殊事件或毒道蛊池扩展。",
+    status: "seed", note: "预埋·后续版本开放",
+    count: () => {
+      const d = getDiscoveredGuKeys();
+      return (window.GU_CATALOG || []).filter((it) => it.category === "gu" && (it.faction === "毒道" || it.faction === "虫群") && isGuUnlocked(it, d)).length;
+    },
+  },
+  {
+    id: "codex_xuedao", name: "血道残谱", target: 5,
+    condition: "发现 5 种血道蛊。",
+    rewardPreview: "后续版本：开放血道特殊蛊。",
+    status: "seed", note: "预埋·后续版本开放",
+    count: () => {
+      const d = getDiscoveredGuKeys();
+      return (window.GU_CATALOG || []).filter((it) => it.category === "gu" && it.faction === "血道" && isGuUnlocked(it, d)).length;
+    },
+  },
+  {
+    id: "codex_mingtu", name: "命途偏转", target: 3,
+    condition: "发现 3 种命途异蛊。",
+    rewardPreview: "后续版本：开放命势特殊事件。",
+    status: "seed", note: "预埋·后续版本开放",
+    count: () => {
+      const d = getDiscoveredGuKeys();
+      return (window.GU_CATALOG || []).filter((it) => it.category === "gu" && it.faction === "命途" && isGuUnlocked(it, d)).length;
+    },
+  },
+  {
+    id: "codex_canjuan", name: "残卷窥真", target: 3,
+    condition: "阅读 3 卷命蛊残卷。",
+    rewardPreview: "后续版本：开放残卷异闻与特殊蛊。",
+    status: "seed", note: "预埋·后续版本开放",
+    count: () => {
+      try { return (typeof LORE_PAGES !== "undefined" ? LORE_PAGES : []).filter((p) => isLoreUnlocked(p.id)).length; }
+      catch (err) { return 0; }
+    },
+  },
+];
+function codexTaskById(id) { return CODEX_TASKS.find((t) => t.id === id) || null; }
+function codexTaskProgress(task) {
+  let cur = 0;
+  try { cur = Math.max(0, task && typeof task.count === "function" ? (task.count() | 0) : 0); } catch (err) { cur = 0; }
+  const target = task && task.target ? task.target : 0;
+  return { cur: target ? Math.min(cur, target) : cur, raw: cur, target, done: target ? cur >= target : false };
+}
+
+/* 派生元信息：不改 gu_catalog 17 条，UI 由此函数取关联任务/类型/路线标签。命途→fateGu。 */
+function guCodexMeta(item) {
+  const it = item || {};
+  const isEco = it.category === "eco";
+  let codexType = "battleGu";
+  if (isEco) codexType = "ecologyGu";
+  else if (it.faction === "命途") codexType = "fateGu";
+  const tags = [];
+  switch (it.faction) {
+    case "毒道": tags.push("毒道"); break;
+    case "虫群": tags.push("虫群", "毒道"); break;
+    case "血道": tags.push("血道"); break;
+    case "命途": tags.push("命势"); break;
+    case "护身": tags.push("护甲"); break;
+    case "燃命": tags.push("燃命"); break;
+    case "骨道": tags.push("骨道"); break;
+    case "控场": tags.push("通用"); break;
+    default: tags.push("通用"); break;
+  }
+  if (isEco) tags.push("生态", "未实装");
+  let relatedTaskId = "codex_baigu";
+  if (it.faction === "血道") relatedTaskId = "codex_xuedao";
+  else if (it.faction === "毒道" || it.faction === "虫群") relatedTaskId = "codex_dudao";
+  else if (it.faction === "命途") relatedTaskId = "codex_mingtu";
+  else if (isEco) relatedTaskId = "codex_canjuan";
+  return {
+    codexType,
+    routeTags: tags,
+    isImplemented: it.category === "gu",
+    isSpecialUnlock: false,
+    relatedTaskId,
+  };
+}
+
+/* 总览：蛊道进境（纯展示统计）。 */
+function renderCodexOverview() {
+  const cat = window.GU_CATALOG || [];
+  const d = getDiscoveredGuKeys();
+  const total = cat.length;
+  const battleSeen = cat.filter((it) => it.category === "gu" && isGuUnlocked(it, d)).length;
+  const battleTotal = cat.filter((it) => it.category === "gu").length;
+  const ecoTotal = cat.filter((it) => it.category === "eco").length;
+  let loreSeen = 0;
+  try { loreSeen = (typeof LORE_PAGES !== "undefined" ? LORE_PAGES : []).filter((p) => isLoreUnlocked(p.id)).length; } catch (err) { loreSeen = 0; }
+  const cell = (k, v) => '<div class="codex-progress-cell"><span class="codex-progress-num">' + escGu(v) + '</span><span class="codex-progress-k">' + escGu(k) + '</span></div>';
+  return '<p class="wangulu-counter">蛊道进境 · 残卷所窥，不过初篇</p>'
+    + '<div class="codex-progress">'
+    + cell("已收录蛊虫", total)
+    + cell("已见战斗蛊", battleSeen + ' / ' + battleTotal)
+    + cell("已见生态蛊", ecoTotal)
+    + cell("已读残卷", loreSeen + ' / ' + (typeof LORE_PAGES !== "undefined" ? LORE_PAGES.length : 0))
+    + cell("图鉴任务·预埋", CODEX_TASKS.length)
+    + '</div>'
+    + '<p class="codex-overview-verse">蛊道无尽，所见不过初篇。<br>待残卷补全，异蛊自会显形。</p>';
+}
+
+/* 图鉴任务列表：条件 + 奖励预告 + 真实进度 + 醒目「预埋」徽章。进度满也不发奖。 */
+function renderCodexTasks() {
+  const cards = CODEX_TASKS.map((task) => {
+    const p = codexTaskProgress(task);
+    const pct = p.target ? Math.round((p.cur / p.target) * 100) : 0;
+    return '<div class="codex-task-card">'
+      + '<div class="codex-task-head"><h4>' + escGu(task.name) + '</h4><span class="codex-seed-badge">' + escGu(task.note) + '</span></div>'
+      + '<p class="codex-task-cond"><span class="codex-task-k">解锁条件</span>' + escGu(task.condition) + '</p>'
+      + '<p class="codex-task-reward"><span class="codex-task-k">奖励预告</span>' + escGu(task.rewardPreview) + '</p>'
+      + '<div class="codex-task-bar"><span class="codex-task-bar-fill" style="width:' + pct + '%"></span></div>'
+      + '<p class="codex-task-prog">当前进度 ' + escGu(p.cur) + ' / ' + escGu(p.target) + '（仅记录·' + (p.done ? '条件已足，待后续版本开放' : '尚未达成') + '）</p>'
+      + '</div>';
+  }).join("");
+  const variant = '<div class="codex-variant-note">'
+    + '<h4>初始卡组变体 · 预告</h4>'
+    + '<p>后续版本或可在不增牌数的前提下，替换初始卡组一至两张：</p>'
+    + '<ul>'
+    + '<li>毒道入门：月刃蛊 → 青瘴蛊</li>'
+    + '<li>血道残谱：月刃蛊 → 血刃蛊</li>'
+    + '<li>命途偏转：一张防御蛊 → 命线蛊</li>'
+    + '</ul>'
+    + '<p class="codex-variant-warn">以上皆为预埋设想，本版未实装，当前不改动任何初始卡组。</p>'
+    + '</div>';
+  return '<p class="wangulu-counter">图鉴任务 · 共 ' + CODEX_TASKS.length + ' 则（皆预埋，进度只录不发奖）</p>'
+    + '<div class="codex-task-list">' + cards + '</div>'
+    + variant;
+}
+
+/* 蛊虫详情「相关图鉴任务」小区：由 guCodexMeta 推导，纯展示状态。 */
+function renderGuTaskLink(item) {
+  if (!item) return "";
+  const meta = guCodexMeta(item);
+  const task = codexTaskById(meta.relatedTaskId);
+  let body = "";
+  if (task) {
+    const stateLabel = meta.isImplemented ? "后续版本开放" : "暂未实装为战斗蛊牌";
+    body += '<div class="wangulu-task-link"><span class="wangulu-task-name">' + escGu(task.name) + '</span><span class="wangulu-task-state">' + escGu(stateLabel) + '</span></div>';
+  }
+  if (!meta.isImplemented) {
+    body += '<div class="wangulu-task-link"><span class="wangulu-task-name">生态异闻</span><span class="wangulu-task-state">暂未实装</span></div>';
+  }
+  if (!body) return "";
+  return '<section class="wangulu-sec"><h4>相关图鉴任务</h4>' + body + '<p class="wangulu-task-foot">皆为预埋，后续版本开放，当前不发奖励。</p></section>';
+}
 let updateLogEl = null;
 function showUpdateLog() {
   if (!updateLogEl) {
