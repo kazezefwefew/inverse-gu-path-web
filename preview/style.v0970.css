@@ -8192,3 +8192,135 @@ body.boot-active { overflow: hidden; }
   .boot-loader-fog, .boot-loader-runes, .boot-loader-runes::before, .boot-loader-seal, .boot-loader-start { animation: none !important; }
 }
 /* ===================== /V0.9.6.4 boot-loader ===================== */
+
+
+/* ===== V0.9.7 结算反馈：7 分区卡片化 + 配色 + 手机可滚 ===== */
+.run-summary {
+  display: block;
+  max-width: 540px;
+  margin: 0 auto;
+}
+.run-summary-section {
+  display: block;
+  margin: 0 0 12px;
+  padding: 13px 15px 14px;
+  border: 1px solid rgba(189, 162, 109, 0.2);
+  border-left: 3px solid rgba(189, 162, 109, 0.42);
+  background: rgba(255, 255, 255, 0.022);
+  border-radius: 2px;
+  text-align: left;
+}
+.run-summary-section h4 {
+  margin: 0 0 8px;
+  color: var(--muted);
+  font: 11px "KaiTi", serif;
+  letter-spacing: 0.22em;
+  font-weight: normal;
+}
+.run-summary-section p { margin: 0 0 4px; }
+.run-summary-section .run-sec-text {
+  color: var(--paper);
+  font: 14px "KaiTi", serif;
+  line-height: 1.55;
+}
+.run-sec-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px 12px;
+}
+.run-sec-grid > div.wide { grid-column: 1 / -1; }
+.run-sec-grid span { display: block; color: var(--muted); font-size: 9px; letter-spacing: 0.1em; }
+.run-sec-grid strong { display: block; margin-top: 2px; color: var(--paper); font: 14px "KaiTi", serif; line-height: 1.4; }
+
+/* 结果分区：死亡暗红 / 通关暗金 */
+.run-sec-result-text { font: 18px "KaiTi", serif; letter-spacing: 0.1em; }
+.run-sec-result.run-sec-clear { border-left-color: #c9a24a; background: rgba(201, 162, 74, 0.06); }
+.run-sec-result.run-sec-clear .run-sec-result-text { color: #d8b864; }
+.run-sec-result.run-sec-death { border-left-color: #97352f; background: rgba(151, 53, 47, 0.06); }
+.run-sec-result.run-sec-death .run-sec-result-text { color: #d1857c; }
+.run-sec-sub { color: var(--muted); font: 12px "KaiTi", serif; line-height: 1.5; }
+
+/* 称号：金褐醒目 */
+.run-sec-title { border-left-color: #bda26d; background: rgba(189, 162, 109, 0.07); }
+.run-sec-title-name {
+  color: #cba96a;
+  font: 22px "KaiTi", serif;
+  letter-spacing: 0.18em;
+  text-shadow: 0 0 12px rgba(189, 162, 109, 0.28);
+}
+.run-sec-title-sub { color: #a7926a; font: 12.5px "KaiTi", serif; line-height: 1.55; margin-top: 5px; }
+
+/* 路线染色：瘴林墨绿 / 血沼暗红 */
+.run-sec-brief.run-sec-miasma { border-left-color: #4a7a4f; background: rgba(74, 122, 79, 0.06); }
+.run-sec-brief.run-sec-bloodmarsh { border-left-color: #97352f; background: rgba(151, 53, 47, 0.05); }
+
+/* 死因分析 / 通关评语 */
+.run-sec-deathcause { border-left-color: #97352f; background: rgba(151, 53, 47, 0.05); }
+.run-sec-cause-title { color: #d1857c; font: 15px "KaiTi", serif; letter-spacing: 0.08em; }
+.run-sec-detail { color: var(--muted); font: 11.5px "KaiTi", serif; line-height: 1.5; }
+.run-sec-commentary { border-left-color: #c9a24a; background: rgba(201, 162, 74, 0.05); }
+.run-sec-commentary .run-sec-text { color: #cbb47e; }
+
+/* 关键数据折叠 */
+.run-sec-more { margin-top: 9px; }
+.run-sec-more summary {
+  cursor: pointer;
+  color: var(--muted);
+  font: 11px "KaiTi", serif;
+  letter-spacing: 0.16em;
+  padding: 3px 0;
+}
+.run-sec-more summary:hover { color: #bda26d; }
+.run-sec-more .run-sec-grid { margin-top: 8px; }
+
+/* 流派条 */
+.run-sec-faction-head { color: var(--paper); font: 14px "KaiTi", serif; letter-spacing: 0.08em; }
+.faction-bars { margin-top: 8px; }
+.faction-bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+.faction-bar-row > span { width: 34px; flex: 0 0 34px; color: var(--muted); font-size: 11px; }
+.faction-bar-track { flex: 1; height: 7px; background: rgba(255, 255, 255, 0.05); border-radius: 4px; overflow: hidden; }
+.faction-bar-track > i {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, rgba(189, 162, 109, 0.55), rgba(201, 162, 74, 0.85));
+  border-radius: 4px;
+}
+.faction-bar-row > em { width: 36px; flex: 0 0 36px; text-align: right; color: #bda26d; font-style: normal; font-size: 11px; }
+.faction-fallback { color: var(--muted); font: 12.5px "KaiTi", serif; }
+.run-sec-bestiary { margin-top: 8px; color: var(--muted); font: 12px "KaiTi", serif; }
+
+/* 推荐下一步 */
+.run-sec-next { border-left-color: #8a7a4a; }
+.run-sec-next .run-sec-text { color: #c5b486; }
+
+/* 反馈分区 */
+.run-sec-feedback .run-sec-text { color: #bda26d; font-size: 13px; }
+
+/* 二层 prepend 块对齐分区卡片视觉体系（保留旧 className，仅在 .run-summary 容器内覆盖样式） */
+.run-summary .layer2-summary-block {
+  display: block;
+  grid-column: auto;
+  margin: 0 0 12px;
+  padding: 11px 14px;
+  border: 1px solid rgba(74, 122, 79, 0.3);
+  border-left: 3px solid #4a7a4f;
+  background: rgba(74, 122, 79, 0.06);
+  border-radius: 2px;
+  text-align: left;
+}
+.run-summary .layer2-summary-block span { display: block; color: var(--muted); font-size: 9px; letter-spacing: 0.1em; }
+.run-summary .layer2-summary-block strong { display: block; margin-top: 3px; color: var(--paper); font: 14px "KaiTi", serif; line-height: 1.45; }
+
+/* 手机可滚：结算遮罩内容溢出时纵向滚动（.result-card 用于结算页，原仅 .map-result 有 overflow，这里补结算页本体） */
+.result-overlay { overflow-y: auto; }
+.result-card:not(.map-result) {
+  max-height: calc(100dvh - 40px);
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+@media (max-width: 720px) {
+  .run-summary { max-width: 100%; }
+  .run-sec-title-name { font-size: 19px; }
+  .run-sec-grid { gap: 6px 10px; }
+  .result-card:not(.map-result) { max-height: calc(100dvh - 16px); }
+}

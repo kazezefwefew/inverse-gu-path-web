@@ -868,7 +868,7 @@ const LORE_SKIP_ANIMATION_STORAGE_KEY = "reverseGu.lore.skipAnimation";
 const RECORDING_MODE_STORAGE_KEY = "reverseGu.recordingMode.enabled";
 const TRIAL_MODE_STORAGE_KEY = "reverseGu.trial.mode";
 const TRIAL_SEED_STORAGE_KEY = "reverseGu.trial.seedDraft";
-const GAME_VERSION = "V0.9.6.4 启动加载界面";
+const GAME_VERSION = "V0.9.7 结算反馈（preview）";
 // TODO: 后续多幕路线扩展时继续抽象 finalNode / bossNode，避免固定四段流程继续扩散。
 const MAX_ROUTE_STEP = 4;
 const BOSS_ROUTE_STEP = 4;
@@ -2302,6 +2302,8 @@ function getEnemyIdForFloor(floor) {
 function createBattleState() {
   const hero = HEROES[runState.heroId];
   const enemyId = getEnemyIdForFloor(runState.floor);
+  /* V0.9.7：无条件登记万蛊录（一层/二层混存，按 enemyId 去重；解掉只在 layer2.active 的旧限制）。 */
+  if (typeof layer2MarkBestiary === "function") layer2MarkBestiary(enemyId);
   const enemyDefinition = ENEMY_LIBRARY[enemyId];
   const enemyHpMultiplier = Number(runState.currentNode?.enemyHpMultiplier) || 1;
   const enemyMaxHp = Math.max(1, Math.ceil(enemyDefinition.maxHp * enemyHpMultiplier));
@@ -5757,6 +5759,7 @@ function resolveEnemyTurn() {
     const blocked = Math.min(game.player.armor, rawDamage);
     const received = Math.max(0, rawDamage - game.player.armor);
     game.player.armor = Math.max(0, game.player.armor - rawDamage);
+    if (received > 0) game.lastHurtSource = "enemyAttack";
     game.player.hp = Math.max(0, game.player.hp - received);
     recordEnemyDamage(received);
     game.enemy.chargedBonus = 0;
@@ -5948,6 +5951,7 @@ function beginNextTurn() {
 function resolvePlayerPoisonAtTurnStart() {
   if (game.player.poison <= 0) return;
   const damage = game.player.poison;
+  game.lastHurtSource = "poisonTick";
   game.player.hp = Math.max(0, game.player.hp - damage);
   recordEnemyDamage(damage);
   game.player.poison = Math.max(0, game.player.poison - 1);
@@ -6032,6 +6036,8 @@ function finishBattle(victory) {
     playDefeatEffect();
     addLog("你的生命归零，道途断绝。", "damage-log");
     runState.status = "failed";
+    // V0.9.7：死亡上下文快照（纯派生死因分析用，全 ||/?. 兜底，拿不到 unknown）
+    try { getRunStats().deathContext = snapshotDeathContext(); } catch (e) { getRunStats().deathContext = { source: "unknown" }; }
     // V0.9.6.3：二层阵亡需在结算前记录节点/敌名（layer2 失败分支不会清 currentNode，但保险起见在此即时取）
     if (runState.layer2?.active) {
       const __l2Node = runState.currentNode?.name || "未知节点";
@@ -6842,6 +6848,174 @@ function getRunEvaluation(cleared) {
   return "尸盘已破，命途未尽。";
 }
 
+// ===== V0.9.7 结算反馈：死亡上下文快照 + 5 个纯派生函数（不持久化，全 || 兜底） =====
+// 死亡上下文快照：在 finishBattle(false) 调用，拿不到全部 unknown
+function snapshotDeathContext() {
+  const rs = (typeof runState !== "undefined" && runState) ? runState : {};
+  const en = (typeof game !== "undefined" && game && game.enemy) ? game.enemy : null;
+  const def = en && en.definition ? en.definition : {};
+  const pl = (typeof game !== "undefined" && game && game.player) ? game.player : {};
+  const maxHp = Math.max(1, Number(rs.maxHp) || 1);
+  const curHp = Number(rs.currentHp) || 0;
+  const enemyActionHasFlag = (flag) => {
+    const acts = def && def.actions;
+    if (!acts) return false;
+    try { return Object.values(acts).some((a) => a && a[flag]); } catch (e) { return false; }
+  };
+  return {
+    source: (typeof game !== "undefined" && game && game.lastHurtSource) ? game.lastHurtSource : "unknown",
+    enemyName: def.name || "未知敌人",
+    isBoss: !!def.isBoss,
+    isElite: !!def.isElite,
+    armorWas0: (Number(pl.armor) || 0) === 0,
+    lowHp: (curHp / maxHp) <= 0.3,
+    playerPoison: Number(pl.poison) || 0,
+    enemyLifesteal: enemyActionHasFlag("lifesteal"),
+    enemySwallow: !!(def.poisonSwallow || def.poisonConvert),
+    enemyEnrage: !!def.enrage,
+    enemyCharge: (typeof game !== "undefined" && game && game.enemy && (Number(game.enemy.chargedBonus) || 0) > 0),
+    enemyPhase2: !!(en && (en.phase2 || en.phase2Triggered)) || !!((typeof getRunStats === "function") && getRunStats().bossPhase2Triggered),
+    layer: (rs.layer2 && rs.layer2.active) ? 2 : 1,
+    route: (rs.layer2 && rs.layer2.routeName) ? rs.layer2.routeName : "",
+    floor: Number(rs.floor) || 0,
+    nodeType: (rs.currentNode && rs.currentNode.type) || "",
+  };
+}
+
+// 1) 本局称号：14 称号优先级命中即返回（已修：地点/逆命未成 置于深泽初探之前、删冗余与不可达分支）
+function generateRunTitle(stats, runState, cleared) {
+  const s = stats || {};
+  const rs = runState || {};
+  const l2 = rs.layer2 || {};
+  const dc = (rs.runStats && rs.runStats.deathContext) || s.deathContext || {};
+  const route = String(l2.routeName || dc.route || "");
+  const deathEnemy = String(s.deathEnemy || dc.enemyName || "");
+  const l2BossDefeated = !!(s.layer2BossDefeated || l2.bossDefeated);
+  const l2Entered = !!(s.layer2Entered || l2.active);
+  const poison = Number(s.poisonDamage) || 0;
+  const blood = Number(s.bloodBonusDamage) || 0;
+  const armor = Number(s.armorGained) || 0;
+  const floor = Number(rs.floor) || 0;
+  const wrap = (title, sub) => ({ title: title || "断途行者", sub: sub || "残卷未尽，命途可再行。" });
+  // ① 通关二层
+  if (l2BossDefeated) return wrap("逆命行者", "深泽尽头，你以一身蛊息逆改了既定的命数。");
+  // ② 败于二层 Boss 留名
+  if (deathEnemy.indexOf("百瘴母蛊") >= 0) return wrap("百瘴留名", "瘴林深处，你的名字与百瘴一同被刻入残卷。");
+  if (deathEnemy.indexOf("血衣蛊母") >= 0) return wrap("血衣未冷", "血沼之主未及收衣，你已倒在它的影下。");
+  // ③ 击败一层 Boss 未进二层（通关收束）
+  if (cleared && !l2Entered) return wrap("尸盘破局者", "你踏碎尸盘，却未再向深处迈出一步。");
+  // ④ 死亡地点（瘴/血）——置于「深泽初探」之前，确保专属称号可达
+  if (!cleared && route.indexOf("瘴") >= 0) return wrap("瘴林折戟", "瘴雾蚀骨，你的兵刃折断在这片墨绿之中。");
+  if (!cleared && (route.indexOf("血沼") >= 0 || route.indexOf("血") >= 0)) return wrap("血沼沉骨", "血泥吞没了你的躯壳，连蛊息也归于沉寂。");
+  // ⑤ 进二层未破二层 Boss 而死（无明确路线染色时的兜底）
+  if (l2Entered && !l2BossDefeated && !cleared) return wrap("逆命未成", "命途已近尽头，你却未能跨过最后一道关。");
+  // ⑥ 进二层但 stats 标记入二层、route 缺失的更弱兜底
+  if (l2Entered && !cleared) return wrap("深泽初探", "你已踏入第二层的生态深径，却止步于半途。");
+  // ⑦ 流派
+  if (poison > 0 && poison >= blood && poison >= armor) return wrap("毒蛊成势", "毒雾缠经，敌命自内而溃，此局毒势已成。");
+  if (blood > 0 && blood >= poison && blood >= armor) return wrap("血灯将熄", "以血换刃，灯火将熄而锋芒未钝。");
+  if (armor > 0 && armor >= poison && armor >= blood) return wrap("铁壳负命", "壳厚如山，你以坚守背负这条逆命之途。");
+  // ⑧ 一层前/中后期死亡（互斥阈值）
+  if (!cleared && floor > 0 && floor <= 2) return wrap("初入蛊途", "刚踏入命途塔，你便折损于浅滩。");
+  if (!cleared && floor === 3) return wrap("蛊道未稳", "蛊道未稳，行至中途便难以为继。");
+  if (!cleared && floor >= 4) return wrap("命途多舛", "你已走得很远，命途却仍多舛难测。");
+  // 兜底
+  return wrap("断途行者", "残卷未尽，蛊路可再行。");
+}
+
+// 2) 死因分析（仅失败用）
+function analyzeDeathCause(stats, runState) {
+  const s = stats || {};
+  const rs = runState || {};
+  const dc = (rs.runStats && rs.runStats.deathContext) || s.deathContext || {};
+  const route = String(dc.route || (rs.layer2 && rs.layer2.routeName) || "");
+  const lastBattle = (s.battleSummaries && s.battleSummaries.length) ? s.battleSummaries[s.battleSummaries.length - 1] : null;
+  const lastHurt = (lastBattle && Number(lastBattle.enemyDamage)) || 0;
+  const detail = `末战承伤 ${lastHurt}、累计护甲 ${Number(s.armorGained) || 0}、累计承伤 ${Number(s.enemyDamage) || 0}`;
+  const make = (cause, reason) => ({ cause: cause || "资源耗尽", reason: reason || "主要死因：资源耗尽，未能撑过敌方攻势。", detail });
+  // Boss 相位强化
+  if (dc.isBoss && dc.enemyPhase2) return make("Boss 相位强化", "第二层 Boss 相位强化后伤害过高，未能在转相前终结。");
+  // 瘴林吞毒
+  if (dc.enemySwallow && route.indexOf("瘴") >= 0) return make("瘴林吞毒反制", "瘴林敌人吞毒反制，毒道爆发不足以压制。");
+  // 血沼吸血
+  if (dc.enemyLifesteal && route.indexOf("血") >= 0) return make("血沼吸血拖战", "血沼敌人吸血拖长战斗，资源逐渐被耗尽。");
+  // 中毒毒发
+  if (dc.source === "poisonTick" || ((Number(dc.playerPoison) || 0) > 0 && dc.source !== "enemyAttack")) return make("中毒毒发", "中毒层数过高，回合结束时毒发身亡。");
+  // 自损透支
+  if (dc.source === "selfCard") return make("自损透支", "自损过度，未能及时止血。");
+  // 护甲不足
+  if (dc.armorWas0 && dc.source === "enemyAttack") return make("护甲不足", "主要死因：护甲不足，被攻势直接击穿。");
+  // 低血连击
+  if (dc.lowHp && dc.source === "enemyAttack") return make("低血连击", "残血状态下被连击收割，未能稳住生命。");
+  // 未打断蓄力
+  if (dc.enemyCharge && dc.source === "enemyAttack") return make("未打断蓄力", "未及时打断敌人蓄力重击，承受了完整一击。");
+  // 兜底
+  return make("资源耗尽", "主要死因：资源耗尽，未能撑过敌方攻势。");
+}
+
+// 3) 通关评语（仅通关用）
+function getRunCommentary(stats, runState) {
+  const s = stats || {};
+  const rs = runState || {};
+  const l2 = rs.layer2 || {};
+  const l2BossDefeated = !!(s.layer2BossDefeated || l2.bossDefeated);
+  const l2Entered = !!(s.layer2Entered || l2.active);
+  const poison = Number(s.poisonDamage) || 0;
+  const blood = Number(s.bloodBonusDamage) || 0;
+  const armor = Number(s.armorGained) || 0;
+  if (l2BossDefeated) return "你越过尸盘，又踏破深泽。瘴林与血沼皆未能留住你的命数。";
+  if (poison > 0 && poison >= blood && poison >= armor) return "你以毒铺路，令敌命从内而溃。此局毒势已成。";
+  if (blood > 0 && blood >= poison && blood >= armor) return "你以己血换敌命，灯残而刃未钝。";
+  if (armor > 0 && armor >= poison && armor >= blood) return "壳厚如山，敌势难侵。此局胜在稳守。";
+  if (!l2Entered) return "尸盘已碎，你选择就此收束命途。此行虽止，蛊息未绝。";
+  return "尸盘已破，命途未尽。你已走到许多人未及之处。";
+}
+
+// 4) 流派倾向（权重折算）
+function inferFactionTendency(stats) {
+  const s = stats || {};
+  const poison = Math.max(0, Number(s.poisonDamage) || 0);
+  const blood = Math.max(0, Number(s.bloodBonusDamage) || 0);
+  const armor = Math.max(0, Number(s.armorGained) || 0) * 0.6;
+  const fate = Math.max(0, Number(s.fateTriggers) || 0) * 12;
+  const cardsPlayed = Number(s.cardsPlayed) || 0;
+  const total = poison + blood + armor + fate;
+  if (cardsPlayed < 3 || total <= 0) {
+    return { primary: "流派未明", secondary: "", percentages: { 毒道: 0, 血道: 0, 护甲: 0, 命势: 0 }, fallback: "流派未明·数据不足" };
+  }
+  const pct = (v) => Math.round((v / total) * 100);
+  const percentages = { 毒道: pct(poison), 血道: pct(blood), 护甲: pct(armor), 命势: pct(fate) };
+  const ranked = Object.entries(percentages).sort((a, b) => b[1] - a[1]);
+  const primary = ranked[0] && ranked[0][1] > 0 ? ranked[0][0] : "流派未明";
+  const secondary = ranked[1] && ranked[1][1] > 0 ? ranked[1][0] : "";
+  return { primary, secondary, percentages, fallback: "" };
+}
+
+// 5) 下一步建议
+function getNextStepHint(stats, runState, cleared, cause, faction) {
+  const s = stats || {};
+  const rs = runState || {};
+  const deckCount = (rs.deckCards && rs.deckCards.length) || 0;
+  const c = String(cause || "");
+  if (cleared) {
+    const l2 = rs.layer2 || {};
+    if (!(s.layer2Entered || l2.active)) return "建议：尝试踏入第二层，挑战瘴林或血沼路线。";
+    if (l2.routeName && l2.routeName.indexOf("瘴") >= 0) return "建议：尝试另一条第二层路线——血沼沉渊。";
+    if (l2.routeName && l2.routeName.indexOf("血") >= 0) return "建议：尝试另一条第二层路线——瘴林深径。";
+    return "建议：尝试不同构筑，或查看万蛊录新增条目。";
+  }
+  if (c.indexOf("瘴林吞毒") >= 0) return "建议：瘴林敌人会吞毒，毒道构筑需搭配直接伤害。";
+  if (c.indexOf("血沼吸血") >= 0) return "建议：血沼敌人会吸血，拖久压力会变大，需提高爆发。";
+  if (c.indexOf("护甲不足") >= 0) return "建议：下次多保留防御牌，应对精英与 Boss 的蓄力。";
+  if (c.indexOf("未打断蓄力") >= 0) return "建议：敌人蓄力时优先叠护甲或打断，避免吃满重击。";
+  if (c.indexOf("中毒") >= 0) return "建议：注意自身中毒层数，及时清毒或补足回复。";
+  if (c.indexOf("自损") >= 0) return "建议：血道自损构筑需搭配稳定回复，避免透支。";
+  if (c.indexOf("Boss 相位") >= 0) return "建议：进入第二层 Boss 前尽量补足回复与护甲。";
+  if (deckCount >= 22) return "建议：卡组过厚会降低核心牌出现率，适当精简。";
+  return "建议：进入第二层前尽量补足回复或护甲。";
+}
+
+
 function getBattleStatsLines() {
   const battles = getRunStats().battleSummaries || [];
   if (!battles.length) return ["尚无铭刻"];
@@ -6947,6 +7121,10 @@ function getRunStatsCopyText(cleared = runState?.status === "cleared") {
     `最高伤害卡：${formatTopCardStat("damage", " 点")}`,
     `最高防御卡：${formatTopCardStat("armor", " 点")}`,
     `死亡节点或通关节点：${cleared ? "塔顶尸盘" : `${stats.deathNode || runState.currentNode?.name || "命途未明"} / ${stats.deathEnemy || "未知敌人"}`}`,
+    `本局称号：${(typeof generateRunTitle === "function" ? (generateRunTitle(stats, runState, cleared) || {}).title : "") || "断途行者"}`,
+    ...((!cleared && typeof analyzeDeathCause === "function") ? (() => { const __c = analyzeDeathCause(stats, runState) || {}; return [`死因：${__c.cause || "资源耗尽"} · ${__c.reason || ""}`]; })() : []),
+    ...((typeof inferFactionTendency === "function") ? (() => { const __f = inferFactionTendency(stats) || {}; if (__f.fallback) return [`本局流派：${__f.fallback}`]; const __p = (__f.percentages && __f.percentages[__f.primary]) || 0; return [`本局流派：${__f.primary || "未明"}（${__p}%）${__f.secondary ? ` / ${__f.secondary}` : ""}`]; })() : []),
+    ...((typeof getNextStepHint === "function") ? [`推荐：${getNextStepHint(stats, runState, cleared, cleared ? "" : ((typeof analyzeDeathCause === "function" ? analyzeDeathCause(stats, runState) : {}) || {}).cause, (typeof inferFactionTendency === "function" ? inferFactionTendency(stats) : {}))}`] : []),
     "提示：若复现问题，请附截图或录屏。",
   ].join("\n");
 }
@@ -7074,42 +7252,97 @@ function showRunConclusion(cleared) {
   dom.resultTitle.textContent = cleared ? "命途塔通关" : "道途断绝";
   dom.resultDescription.textContent = cleared
     ? getRunEvaluation(true)
-    : `${stats.deathEnemy || game.enemy.definition.name}终结了此局命途，死于${deathStepText}。${getRunEvaluation(false)}`;
+    : `${stats.deathEnemy || game.enemy?.definition?.name || "未知敌人"}终结了此局命途，死于${deathStepText}。${getRunEvaluation(false)}`;
+  // === V0.9.7 结算反馈：7 分区重构（全 ||/?. 兜底，绝不 undefined/null/NaN） ===
+  const __titleInfo = generateRunTitle(stats, runState, cleared);
+  const __faction = inferFactionTendency(stats);
+  const __cause = cleared ? null : analyzeDeathCause(stats, runState);
+  const __hint = getNextStepHint(stats, runState, cleared, __cause ? __cause.cause : "", __faction);
+  const __routeName = String((runState.layer2 && runState.layer2.routeName) || (stats.deathContext && stats.deathContext.route) || "");
+  const __routeClass = __routeName.indexOf("瘴") >= 0 ? " run-sec-miasma" : (__routeName.indexOf("血") >= 0 ? " run-sec-bloodmarsh" : "");
+  const __layer = (runState.layer2 && runState.layer2.active) ? 2 : 1;
+  const __layerText = __layer === 2 ? `第二层 · ${(runState.layer2 && runState.layer2.routeName) || "生态深径"}` : "第一层 · 命途塔";
+  const __routeLine = __layer === 2
+    ? `${(runState.layer2 && runState.layer2.routeName) || "生态深径"} · Boss${(runState.layer2 && runState.layer2.bossDefeated) ? "已破" : "未破"} · 终点「${(runState.layer2 && runState.layer2.lastNodeName) || "-"}」`
+    : routeText;
+  const __finalNode = cleared
+    ? (__layer === 2 ? ((runState.layer2 && runState.layer2.lastNodeName) || "生态尽头") : "塔顶尸盘")
+    : `${deathStepText} · ${stats.deathNode || runState.currentNode?.name || "命途未明"} · ${stats.deathEnemy || "未知敌人"}`;
+  const __bestiaryCount = (typeof layer2LoadBestiary === "function" ? layer2LoadBestiary().size : 0);
+  const __pctBar = (label, val) => `<div class="faction-bar-row"><span>${label}</span><div class="faction-bar-track"><i style="width:${Math.max(0, Math.min(100, Number(val) || 0))}%"></i></div><em>${Math.max(0, Math.min(100, Number(val) || 0))}%</em></div>`;
+  const __factionBars = __faction.fallback
+    ? `<p class="faction-fallback">${__faction.fallback}</p>`
+    : (__pctBar("毒道", __faction.percentages["毒道"]) + __pctBar("血道", __faction.percentages["血道"]) + __pctBar("护甲", __faction.percentages["护甲"]) + __pctBar("命势", __faction.percentages["命势"]));
+  const __sec4 = cleared
+    ? `<section class="run-summary-section run-sec-commentary"><h4>通关评语</h4><p class="run-sec-text">${getRunCommentary(stats, runState)}</p></section>`
+    : `<section class="run-summary-section run-sec-deathcause"><h4>死因分析</h4><p class="run-sec-cause-title">${(__cause && __cause.cause) || "资源耗尽"}</p><p class="run-sec-text">${(__cause && __cause.reason) || "主要死因：资源耗尽，未能撑过敌方攻势。"}</p><p class="run-sec-detail">${(__cause && __cause.detail) || ""}</p></section>`;
   dom.runSummary.innerHTML = `
-    <div class="run-summary-item"><span>入塔蛊修</span><strong>${hero.name}</strong></div>
-    <div class="run-summary-item"><span>本命遗物</span><strong>${relic.name}</strong></div>
-    <div class="run-summary-item"><span>试炼模式</span><strong>${getTrialModeInfo(runState.trialMode).name}</strong></div>
-    <div class="run-summary-item"><span>命途种子</span><strong>${runState.trialSeed || "无"}</strong></div>
-    <div class="run-summary-item"><span>第 3 段选择</span><strong>${getThirdStepChoiceSummary()}</strong></div>
-    <div class="run-summary-item"><span>休整结果</span><strong>${getRestResultSummary()}</strong></div>
-    <div class="run-summary-item"><span>最终生命</span><strong>${runState.currentHp} / ${runState.maxHp}</strong></div>
-    <div class="run-summary-item"><span>最终卡组</span><strong>${runState.deckCards.length} 张</strong></div>
-    <div class="run-summary-item"><span>最终蛊石</span><strong>${runState.guStones}</strong></div>
-    <div class="run-summary-item"><span>击败精英</span><strong>${runState.eliteDefeated ? "是" : "否"}</strong></div>
-    <div class="run-summary-item"><span>总回合数</span><strong>${stats.totalTurns}</strong></div>
-    <div class="run-summary-item"><span>Boss 战回合</span><strong>${stats.bossTurns || "未遭遇"}</strong></div>
-    <div class="run-summary-item"><span>最高伤害卡</span><strong>${topDamageCard}</strong></div>
-    <div class="run-summary-item"><span>最高防御卡</span><strong>${topArmorCard}</strong></div>
-    <div class="run-summary-item"><span>最高炼化等级</span><strong>${getHighestUpgradeSummary()}</strong></div>
-    <div class="run-summary-item"><span>炼蛊结果</span><strong>稳 ${stats.stableRefines} / 异 ${stats.mutations} / 噬 ${stats.backlashes}</strong></div>
-    <div class="run-summary-item"><span>毒性总伤害</span><strong>${stats.poisonDamage}</strong></div>
-    <div class="run-summary-item"><span>Boss 压毒次数</span><strong>${stats.bossPoisonSuppressions || 0}</strong></div>
-    <div class="run-summary-item"><span>Boss 最高毒层</span><strong>${stats.bossHighestPoison || 0}</strong></div>
-    <div class="run-summary-item"><span>Boss 压去毒层</span><strong>${stats.bossPoisonSuppressedLayers || 0}</strong></div>
-    <div class="run-summary-item"><span>Boss 二相</span><strong>${stats.bossPhase2Triggered ? "已触发" : "未触发"}</strong></div>
-    <div class="run-summary-item"><span>血煞额外伤害</span><strong>${stats.bloodBonusDamage}</strong></div>
-    <div class="run-summary-item"><span>总防御</span><strong>${stats.armorGained}</strong></div>
-    <div class="run-summary-item"><span>总治疗</span><strong>${stats.healing}</strong></div>
-    ${cleared ? "" : `<div class="run-summary-item"><span>最后承伤</span><strong>${lastBattleSummary?.enemyDamage || 0}</strong></div>`}
-    <div class="run-summary-item wide"><span>获得遗物</span><strong>${relicText}</strong></div>
-    <div class="run-summary-item wide"><span>走过路线</span><strong>${routeText}</strong></div>
-    <div class="run-summary-item wide"><span>第二层</span><strong>${runState.layer2?.active ? `${runState.layer2.routeName} · Boss${runState.layer2.bossDefeated ? "已破" : "未破"} · 终点「${runState.layer2.lastNodeName || "-"}」` : "未进入"}</strong></div>
-    <div class="run-summary-item wide"><span>新增万蛊录</span><strong>已遇敌怪/首领 ${(typeof layer2LoadBestiary === "function" ? layer2LoadBestiary().size : 0)} 条</strong></div>
-    <div class="run-summary-item wide resource-block"><span>材料与蛊石</span><strong>${materialText} · 蛊石 ${runState.guStones}</strong></div>
-    <div class="run-summary-item wide"><span>${cleared ? "击败敌人" : `抵达第 ${runState.floor} 段 · 已击败`}</span><strong>${defeated}</strong></div>
-    ${cleared ? "" : `<div class="run-summary-item wide"><span>死亡节点</span><strong>${deathStepText} · ${stats.deathNode || runState.currentNode?.name || "命途未明"} · ${stats.deathEnemy || "未知敌人"}</strong></div>`}
-    <div class="run-summary-item wide"><span>本局评价</span><strong>${getRunEvaluation(cleared)}</strong></div>
-    <div class="run-summary-item wide feedback-line"><span>内测反馈</span><strong>你觉得哪张蛊最强？如果卡组过强或过弱，请记录角色、遗物和关键蛊牌。</strong></div>`;
+    <section class="run-summary-section run-sec-result ${cleared ? "run-sec-clear" : "run-sec-death"}">
+      <h4>本局结果</h4>
+      <p class="run-sec-result-text">${cleared ? "命途塔通关 · 功成" : `道途断绝 · 止步${deathStepText}`}</p>
+      <p class="run-sec-sub">入塔蛊修 ${hero?.name || "未知蛊修"} · 本命遗物 ${relic?.name || "未知遗物"} · ${getTrialModeInfo(runState.trialMode)?.name || "标准试炼"}</p>
+    </section>
+    <section class="run-summary-section run-sec-title">
+      <h4>本局称号</h4>
+      <p class="run-sec-title-name">${__titleInfo.title}</p>
+      <p class="run-sec-title-sub">${__titleInfo.sub}</p>
+    </section>
+    <section class="run-summary-section run-sec-brief${__routeClass}">
+      <h4>命途简报</h4>
+      <div class="run-sec-grid">
+        <div><span>所在层</span><strong>${__layerText}</strong></div>
+        <div><span>走过路线</span><strong>${__routeLine}</strong></div>
+        <div><span>${cleared ? "通关节点" : "最终节点"}</span><strong>${__finalNode}</strong></div>
+        <div><span>存活回合</span><strong>${stats.totalTurns || 0} 回合</strong></div>
+      </div>
+    </section>
+    ${__sec4}
+    <section class="run-summary-section run-sec-data">
+      <h4>关键数据</h4>
+      <div class="run-sec-grid">
+        <div><span>剩余生命</span><strong>${runState.currentHp || 0} / ${runState.maxHp || 0}</strong></div>
+        <div><span>击败精英</span><strong>${runState.eliteDefeated ? "是" : "否"}</strong></div>
+        <div><span>最高伤害卡</span><strong>${topDamageCard}</strong></div>
+        <div><span>累计总伤害</span><strong>${stats.playerDamage || 0}</strong></div>
+        <div><span>最终卡组</span><strong>${(runState.deckCards && runState.deckCards.length) || 0} 张</strong></div>
+        <div><span>最终蛊石</span><strong>${runState.guStones || 0}</strong></div>
+      </div>
+      <details class="run-sec-more"><summary>更多数据</summary><div class="run-sec-grid">
+        <div><span>最高防御卡</span><strong>${topArmorCard}</strong></div>
+        <div><span>累计护甲</span><strong>${stats.armorGained || 0}</strong></div>
+        <div><span>累计中毒伤害</span><strong>${stats.poisonDamage || 0}</strong></div>
+        <div><span>血煞额外伤害</span><strong>${stats.bloodBonusDamage || 0}</strong></div>
+        <div><span>累计回血</span><strong>${stats.healing || 0}</strong></div>
+        <div><span>用牌数</span><strong>${stats.cardsPlayed || 0}</strong></div>
+        <div><span>Boss 战回合</span><strong>${stats.bossTurns || "未遭遇"}</strong></div>
+        <div><span>Boss 二相</span><strong>${stats.bossPhase2Triggered ? "已触发" : "未触发"}</strong></div>
+        <div><span>Boss 压毒次数</span><strong>${stats.bossPoisonSuppressions || 0}</strong></div>
+        <div><span>Boss 最高毒层</span><strong>${stats.bossHighestPoison || 0}</strong></div>
+        <div><span>Boss 压去毒层</span><strong>${stats.bossPoisonSuppressedLayers || 0}</strong></div>
+        <div><span>炼蛊 稳/异/噬</span><strong>${stats.stableRefines || 0} / ${stats.mutations || 0} / ${stats.backlashes || 0}</strong></div>
+        <div><span>最高炼化</span><strong>${getHighestUpgradeSummary() || "无"}</strong></div>
+        <div><span>命途种子</span><strong>${runState.trialSeed || "无"}</strong></div>
+        <div><span>第 3 段选择</span><strong>${getThirdStepChoiceSummary() || "无"}</strong></div>
+        <div><span>休整结果</span><strong>${getRestResultSummary() || "无"}</strong></div>
+        <div class="wide"><span>${cleared ? "击败敌人" : `抵达第 ${runState.floor || 0} 段 · 已击败`}</span><strong>${defeated}</strong></div>
+        <div class="wide"><span>材料与蛊石</span><strong>${materialText} · 蛊石 ${runState.guStones || 0}</strong></div>
+        <div class="wide"><span>获得遗物</span><strong>${relicText}</strong></div>
+      </div></details>
+    </section>
+    <section class="run-summary-section run-sec-faction">
+      <h4>本局流派</h4>
+      <p class="run-sec-faction-head">主修：${__faction.fallback ? "未明" : __faction.primary}${__faction.secondary ? ` · 次修：${__faction.secondary}` : ""}</p>
+      <div class="faction-bars">${__factionBars}</div>
+      <p class="run-sec-bestiary">${__bestiaryCount > 0 ? `万蛊录已遇敌怪/首领 ${__bestiaryCount} 条` : "本局未新增万蛊录条目"}</p>
+    </section>
+    <section class="run-summary-section run-sec-next">
+      <h4>推荐下一步</h4>
+      <p class="run-sec-text">${__hint}</p>
+    </section>
+    <section class="run-summary-section run-sec-feedback">
+      <h4>内测反馈</h4>
+      <p class="run-sec-text">你觉得哪张蛊最强？如果卡组过强或过弱，请记录角色、遗物和关键蛊牌。</p>
+    </section>`;
   dom.runSummary.classList.remove("hidden");
   dom.resultPrimaryButton.textContent = "再入命途塔";
   dom.resultPrimaryButton.dataset.action = "newRun";
@@ -8682,7 +8915,8 @@ function devUnlockAllCodex() {
   }
   // 二层敌人/Boss
   const L2_ENEMIES = ["rotleafGu", "miasmaParasite", "miasmaLanternEliteGu", "miasmaMotherBoss",
-    "bloodLeechSwarm", "brokenMeridianGu", "bloodRobePriestEliteGu", "bloodRobeMotherBoss"];
+    "bloodLeechSwarm", "brokenMeridianGu", "bloodRobePriestEliteGu", "bloodRobeMotherBoss",
+    "shanxiao", "rottenShanxiao", "bloodwolf", "redManeBloodwolf", "bloodwolfElite", "beeswarm", "wildBeeTide", "corpsepuppet"];
   if (typeof layer2MarkBestiary === "function") L2_ENEMIES.forEach((id) => layer2MarkBestiary(id));
   // 残卷
   if (typeof LORE_PAGES !== "undefined" && Array.isArray(LORE_PAGES) && typeof unlockLorePage === "function") {
@@ -8703,7 +8937,8 @@ function devResetCodex() {
 
 function devMarkLayer2Enemies() {
   const L2_ENEMIES = ["rotleafGu", "miasmaParasite", "miasmaLanternEliteGu", "miasmaMotherBoss",
-    "bloodLeechSwarm", "brokenMeridianGu", "bloodRobePriestEliteGu", "bloodRobeMotherBoss"];
+    "bloodLeechSwarm", "brokenMeridianGu", "bloodRobePriestEliteGu", "bloodRobeMotherBoss",
+    "shanxiao", "rottenShanxiao", "bloodwolf", "redManeBloodwolf", "bloodwolfElite", "beeswarm", "wildBeeTide", "corpsepuppet"];
   if (typeof layer2MarkBestiary !== "function") { devNotify("layer2MarkBestiary 不可用。", "damage-log"); return; }
   L2_ENEMIES.forEach((id) => layer2MarkBestiary(id));
   devNotify("已标记第二层敌人/Boss 为已遭遇。", "positive-log");
@@ -8754,6 +8989,113 @@ function devCopyToClipboard(label, obj) {
   }
 }
 
+/* ===== V0.9.7 结算模拟：预置假 stats/runState 字段 + game.enemy 兜底，直接打开 showRunConclusion ===== */
+/* 给当前 runState 注入一组结算所需的最小快照字段（仅用于 Dev 预览结算页，不影响真实对局逻辑）。 */
+function devSeedRunStats(opts) {
+  if (typeof getRunStats !== "function") return null;
+  const stats = getRunStats();
+  stats.deathNode = opts.deathNode || stats.deathNode || "";
+  stats.deathEnemy = opts.deathEnemy || stats.deathEnemy || "";
+  if (opts.layer2Entered != null) stats.layer2Entered = opts.layer2Entered;
+  if (opts.layer2Route) stats.layer2Route = opts.layer2Route;
+  if (opts.layer2BossDefeated != null) stats.layer2BossDefeated = opts.layer2BossDefeated;
+  if (opts.bossPhase2Triggered != null) stats.bossPhase2Triggered = opts.bossPhase2Triggered;
+  // V0.9.7：注入死亡上下文，使 analyzeDeathCause 死因分支可在 Dev 结算模拟中逐个点验。
+  if (opts.cleared) { stats.deathContext = undefined; return stats; }
+  const __route = String(opts.layer2Route || opts.routeName || "");
+  const __enemy = String(opts.deathEnemy || "");
+  const __isBoss = __enemy.indexOf("母蛊") >= 0 || __enemy.indexOf("蛊母") >= 0;
+  const __dc = {
+    source: "enemyAttack", enemyName: __enemy || "未知敌人",
+    isBoss: __isBoss, isElite: false,
+    armorWas0: true, lowHp: true, playerPoison: 0,
+    enemyLifesteal: __route.indexOf("血") >= 0,
+    enemySwallow: __route.indexOf("瘴") >= 0,
+    enemyEnrage: false, enemyCharge: false,
+    enemyPhase2: !!opts.bossPhase2Triggered,
+    layer: opts.layer2 ? 2 : 1, route: __route,
+    floor: Number(runState.floor) || 0, nodeType: "",
+  };
+  // 一层默认演示「护甲不足」，二层 Boss 演示「相位强化」，瘴/血路线演示吞毒/吸血。
+  if (!opts.layer2) { __dc.armorWas0 = true; __dc.lowHp = false; }
+  stats.deathContext = __dc;
+  return stats;
+}
+
+/* 为无战斗时的结算页提供 game.enemy 兜底（showRunConclusion 读 game.enemy?.definition?.name）。 */
+function devEnsureEnemyFallback(enemyId, name) {
+  if (typeof game === "undefined" || !game) return;
+  if (game.enemy && game.enemy.definition) return;
+  const def = (typeof ENEMY_LIBRARY !== "undefined" && enemyId && ENEMY_LIBRARY[enemyId])
+    ? ENEMY_LIBRARY[enemyId]
+    : { name: name || "未知敌人" };
+  game.enemy = game.enemy || {};
+  game.enemy.definition = game.enemy.definition || def;
+}
+
+function devSimRunConclusion(opts) {
+  if (!devRequireRun()) return;
+  if (opts.layer2) {
+    runState.layer = 2;
+    runState.layer2 = runState.layer2 || {};
+    runState.layer2.active = true;
+    if (opts.routeId) runState.layer2.routeId = opts.routeId;
+    if (opts.routeName) runState.layer2.routeName = opts.routeName;
+    if (opts.lastNodeName) runState.layer2.lastNodeName = opts.lastNodeName;
+    if (opts.bossDefeated != null) runState.layer2.bossDefeated = opts.bossDefeated;
+  }
+  devSeedRunStats(opts);
+  devEnsureEnemyFallback(opts.enemyId, opts.deathEnemy);
+  if (typeof showRunConclusion === "function") {
+    showRunConclusion(!!opts.cleared);
+    devNotify(opts.label || "已打开模拟结算页。", "important");
+  } else {
+    devNotify("showRunConclusion 不可用。", "damage-log");
+  }
+}
+
+function devSimL1Death() {
+  devSimRunConclusion({ cleared: false, layer2: false,
+    deathNode: "命途塔·塔阶", deathEnemy: "血纹狼王", enemyId: "bloodwolfElite",
+    layer2Entered: false, label: "模拟：一层死亡结算。" });
+}
+function devSimL2Death() {
+  devSimRunConclusion({ cleared: false, layer2: true, routeId: "miasma", routeName: "瘴林",
+    lastNodeName: "瘴林·深径", bossDefeated: false,
+    deathNode: "第二层·瘴林·深径", deathEnemy: "瘴林执灯者", enemyId: "miasmaLanternEliteGu",
+    layer2Entered: true, layer2Route: "瘴林", layer2BossDefeated: false, label: "模拟：二层死亡结算。" });
+}
+function devSimMiasmaBossDeath() {
+  devSimRunConclusion({ cleared: false, layer2: true, routeId: "miasma", routeName: "瘴林",
+    lastNodeName: "瘴林·之主", bossDefeated: false,
+    deathNode: "第二层·瘴林·之主", deathEnemy: "百瘴母蛊", enemyId: "miasmaMotherBoss",
+    layer2Entered: true, layer2Route: "瘴林", layer2BossDefeated: false, bossPhase2Triggered: true,
+    label: "模拟：败于百瘴母蛊结算。" });
+}
+function devSimBloodBossDeath() {
+  devSimRunConclusion({ cleared: false, layer2: true, routeId: "bloodmarsh", routeName: "血沼",
+    lastNodeName: "血沼·之主", bossDefeated: false,
+    deathNode: "第二层·血沼·之主", deathEnemy: "血衣蛊母", enemyId: "bloodRobeMotherBoss",
+    layer2Entered: true, layer2Route: "血沼", layer2BossDefeated: false, bossPhase2Triggered: true,
+    label: "模拟：败于血衣蛊母结算。" });
+}
+function devSimL2Clear() {
+  devSimRunConclusion({ cleared: true, layer2: true, routeId: "miasma", routeName: "瘴林",
+    lastNodeName: "瘴林·之主", bossDefeated: true,
+    deathEnemy: "百瘴母蛊", enemyId: "miasmaMotherBoss",
+    layer2Entered: true, layer2Route: "瘴林", layer2BossDefeated: true, label: "模拟：二层通关结算。" });
+}
+function devCopyRunSummary() {
+  if (!devRequireRun()) return;
+  if (typeof getRunStatsCopyText === "function") {
+    const lines = getRunStatsCopyText();
+    const text = Array.isArray(lines) ? lines.join("\n") : String(lines);
+    devCopyToClipboard("本局结算反馈", text);
+  } else {
+    devCopyToClipboard("runState（结算数据）", runState);
+  }
+}
+
 /* Dev 动作映射表：id -> handler。全部调用真实游戏函数/字段后 devRender()。 */
 const DEV_ACTIONS = {
   // —— 资源 ——
@@ -8791,6 +9133,13 @@ const DEV_ACTIONS = {
   "codexReset": devResetCodex,
   "codexMarkL2": devMarkLayer2Enemies,
   "codexMarkBoss": devMarkLayer2BossDefeated,
+  // —— 结算模拟 ——
+  "simL1Death": devSimL1Death,
+  "simL2Death": devSimL2Death,
+  "simMiasmaBossDeath": devSimMiasmaBossDeath,
+  "simBloodBossDeath": devSimBloodBossDeath,
+  "simL2Clear": devSimL2Clear,
+  "copyRunSummary": devCopyRunSummary,
   // —— 调试 ——
   "copyRun": () => { if (!devRequireRun()) return; devCopyToClipboard("runState", runState); },
   "copyGame": () => { if (!devRequireBattle()) return; devCopyToClipboard("game", game); },
@@ -8827,6 +9176,11 @@ const DEV_PANEL_GROUPS = [
   { title: "万蛊录", buttons: [
     ["解锁全部条目", "codexUnlockAll"], ["重置发现数据", "codexReset"],
     ["标记二层敌人已见", "codexMarkL2"], ["标记二层Boss已击败", "codexMarkBoss"],
+  ] },
+  { title: "结算模拟", buttons: [
+    ["模拟一层死亡", "simL1Death"], ["模拟二层死亡", "simL2Death"],
+    ["败百瘴母蛊", "simMiasmaBossDeath"], ["败血衣蛊母", "simBloodBossDeath"],
+    ["二层通关", "simL2Clear"], ["复制结算反馈", "copyRunSummary"],
   ] },
   { title: "调试", buttons: [
     ["复制 runState", "copyRun"], ["复制 game", "copyGame"],
