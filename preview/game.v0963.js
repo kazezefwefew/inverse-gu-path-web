@@ -2700,7 +2700,7 @@ function openEliteConfirm(node) {
   hideRewardPanels();
   dom.resultSeal.textContent = "煞";
   dom.resultEyebrow.textContent = "命途分岔 · 精英";
-  dom.resultTitle.textContent = "血纹狼王";
+  dom.resultTitle.textContent = (node.enemyId && typeof ENEMY_LIBRARY !== "undefined" && ENEMY_LIBRARY[node.enemyId]?.name) || "血纹狼王";
   dom.resultDescription.textContent = "此战风险更高，胜后奖励更厚。若暂不进入，可回到命途图重新考虑。";
   dom.resultTurns.textContent = "—";
   dom.resultHp.textContent = runState.currentHp;
@@ -3296,6 +3296,10 @@ function showLayer2Conclusion(cleared) {
     `Boss「${route ? LAYER2_ROUTES[st.routeId].name : "-"}」${st.bossDefeated ? "已破" : "未破"} · ` +
     `推进 ${st.nodesCleared || 0} 节点 · 终点「${st.lastNodeName || "-"}」</strong>`;
   dom.runSummary?.prepend(extra);
+  // 关键：finishBattle 的二层分支提前 return，不会走到通用的显示遮罩处，这里自己显示，避免 Boss 胜利后卡住。
+  dom.resultOverlay.classList.remove("hidden");
+  document.body.classList.add("modal-open");
+  updateMobileViewportState();
 }
 
 function completeOverlayNode() {
@@ -5835,7 +5839,7 @@ function finishBattle(victory) {
       gainMaterial(eliteMaterial, 1, "精英战利品");
       const eliteRelic = gainRandomOrdinaryRelic("精英战利品");
       runState.lastBattleRewards = { type: "elite", stones: 20, materialId: eliteMaterial, relicId: eliteRelic, furnace: true };
-      addLog("精英：血纹狼王已败，蛊炉机会已开启。", "important");
+      addLog(`精英：${game.enemy.definition.name}已败${runState.layer2?.active ? "。" : "，蛊炉机会已开启。"}`, "important");
     } else if (runState.currentNode?.type === "battle") {
       unlockLorePage("bloodStone");
       gainGuStones(10, "普通战斗胜利");
