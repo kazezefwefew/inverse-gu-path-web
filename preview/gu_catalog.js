@@ -188,7 +188,7 @@ window.GU_CATALOG = [
     habitat: "盘踞命途塔下层阴暗塔阶。", feeding: "饮血裂石，啖入塔修者之血肉。", temperament: "凶蛮善伏，蓄势而后裂扑。",
     evolution: "积腐可堕为「腐皮山魈」。", synergy: "与塔阶同类轮番扑杀。", counteredBy: "惧速攻，避其蓄势重击。",
     dropsFrom: "第一层·命途塔 普通战。", unlockCondition: "于命途塔遭遇即录入。",
-    gameplayEffect: "", image: "assets/portraits/enemy-shanxiao.png",
+    gameplayEffect: "", image: "assets/portraits/enemy-shanxiao-web.jpg",
   },
   {
     id: "enemy_rottenshanxiao", category: "enemy", cardKey: "", enemyId: "rottenShanxiao",
@@ -198,7 +198,7 @@ window.GU_CATALOG = [
     habitat: "蛰伏命途塔潮腐的塔阶角落。", feeding: "啖腐肉、吸塔中瘴息。", temperament: "阴毒迟缓，腐息缠身。",
     evolution: "由「山魈」积腐堕化而成。", synergy: "与塔阶凶兽同列施毒。", counteredBy: "惧净毒与速决，避其叠毒。",
     dropsFrom: "第一层·命途塔 普通战。", unlockCondition: "于命途塔遭遇即录入。",
-    gameplayEffect: "", image: "assets/portraits/enemy-shanxiao.png",
+    gameplayEffect: "", image: "assets/portraits/enemy-shanxiao-web.jpg",
   },
   {
     id: "enemy_bloodwolf", category: "enemy", cardKey: "", enemyId: "bloodwolf",
@@ -208,7 +208,7 @@ window.GU_CATALOG = [
     habitat: "游走命途塔煞雾弥漫的血径。", feeding: "以煞气为食，饥则噬血。", temperament: "贪噬凶猛，逐血长嚎。",
     evolution: "可异变为「赤鬃血狼」。", synergy: "与血狼同类成群猎杀。", counteredBy: "惧速杀，避其饥噬重击。",
     dropsFrom: "第一层·命途塔 普通战。", unlockCondition: "于命途塔遭遇即录入。",
-    gameplayEffect: "", image: "assets/portraits/enemy-bloodwolf.png",
+    gameplayEffect: "", image: "assets/portraits/enemy-bloodwolf-web.jpg",
   },
   {
     id: "enemy_redmanebloodwolf", category: "enemy", cardKey: "", enemyId: "redManeBloodwolf",
@@ -218,7 +218,7 @@ window.GU_CATALOG = [
     habitat: "游猎命途塔血径深处。", feeding: "逐血而食，越战越饥。", temperament: "亢狂嗜杀，残血则暴怒。",
     evolution: "由「异变血狼」染血而成。", synergy: "与血纹狼王同源凶猎。", counteredBy: "惧高爆速杀，避其狂怒相位。",
     dropsFrom: "第一层·命途塔 普通战。", unlockCondition: "于命途塔遭遇即录入。",
-    gameplayEffect: "", image: "assets/portraits/enemy-bloodwolf.png",
+    gameplayEffect: "", image: "assets/portraits/enemy-bloodwolf-web.jpg",
   },
   {
     id: "enemy_bloodwolfelite", category: "enemy", cardKey: "", enemyId: "bloodwolfElite",
@@ -228,7 +228,7 @@ window.GU_CATALOG = [
     habitat: "盘踞命途塔精英试炼之地。", feeding: "猎食塔修者，血纹饮血而盛。", temperament: "凶悍狡狂，残血则血纹狂化。",
     evolution: "（命途精英，暂无玩家蛊牌。）", synergy: "为尸盘监守拦路开道。", counteredBy: "惧稳守高爆，避其低血追杀。",
     dropsFrom: "第一层·命途塔 精英战。", unlockCondition: "于命途塔遭遇即录入。",
-    gameplayEffect: "", image: "assets/portraits/enemy-bloodwolf.png",
+    gameplayEffect: "", image: "assets/portraits/enemy-bloodwolf-web.jpg",
   },
   {
     id: "enemy_beeswarm", category: "enemy", cardKey: "", enemyId: "beeswarm",
@@ -238,7 +238,7 @@ window.GU_CATALOG = [
     habitat: "盘旋命途塔废弃虫巢、破灯残烛之间。", feeding: "采毒酿瘴，啖入塔修者之血。", temperament: "狂乱群居，受激则倾巢突袭。",
     evolution: "失控可乱化为「乱蜂蛊潮」。", synergy: "群蜂叠毒、以多欺寡。", counteredBy: "惧范围与速攻，散则力竭。",
     dropsFrom: "第一层·命途塔 普通战。", unlockCondition: "于命途塔遭遇即录入。",
-    gameplayEffect: "", image: "assets/portraits/enemy-beeswarm.png",
+    gameplayEffect: "", image: "assets/portraits/enemy-beeswarm-web.jpg",
   },
   {
     id: "enemy_wildbeetide", category: "enemy", cardKey: "", enemyId: "wildBeeTide",
@@ -248,7 +248,7 @@ window.GU_CATALOG = [
     habitat: "翻涌于命途塔阴风穿堂的破巢。", feeding: "吞瘴噬怨，越乱越盛。", temperament: "暴乱无形，聚散无常。",
     evolution: "由「毒蜂蛊群」失控暴乱而成。", synergy: "与毒蜂同巢压迫铺毒。", counteredBy: "惧速决，免其连蜇叠毒。",
     dropsFrom: "第一层·命途塔 普通战。", unlockCondition: "于命途塔遭遇即录入。",
-    gameplayEffect: "", image: "assets/portraits/enemy-beeswarm.png",
+    gameplayEffect: "", image: "assets/portraits/enemy-beeswarm-web.jpg",
   },
 
   /* ===== V0.9.6 第二层 · 敌怪图谱（category:"enemy"，带 enemyId 供「已遇」解锁，无立绘走暗色占位） ===== */
@@ -342,7 +342,7 @@ window.GU_CATALOG = [
     habitat: "踞守命途塔最高处的尸盘王座。", feeding: "以塔中亡魂与万蛊豢养尸火。", temperament: "沉寂威重，蓄势则万蛊俱动。",
     evolution: "破之则塔顶裂开向下暗径，通往第二层。", synergy: "麾下尽是命途塔守阶凶兽。", counteredBy: "惧持续压制；蓄势重击须及时打断。",
     dropsFrom: "第一层·命途塔 塔顶 Boss。", unlockCondition: "于塔顶遭遇即录入。",
-    gameplayEffect: "", image: "assets/portraits/enemy-corpsepuppet.png",
+    gameplayEffect: "", image: "assets/portraits/enemy-corpsepuppet-web.jpg",
   },
 
   /* ===== V0.9.6 第二层 · 首领残卷（category:"boss"，带 enemyId） ===== */
@@ -474,9 +474,9 @@ window.GU_CATALOG = [
   },
   {
     id: "enemy_chaosSwarmHordeGu", category: "enemy", cardKey: "", enemyId: "chaosSwarmHordeGu",
-    name: "乱蜂蛊潮", alias: "密牌抢攻", rarity: "普通", faction: "毒道", type: "敌怪", stage: "蜂窟·潮群",
+    name: "蜂潮蛊涌", alias: "密牌抢攻", rarity: "普通", faction: "毒道", type: "敌怪", stage: "蜂窟·潮群",
     descriptionShort: "裹潮成团、密牌则抢攻的蜂窟潮群。",
-    descriptionLore: "蜂窟录：乱蜂蛊潮是无数毒蜂裹成的一团活潮，没有阵形、只剩乱翅。你出手越密，它越是被激得乱翅抢攻，反扑得越狠。",
+    descriptionLore: "蜂窟录：蜂潮蛊涌是无数毒蜂裹成的一团活潮，没有阵形、只剩乱翅。你出手越密，它越是被激得乱翅抢攻，反扑得越狠。",
     habitat: "翻涌于蜂窟魔巢的潮群通道。", feeding: "吞毒蜜噬同类残躯，越乱越盛。", temperament: "暴乱无形，受密牌激则抢攻。",
     evolution: "（生态敌怪，暂无玩家蛊牌。）", synergy: "与蜂窟守卫同巢以抢攻压迫。", counteredBy: "单回合勿出牌过密，免其抢攻反噬。",
     dropsFrom: "第三层·蜂窟魔巢 普通战。", unlockCondition: "于蜂窟遭遇即录入。",
