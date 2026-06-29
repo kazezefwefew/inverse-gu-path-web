@@ -12,18 +12,21 @@
   </style>
   <meta name="description" content="原创暗黑东方奇幻卡牌肉鸽原型《逆命蛊途》">
   <title>逆命蛊途 · 命途塔试炼</title>
-  <script>window.__NMG_BUILD__ = "v0.9.8.6-mapdeepen";</script>
-  <link rel="stylesheet" href="style.v0976.css">
+  <script>window.__NMG_BUILD__ = "v0.9.8.7-mobile-preview";</script>
+  <link rel="stylesheet" href="style.v0977.css">
   <script src="audio.v0979.js" defer></script>
   <script src="gu_catalog.js?v=v0983" defer></script>
-  <script src="game.v0984.js" defer></script>
+  <script src="game.v0985.js" defer></script>
   <script>
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.getRegistrations().then(function (rs) { rs.forEach(function (r) { r.unregister(); }); }).catch(function () {});
       if (window.caches && caches.keys) { caches.keys().then(function (ks) { ks.forEach(function (k) { caches.delete(k); }); }).catch(function () {}); }
     }
     (function () {
-      if (!window.matchMedia || !window.matchMedia("(pointer: coarse)").matches) return;
+      // V0.9.8.7：全屏按钮仅在「桌面·非触屏·宽屏」创建——手机/触屏/窄屏本已全屏，且该按钮浮于左下会压住手牌第一张，故不创建（窄屏再由 CSS @media 兜底隐藏）。桌面保留全屏功能。
+      if (!window.matchMedia) return;
+      if (window.matchMedia("(pointer: coarse)").matches) return;
+      if (window.matchMedia("(max-width: 820px)").matches) return;
       var el = document.documentElement;
       var req = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen;
       if (!req) return;
@@ -87,10 +90,15 @@
       <span class="start-moon"></span>
     </div>
     <div class="start-content">
-      <p class="start-kicker">原创暗黑东方卡牌肉鸽 · V0.9.8.6 地图深化</p>
+      <p class="start-kicker">原创暗黑东方卡牌肉鸽 · V0.9.8.7 移动端化与续局（preview）</p>
       <div class="start-logo" aria-hidden="true"><span>蛊</span></div>
       <h1 id="startTitle">逆命蛊途</h1>
       <p class="start-subtitle">以蛊为刃，以命为薪。命途塔中，从来没有天命之人。</p>
+      <!-- V0.9.8.7 自动续局：有未完成存档时由 JS 显示 -->
+      <button id="resumeRunButton" class="resume-run-button hidden" type="button">
+        <span class="resume-run-main">继续上一局</span>
+        <small class="resume-run-sub" id="resumeRunSummary"></small>
+      </button>
       <div class="start-guide-actions" aria-label="新手与测试设置">
         <button id="tutorialOpenButton" class="start-guide-button" type="button">初入命途</button>
         <button id="updateLogButton" class="start-guide-button update-log-button" type="button">更新公告</button>
@@ -120,12 +128,24 @@
 
       <button id="startBattleButton" class="start-button" type="button">
         <span>踏入命途塔</span>
-        <small>踏破四段，直面尸盘监守</small>
+        <small>层层深入，直面尸盘监守</small>
       </button>
       <p id="runProgress" class="run-progress hidden"></p>
       <p class="start-feedback-note">网页试玩版：当前为开发测试版本，数据与内容仍会调整。</p>
     </div>
   </section>
+
+  <!-- V0.9.8.7 自动续局：新开一局且已有未完成存档时的覆盖确认弹窗 -->
+  <div id="overwriteConfirmOverlay" class="overwrite-confirm-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="overwriteConfirmTitle">
+    <div class="overwrite-confirm-card">
+      <h3 id="overwriteConfirmTitle">覆盖上一局？</h3>
+      <p id="overwriteConfirmText">开新局将覆盖上一局存档进度，确定继续？</p>
+      <div class="overwrite-confirm-actions">
+        <button id="overwriteConfirmCancel" type="button">取消</button>
+        <button id="overwriteConfirmOk" type="button">开新局（覆盖）</button>
+      </div>
+    </div>
+  </div>
 
   <div id="fxLayer" class="fx-layer" aria-hidden="true"></div>
   <div id="effectLayer" class="effect-layer" aria-hidden="true"></div>
