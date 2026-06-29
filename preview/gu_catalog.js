@@ -398,7 +398,7 @@ window.GU_CATALOG = [
     habitat: "踞守骨塔高陵最深的骨巢王座。", feeding: "以陈骨残念与亡魂共鸣豢养骨火。", temperament: "沉寂威重，受扰则召卫蓄力齐发。",
     evolution: "半血触发「骨巢开裂」相位，召卫与蓄力压势大增。", synergy: "麾下尽是骨塔朽甲与骨甲蛊卫。", counteredBy: "惧持续压制；召卫蓄力须及时打断，纯毒难以速杀。",
     dropsFrom: "第三层·骨塔高陵 路线 Boss。", unlockCondition: "于骨塔遭遇即录入。",
-    gameplayEffect: "召卫叠甲、蓄力重击镇陵，半血触发「骨巢开裂」强化；具部分毒抗，并会吞毒化为自身回复。", image: "",
+    gameplayEffect: "召卫叠甲、蓄力重击镇陵，半血触发「骨巢开裂」强化；具部分毒抗，并会吞毒化为自身回复。", image: "assets/portraits/bone-nest-tomb-king.webp",
   },
   {
     id: "boss_calamityQueen", category: "boss", cardKey: "", enemyId: "calamityQueenBoss",
@@ -408,7 +408,7 @@ window.GU_CATALOG = [
     habitat: "伏于蜂窟魔巢核心的蜂后巢室。", feeding: "以毒蜜与孵巢蜂群孕育无尽蜂潮。", temperament: "慵懒孕蜂，半血则掀蜂群暴动。",
     evolution: "半血触发「蜂群暴动」相位，蜂群层数与毒刺压势暴增。", synergy: "麾下尽是蜂窟毒蜂与蜂巢虫蛊。", counteredBy: "惧高爆速杀；拖延则蜂群层数失控。",
     dropsFrom: "第三层·蜂窟魔巢 路线 Boss。", unlockCondition: "于蜂窟遭遇即录入。",
-    gameplayEffect: "", image: "",
+    gameplayEffect: "", image: "assets/portraits/calamity-bee-queen.webp",
   },
 
   /* ===== V0.9.8 第三层 · 敌怪图谱（category:"enemy"，带 enemyId 供「已遇」解锁） ===== */
@@ -420,7 +420,7 @@ window.GU_CATALOG = [
     habitat: "游荡骨塔高陵的骨堆缝隙。", feeding: "啃陈骨残念，铃响越密食得越欢。", temperament: "阴冷好扰，受激则乱铃齐摇。",
     evolution: "（生态敌怪，暂无玩家蛊牌。）", synergy: "与骨塔同类以乱铃配合蓄力。", counteredBy: "惧速决，免其乱铃扰神。",
     dropsFrom: "第三层·骨塔高陵 普通战。", unlockCondition: "于骨塔遭遇即录入。",
-    gameplayEffect: "摇响骨铃扰乱心神（乱铃），并蓄势加重下一击。", image: "assets/codex/gu/bonebell-gu.webp",
+    gameplayEffect: "摇响骨铃扰乱心神（乱铃），并蓄势加重下一击。", image: "assets/portraits/bone-bell-patrol-gu.webp",
   },
   {
     id: "enemy_skeletonPuppetGu", category: "enemy", cardKey: "", enemyId: "skeletonPuppetGu",
@@ -430,7 +430,7 @@ window.GU_CATALOG = [
     habitat: "列阵骨塔高陵的朽甲阵。", feeding: "由骨巢蛊丝牵引，无须进食。", temperament: "迟缓固执，蓄力则一击倾尽。",
     evolution: "（生态敌怪，暂无玩家蛊牌。）", synergy: "与骨甲蛊卫同列拦路。", counteredBy: "蓄力重砸受够阈值伤害可打断，未断则吃满一击。",
     dropsFrom: "第三层·骨塔高陵 普通战。", unlockCondition: "于骨塔遭遇即录入。",
-    gameplayEffect: "缩骨蓄甲后蓄力重砸（蓄力可在受够阈值伤害后打断）；朽甲在身具部分毒抗。", image: "",
+    gameplayEffect: "缩骨蓄甲后蓄力重砸（蓄力可在受够阈值伤害后打断）；朽甲在身具部分毒抗。", image: "assets/portraits/rotten-armor-gu-soldier.webp",
   },
   {
     id: "enemy_boneArmorGuardGu", category: "enemy", cardKey: "", enemyId: "boneArmorGuardGu",
@@ -440,7 +440,7 @@ window.GU_CATALOG = [
     habitat: "镇守骨塔高陵的甲士列。", feeding: "啃食金石骨屑修补骨甲。", temperament: "迟钝而坚，残血则骨甲暴坚。",
     evolution: "（生态敌怪，暂无玩家蛊牌。）", synergy: "与朽甲蛊兵同列叠甲压迫。", counteredBy: "惧破甲与高爆；护甲未破前输出难以突破。",
     dropsFrom: "第三层·骨塔高陵 普通战。", unlockCondition: "于骨塔遭遇即录入。",
-    gameplayEffect: "覆甲固身后，自身有护甲时攻击附加额外伤害（甲坚击重）；骨甲在身具较强毒抗。", image: "",
+    gameplayEffect: "覆甲固身后，自身有护甲时攻击附加额外伤害（甲坚击重）；骨甲在身具较强毒抗。", image: "assets/portraits/bone-armor-gu-guard.webp",
   },
   {
     id: "enemy_boneCommanderElite", category: "enemy", cardKey: "", enemyId: "boneCommanderElite",
@@ -450,7 +450,7 @@ window.GU_CATALOG = [
     habitat: "统辖骨塔高陵精英试炼之地。", feeding: "以号令凝聚尸群骨煞为养。", temperament: "威厉狠戾，残血则厉令狂涌。",
     evolution: "（骨塔精英，暂无玩家蛊牌。）", synergy: "为骨巢守墓王号令开道。", counteredBy: "惧高爆速杀，避其执令累加重击。",
     dropsFrom: "第三层·骨塔高陵 精英战。", unlockCondition: "于骨塔遭遇即录入。",
-    gameplayEffect: "以执令印记自加号令、攻势随令累增；残血厉令狂涌。", image: "",
+    gameplayEffect: "以执令印记自加号令、攻势随令累增；残血厉令狂涌。", image: "assets/portraits/bone-tower-commander.webp",
   },
   {
     id: "enemy_venomBeeGu", category: "enemy", cardKey: "", enemyId: "venomBeeGu",
@@ -460,7 +460,7 @@ window.GU_CATALOG = [
     habitat: "盘旋蜂窟魔巢的巢道空隙。", feeding: "采毒花酿瘴，啖入来者之血。", temperament: "轻捷乱舞，专挑空门连刺。",
     evolution: "（生态敌怪，暂无玩家蛊牌。）", synergy: "与蜂巢虫蛊同巢铺毒。", counteredBy: "惧速决，免其连刺叠毒。",
     dropsFrom: "第三层·蜂窟魔巢 普通战。", unlockCondition: "于蜂窟遭遇即录入。",
-    gameplayEffect: "毒针连刺多段命中，渗毒蜇刺为你叠毒、残血时额外加伤。", image: "",
+    gameplayEffect: "毒针连刺多段命中，渗毒蜇刺为你叠毒、残血时额外加伤。", image: "assets/portraits/venom-bee-gu.webp",
   },
   {
     id: "enemy_beehiveBroodGu", category: "enemy", cardKey: "", enemyId: "beehiveBroodGu",
@@ -470,7 +470,7 @@ window.GU_CATALOG = [
     habitat: "盘踞蜂窟魔巢的孵巢深处。", feeding: "以毒蜜不断孵化新蜂群。", temperament: "慵懒孵巢，越拖蜂群越盛。",
     evolution: "（生态敌怪，暂无玩家蛊牌。）", synergy: "与毒蜂蛊同巢以蜂群压迫。", counteredBy: "惧高爆速杀；拖延则蜂群层数失控。",
     dropsFrom: "第三层·蜂窟魔巢 普通战。", unlockCondition: "于蜂窟遭遇即录入。",
-    gameplayEffect: "持续孵化蜂群，攻击随蜂群层数累增（蜂群机制）。", image: "",
+    gameplayEffect: "持续孵化蜂群，攻击随蜂群层数累增（蜂群机制）。", image: "assets/portraits/beehive-brood-gu.webp",
   },
   {
     id: "enemy_chaosSwarmHordeGu", category: "enemy", cardKey: "", enemyId: "chaosSwarmHordeGu",
@@ -480,7 +480,7 @@ window.GU_CATALOG = [
     habitat: "翻涌于蜂窟魔巢的潮群通道。", feeding: "吞毒蜜噬同类残躯，越乱越盛。", temperament: "暴乱无形，受密牌激则抢攻。",
     evolution: "（生态敌怪，暂无玩家蛊牌。）", synergy: "与蜂窟守卫同巢以抢攻压迫。", counteredBy: "单回合勿出牌过密，免其抢攻反噬。",
     dropsFrom: "第三层·蜂窟魔巢 普通战。", unlockCondition: "于蜂窟遭遇即录入。",
-    gameplayEffect: "你单回合出牌过密时触发抢攻，该次攻击额外加重（抢攻反噬）。", image: "assets/codex/gu/chaos-bee-gu.webp",
+    gameplayEffect: "你单回合出牌过密时触发抢攻，该次攻击额外加重（抢攻反噬）。", image: "assets/portraits/swarm-surge-gu.webp",
   },
   {
     id: "enemy_beehiveGuardElite", category: "enemy", cardKey: "", enemyId: "beehiveGuardElite",
@@ -490,7 +490,7 @@ window.GU_CATALOG = [
     habitat: "巡守蜂窟魔巢精英巢道。", feeding: "以蜡甲蜂刺截杀来犯者为养。", temperament: "森严护巢，残血则蜂刺狂涌。",
     evolution: "（蜂窟精英，暂无玩家蛊牌。）", synergy: "为灾厄蜂后护巢开道。", counteredBy: "勿密牌强攻；惧稳节奏高爆速杀。",
     dropsFrom: "第三层·蜂窟魔巢 精英战。", unlockCondition: "于蜂窟遭遇即录入。",
-    gameplayEffect: "你单回合出牌过密时蜂刺反噬、攻击额外加重；蜡针连射叠毒。", image: "",
+    gameplayEffect: "你单回合出牌过密时蜂刺反噬、攻击额外加重；蜡针连射叠毒。", image: "assets/portraits/beehive-gu-guard.webp",
   },
 
   /* ===== V0.9.8 第三层 · 生态条目（category:"eco"，沿用现有 eco 渲染，恒显示） ===== */
