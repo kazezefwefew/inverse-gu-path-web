@@ -4,8 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="theme-color" content="#0a0d0a">
-  <link rel="manifest" href="manifest.webmanifest">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <!-- V0.9.6.4 boot-loader 关键内联样式：先于外链 style.css 生效，确保启动界面第一帧绘制、彻底盖住主菜单不闪现。完整样式见 style.css。 -->
   <style>
     #bootLoader{position:fixed;inset:0;z-index:100000;display:grid;place-items:center;padding:24px;background:radial-gradient(circle at 50% 22%,rgba(75,119,88,0.10),transparent 42%),radial-gradient(circle at 18% 82%,rgba(157,47,42,0.12),transparent 46%),#080b09;color:#bda26d;font-family:"STKaiti","KaiTi",serif;opacity:1;transition:opacity .6s ease;}
@@ -14,62 +12,15 @@
   </style>
   <meta name="description" content="原创暗黑东方奇幻卡牌肉鸽原型《逆命蛊途》">
   <title>逆命蛊途 · 命途塔试炼</title>
-  <script>window.__NMG_BUILD__ = "v0.9.7.1-pwa-install-preview";</script>
-  <link rel="stylesheet" href="style.v0972.css">
+  <script>window.__NMG_BUILD__ = "v0.9.7-run-summary";</script>
+  <link rel="stylesheet" href="style.v0970.css">
   <script src="audio.v0962.js" defer></script>
   <script src="gu_catalog.js?v=v0970" defer></script>
-  <script src="game.v0972.js" defer></script>
+  <script src="game.v0971.js" defer></script>
   <script>
-    // V0.9.7.1 PWA：早期建好 __pwaState 并尽早捕获 beforeinstallprompt（game.js 加载前事件就可能触发）
-    window.__pwaState = window.__pwaState || {
-      manifestLoaded: !!document.querySelector('link[rel="manifest"]'),
-      serviceWorkerRegistered: false,
-      beforeInstallPromptCaptured: false,
-      isStandalone: (window.matchMedia && (window.matchMedia('(display-mode: standalone)').matches || window.matchMedia('(display-mode: fullscreen)').matches)) || navigator.standalone === true,
-      isInAppBrowser: /MicroMessenger|QQ\/|Qzone|DouYin|TikTok|musical_ly|Weibo|Baiduboxapp|Alipay/i.test(navigator.userAgent || ''),
-      deferredPrompt: null,
-      cacheVersion: 'nmg-pwa-v0972',
-      startUrl: location.href,
-      scope: './',
-      canInstall: false,
-      buttonState: 'hidden'
-    };
-    window.addEventListener('beforeinstallprompt', function (e) {
-      try { e.preventDefault(); } catch (err) {}
-      window.__pwaState.deferredPrompt = e;
-      window.__pwaState.beforeInstallPromptCaptured = true;
-      window.__pwaState.canInstall = true;
-      try { document.dispatchEvent(new CustomEvent('pwa:install-ready')); } catch (err) {}
-    });
-    window.addEventListener('appinstalled', function () {
-      window.__pwaState.deferredPrompt = null;
-      window.__pwaState.canInstall = false;
-      window.__pwaState.isStandalone = true;
-      try { document.dispatchEvent(new CustomEvent('pwa:installed')); } catch (err) {}
-    });
-    // Service Worker：仅 preview 路径注册（正式入口不变）；非 preview 则清理旧 SW/缓存
     if ("serviceWorker" in navigator) {
-      if (location.pathname.indexOf("/preview/") !== -1) {
-        window.addEventListener("load", function () {
-          navigator.serviceWorker.register("./service-worker.js", { scope: "./" }).then(function (reg) {
-            window.__pwaState.serviceWorkerRegistered = true;
-            try {
-              reg.addEventListener("updatefound", function () {
-                var nw = reg.installing; if (!nw) return;
-                nw.addEventListener("statechange", function () {
-                  if (nw.state === "installed" && navigator.serviceWorker.controller) {
-                    var playing = (typeof game !== "undefined" && game && game.status === "playing");
-                    try { document.dispatchEvent(new CustomEvent("pwa:update-ready", { detail: { registration: reg, playing: playing } })); } catch (e2) {}
-                  }
-                });
-              });
-            } catch (err) {}
-          }).catch(function (err) { console.warn("[PWA] SW 注册失败", err); });
-        });
-      } else {
-        navigator.serviceWorker.getRegistrations().then(function (rs) { rs.forEach(function (r) { r.unregister(); }); }).catch(function () {});
-        if (window.caches && caches.keys) { caches.keys().then(function (ks) { ks.forEach(function (k) { caches.delete(k); }); }).catch(function () {}); }
-      }
+      navigator.serviceWorker.getRegistrations().then(function (rs) { rs.forEach(function (r) { r.unregister(); }); }).catch(function () {});
+      if (window.caches && caches.keys) { caches.keys().then(function (ks) { ks.forEach(function (k) { caches.delete(k); }); }).catch(function () {}); }
     }
     (function () {
       if (!window.matchMedia || !window.matchMedia("(pointer: coarse)").matches) return;
@@ -592,7 +543,7 @@
       <button id="settingsCloseButton" class="deck-close-button" type="button" aria-label="关闭设置">×</button>
       <p class="deck-eyebrow">试玩包设置</p>
       <h2 id="settingsTitle">设置</h2>
-      <p id="settingsVersion" class="settings-version">当前版本：V0.9.7.1 PWA 预览</p>
+      <p id="settingsVersion" class="settings-version">当前版本：V0.9.7 结算反馈</p>
       <div class="settings-list">
         <button id="settingsMusicToggle" type="button">音乐：开</button>
         <label class="settings-volume" for="settingsVolume">
