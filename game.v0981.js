@@ -984,7 +984,7 @@ const LAYER3_THEME_EVENTS = Object.freeze({
 
 const RELICS = {
   jadeMarrow: {
-    name: "寒玉髓", glyph: "玉", description: "最大生命 +8；入塔时恢复至上限。",
+    name: "寒玉髓", glyph: "玉", description: "最大生命 +8；每场战斗结束后恢复 6 点生命。",
   },
   yuanCicada: {
     name: "纳元蝉", glyph: "蝉", description: "每回合基础真元由 3 提升至 4。",
@@ -2510,7 +2510,7 @@ function createBattleState() {
   const __mt = MODE_TUNING[runState.mode || "normal"] || MODE_TUNING.normal;
   const modeHpMul = enemyDefinition.isBoss ? __mt.bossHpMul : __mt.hpMul;
   const enemyMaxHp = Math.max(1, Math.ceil(enemyDefinition.maxHp * enemyHpMultiplier * modeHpMul));
-  const startingArmor = (runState.relicId === "boneCarapace" ? 3 : 0) + runState.startArmorBonus;
+  const startingArmor = (runState.relicId === "boneCarapace" ? 4 : 0) + runState.startArmorBonus;
   const deck = runState.deckCards.map(createCardFromDeckEntry);
   const combatRelic = {
     tailCutUsed: false,
@@ -2821,9 +2821,9 @@ function getNodeCompleteNotice(node) {
   if (!node) return "";
   if (node.type === "shop") return "蛊坊交易已毕";
   if (node.type === "event") return runState.lastEventNotice || "机缘已定";
-  if (node.type === "elite") return "血纹狼王已败";
+  if (node.type === "elite") return `${ENEMY_LIBRARY[node.enemyId]?.name || "精英"}已败`;
   if (node.type === "rest") return runState.lastRestResult || "休整已毕";
-  if (node.type === "boss") return "尸盘监守已破";
+  if (node.type === "boss") return `${ENEMY_LIBRARY[node.enemyId]?.name || "尸盘监守"}已破`;
   return `${node.name}已伏诛`;
 }
 
@@ -4646,7 +4646,7 @@ function confirmShopRemoveCard() {
 
 function removeShopCard(instanceId) {
   const state = getShopState();
-  if (state.remove || runState.deckCards.length <= 6 || !spendShopStones(18)) return;
+  if (state.remove || runState.deckCards.length <= 6 || !spendShopStones(18 + ((runState.layer3?.active ? 3 : runState.layer2?.active ? 2 : 1) - 1) * 6)) return; // 删牌价随层 18/24/30，与渲染/门控同公式
   const removed = removeDeckEntryById(instanceId);
   if (!removed) return;
   state.remove = true;
@@ -4775,7 +4775,7 @@ function logPassiveOpening() {
     addLog(`随身遗物：${ordinaryText}。`, "system-log");
   }
   if (runState.relicId === "boneCarapace") {
-    spawnFloatText(dom.playerPortrait, "+3 护甲", "defense-float");
+    spawnFloatText(dom.playerPortrait, "+4 护甲", "defense-float");
     playArmorEffect();
   }
   if (runState.startArmorBonus > 0) {
@@ -6924,7 +6924,7 @@ function finishBattle(victory) {
   // V0.9.8.5 胜利结算前置增益（放 sync 之后、各层 return 分支之前，覆盖一/二/三层全部胜利）：
   if (victory) {
     if (runState.relicId === "jadeMarrow") healRunHp(6, "寒玉髓"); // 寒玉髓续航引擎：每场战斗后回 6 生命
-    if (runState.currentNode?.type === "boss" || runState.floor === MAX_ROUTE_STEP) gainGuStones(15, "Boss胜利"); // 所有 Boss 胜利补蛊石，把钱引导到 Boss 后
+    if (runState.currentNode?.type === "boss") gainGuStones(15, "Boss胜利"); // 所有 Boss 胜利补蛊石（type==="boss" 覆盖一/二/三层 Boss）。原 ||floor===MAX 子句为冗余：非Boss战 floor=node.step=1/2/3，仅 step=4 的 Boss 节点才=MAX，删之仅为语义清晰
     if (runState.heroId === "blood") { const __bn = Math.min(8, game.bloodCardsPlayedThisBattle || 0); if (__bn > 0) healRunHp(__bn, "血海饲蛊·战意续息"); } // 血道被动：战后按本场血道出牌数回血（每张+1，上限8）
   }
   const card = dom.resultOverlay.querySelector(".result-card");
@@ -7029,8 +7029,8 @@ function openCardReward() {
   if (runState.currentNode?.type === "elite") {
     const material = MATERIALS[runState.lastBattleRewards?.materialId];
     const relic = ORDINARY_RELICS[runState.lastBattleRewards?.relicId];
-    dom.resultEyebrow.textContent = "精英战利品 · 血纹狼王已败";
-    dom.resultDescription.textContent = `已获得 20 蛊石${material ? `、${material.name}` : ""}${relic ? `与遗物「${relic.name}」` : ""}；选牌后将获得一次炼蛊机会。`;
+    dom.resultEyebrow.textContent = `精英战利品 · ${game.enemy?.definition?.name || "精英"}已败`;
+    dom.resultDescription.textContent = `已获得 ${runState.lastBattleRewards?.stones ?? 16} 蛊石${material ? `、${material.name}` : ""}${relic ? `与遗物「${relic.name}」` : ""}；选牌后将获得一次炼蛊机会。`;
   } else {
     dom.resultDescription.textContent = "从三枚新生蛊卵中收纳一枚，或舍弃收获继续前行。";
   }
@@ -7708,7 +7708,6 @@ function advanceToNextFloor() {
   if (runState.currentNode?.type === "elite" && !runState.furnaceResolved) return;
   dom.resultOverlay.classList.add("hidden");
   refreshModalLock();
-  if (runState?.layer3?.active) { layer3CompleteNodeAndReturnMap(); return; }
   if (runState?.layer3?.active) { layer3CompleteNodeAndReturnMap(); return; }
   if (runState?.layer2?.active) { layer2CompleteNodeAndReturnMap(); return; }
   completeCurrentNodeAndReturnMap();
@@ -9282,7 +9281,7 @@ function getCardKeywordHelp(card) {
   if (card.type === "poison" || card.typeName.includes("毒道")) keywords.push("毒性：敌方回合结束时造成等同层数的伤害；重复施毒可触发蚀毒。");
   if (card.upgradeLevel > 0) keywords.push(`炼化：当前 +${card.upgradeLevel}；${card.upgradeConfig?.rule || "强化了主要数值。"}`);
   if (card.mutated) keywords.push("异变：由蛊炉材料炼蛊转化而来，不能再次异变。");
-  if (card.damaged) keywords.push(`受损：本局该卡消耗 +${card.costPenalty || 1}。`);
+  if (card.damaged) keywords.push("受损：蛊性受创，徒留旧痕。");
   if (card.skewed) keywords.push(getSkewPenaltyText(card));
   return keywords;
 }
