@@ -1,5 +1,5 @@
 {
-  "build": "v0.9.9-longevity-dev-b3a",
-  "version": "V0.9.9-dev 寿道·子批3 + 朝暮立绘修复/瘦身（开发预览）",
+  "build": "v0.9.9-longevity-dev-b6",
+  "version": "V0.9.9-dev 寿道·子批4蛊修列传+子批5寿元经济+子批6死劫模式（开发预览）",
   "note": "游戏内更新闸读取本文件(不缓存)比对当前已加载 build；部署时务必把 build 改成该环境 index.html 的 __NMG_BUILD__ 值。"
 }
