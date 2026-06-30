@@ -766,6 +766,58 @@ window.GU_CATALOG = [
     gameplayEffect: "下一张攻击蛊伤害翻倍；若本回合已获得命势，抽 1 张牌。", image: "assets/codex/gu/drunk-fate-worm-gu.webp",
   },
 
+  /* ===== 寿道进阶蛊（V0.9.9 子批3 新增·朝暮专属；codex 立绘待补，image 留空走单字框）===== */
+  {
+    id: "gu_burnlife", category: "gu", cardKey: "burnLife",
+    name: "焚寿蛊", alias: "燃年之蝎", rarity: "异蛊", faction: "寿道", type: "攻击", stage: "异蛊·焚形",
+    descriptionShort: "本场焚寿越多、尾毒越炽的寿道攻蛊。",
+    descriptionLore: "寿道异篇：焚寿蛊形如赤蝎，尾节中空，蓄着一截主人的年岁。每当蛊师焚寿催术，它便把那缕岁月吸入尾针，越积越烫；待它出手，尾针倾尽本场所焚之寿，一蜇即是数年光阴化作的烈毒。老蛊师诫之：「它记得你烧过的每一年，也会替你一并讨回。」",
+    habitat: "蛰居寿宴残烛、停灵长明灯将尽的炉膛。", feeding: "啖主人当场焚去的寿数，焚得越多养得越凶。", temperament: "贪烈嗜燃，主焚则喜，主惜寿则蔫。",
+    evolution: "焚寿成瘾可蜕「燃命蝎」，一蜇燃尽半生。", synergy: "与「回光蛊」及「焚寿燃命」同流，焚得越狠尾毒越烈。", counteredBy: "本场未焚寿则尾针空乏、伤平平；寿尽则反噬其主。",
+    dropsFrom: "命途中阶、寿道蛊奖励选牌（朝暮专属）。", unlockCondition: "蛊囊中曾收容此蛊即录入。",
+    gameplayEffect: "消耗 2 寿元，造成 6 点伤害；本场每焚去 1 点寿元额外 +2（含本次）。", image: "",
+  },
+  {
+    id: "gu_erodeage", category: "gu", cardKey: "erodeAge",
+    name: "蚀岁蛊", alias: "夺寿之蛭", rarity: "灵蛊", faction: "寿道", type: "攻击", stage: "灵蛊·蚀形",
+    descriptionShort: "啮敌伤身、反哺主人寿元的寿道吸蛊。",
+    descriptionLore: "寿道残卷：蚀岁蛊状若苍黑水蛭，口器分作两端——一端啮敌、一端连主。它咬开敌身时，顺着血肉里残存的「岁气」倒吸而上，分一缕回填主人将枯的寿元。蛊师戏称：「替我啃一口敌人的命，捎带还我两年阳寿。」夺的是敌岁，养的是己年。",
+    habitat: "潜居古冢棺缝、岁气未散的枯骨之间。", feeding: "吸敌身岁气、转哺主人寿元，不啖凡食。", temperament: "阴冷而恋主，咬定不松，所夺必有所还。",
+    evolution: "久吸可蜕「噬寿蛭」，一口夺敌数岁、回主更丰。", synergy: "与「续命蛊」「枯荣蛊」同养，边战边续、寿元长青。", counteredBy: "敌身岁气稀薄（傀儡尸物）则吸而无获，回寿甚微。",
+    dropsFrom: "命途中阶、寿道蛊奖励选牌（朝暮专属）。", unlockCondition: "蛊囊中曾收容此蛊即录入。",
+    gameplayEffect: "造成 8 点伤害，并夺回 2 点寿元（不超过上限）。", image: "",
+  },
+  {
+    id: "gu_focallife", category: "gu", cardKey: "focalLife",
+    name: "回光蛊", alias: "返照之蛾", rarity: "异蛊", faction: "寿道", type: "辅助", stage: "异蛊·焰形",
+    descriptionShort: "焚寿引回光返照、本回合攻势翻倍的寿道秘蛊。",
+    descriptionLore: "寿道孤篇：回光蛊是一只通体莹白的火蛾，平素蛰伏不动，唯在主人焚去大段寿元时倏然振翅——翅上鳞粉燃作回光，恰如灯将熄前那一瞬的暴亮。这一刻蛊师的每道蛊术都被照得加倍凶猛，代价是又一截年岁随光烬去。残篇叹：「回光返照者，光最盛，命亦最短。」",
+    habitat: "绕飞将熄的长明灯、临终人榻前的烛影。", feeding: "啖主人大段焚去的寿元，化作翅上回光。", temperament: "静极而烈，不动则已，一动倾尽。",
+    evolution: "可蜕「殒光蛾」，回光更亮而焚寿更巨。", synergy: "与「焚寿蛊」「裂魂蛊」同出，借翻倍一举倾尽爆发。", counteredBy: "寿元不足则唤之不应；翻倍仅及本回合，过则光熄。",
+    dropsFrom: "命途中阶、寿道蛊奖励选牌（朝暮专属）。", unlockCondition: "蛊囊中曾收容此蛊即录入。",
+    gameplayEffect: "消耗 3 寿元，本回合攻击蛊伤害翻倍。", image: "",
+  },
+  {
+    id: "gu_mulberryfield", category: "gu", cardKey: "mulberryField",
+    name: "桑田蛊", alias: "易海之龟", rarity: "灵蛊", faction: "寿道", type: "辅助", stage: "灵蛊·苍形",
+    descriptionShort: "焚寿催敌速朽、攻势永减的寿道控蛊。",
+    descriptionLore: "寿道古简：桑田蛊形如苍青老龟，背甲刻满年轮般的裂纹，一圈即一纪。蛊师焚寿喂之，它便对敌呵出一口「岁息」——沧海化桑田只在弹指，敌人随之老朽：筋骨松、气力衰，举刀都慢了半拍，且这衰老不可逆、层层累加。古谚：「它不杀你，只是让你老得太快。」",
+    habitat: "伏于古井深潭、沧桑变迁的废墟地脉。", feeding: "食主焚之寿，吐为加于敌身的岁月。", temperament: "迟缓而执拗，加诸敌身的衰老从不收回。",
+    evolution: "久养可蜕「沧桑龟」，一息令敌老去数纪。", synergy: "与拖延、护甲流同行，敌势愈衰则己愈稳。", counteredBy: "对无血肉、不知老朽的尸傀效力大减。",
+    dropsFrom: "命途中阶、寿道蛊奖励选牌（朝暮专属）。", unlockCondition: "蛊囊中曾收容此蛊即录入。",
+    gameplayEffect: "消耗 1 寿元，使敌人衰老 3（攻击意图永久 -3，可叠加）。", image: "",
+  },
+  {
+    id: "gu_prolonglife", category: "gu", cardKey: "prolongLife",
+    name: "续命蛊", alias: "接寿之鹤", rarity: "灵蛊", faction: "寿道", type: "辅助", stage: "灵蛊·延形",
+    descriptionShort: "回填寿元、为焚寿续薪的寿道疗蛊。",
+    descriptionLore: "寿道善篇：续命蛊形似一只缩骨白鹤，喙中常衔一截不知从何处接来的岁月。寿道蛊修焚命如焚薪，烧得太急便有油尽之虞；此时放出续命蛊，它便将喙中年岁缓缓渡回主人体内，添薪续火，免得未及伤敌、自己先成了灰。蛊师谓：「焚寿者不可无续命，正如点灯者不可无油。」",
+    habitat: "栖于松柏古观、福寿碑前的清气之地。", feeding: "不夺人寿，唯采天地间游离的零散岁气。", temperament: "温驯而惜命，所续之寿不溢上限、不可强求。",
+    evolution: "久养可蜕「延龄鹤」，一渡续回更丰，亦能解他人寿厄。", synergy: "与「焚寿蛊」「回光蛊」一焚一续成环，焚得起也续得回。", counteredBy: "寿元已满则无可续；续命非治病，挡不住当下的刀。",
+    dropsFrom: "命途中阶、寿道蛊奖励选牌（朝暮专属）。", unlockCondition: "蛊囊中曾收容此蛊即录入。",
+    gameplayEffect: "恢复 6 点寿元（不超过上限）。", image: "",
+  },
+
   /* ===== 蛊修列传（category="hero"，无 cardKey，恒显；走 renderHeroDetail 专属版式）===== */
   {
     id: "hero_fate", category: "hero", glyph: "命",
