@@ -1,0 +1,5 @@
+{
+  "build": "v0.9.8.8-updategate-preview",
+  "version": "V0.9.8.8 更新闸",
+  "note": "游戏内更新闸读取本文件(不缓存)比对当前已加载 build；部署时务必把 build 改成该环境 index.html 的 __NMG_BUILD__ 值。"
+}
