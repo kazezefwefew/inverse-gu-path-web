@@ -4,7 +4,7 @@
  * 《逆命蛊途》V0.9.2.1「网页试玩首轮反馈修复」
  * 结构说明：
  * 1. CARD_LIBRARY / ENEMY_LIBRARY / RELICS / REFINEMENTS 只保存数据；
- * 2. game 保存单场战斗状态，runState 保存完整四段命途试炼的继承数据；
+ * 2. game 保存单场战斗状态，runState 保存完整命途试炼的继承数据；
  * 3. 结算函数不直接拼界面，统一由 render 系列函数刷新；
  * 4. 动画只是战斗反馈层，不参与数值，便于后续加入地图、事件和多场战斗。
  */
@@ -1203,7 +1203,7 @@ const LORE_SKIP_ANIMATION_STORAGE_KEY = "reverseGu.lore.skipAnimation";
 const RECORDING_MODE_STORAGE_KEY = "reverseGu.recordingMode.enabled";
 const TRIAL_MODE_STORAGE_KEY = "reverseGu.trial.mode";
 const TRIAL_SEED_STORAGE_KEY = "reverseGu.trial.seedDraft";
-const GAME_VERSION = "V0.9.9.5 局内 UI 收口";
+const GAME_VERSION = "V0.9.10 命途种子可复现";
 window.GAME_VERSION = GAME_VERSION;
 // V0.9.8.6 地图深化：每层 4 段 → 6 段（路更长、岔更密、中段内容更易玩到）。
 // 不变量：Boss 永在末段（BOSS_ROUTE_STEP===MAX_ROUTE_STEP），REST 为临门软段（末段-1）。
@@ -1613,7 +1613,7 @@ function recordBattleFinished(victory) {
   }
 }
 
-// progression 仅保存标题界面的选择；整局四段命途状态统一由 runState 管理。
+// progression 仅保存标题界面的选择；整局命途状态统一由 runState 管理。
 const progression = {
   selectedHeroId: "fate",
   selectedRelicId: "jadeMarrow",
@@ -1913,7 +1913,7 @@ function generateTrialSeed() {
 }
 
 function seedToNumber(seed) {
-  const text = normalizeTrialSeed(seed) || generateTrialSeed();
+  const text = normalizeTrialSeed(seed) || String(seed || "MT-0000").toUpperCase();
   let hash = 2166136261;
   for (const char of text) {
     hash ^= char.charCodeAt(0);
@@ -1961,6 +1961,8 @@ function createRunRngState(seed) {
       event: createRngChannel(seed, "event"),
       refine: createRngChannel(seed, "refine"),
       intent: createRngChannel(seed, "intent"),
+      draw: createRngChannel(seed, "draw"),
+      combat: createRngChannel(seed, "combat"),
     },
   };
 }
@@ -1971,6 +1973,21 @@ function getRunRandom(channel = "route") {
     runState.rngState.channels[channel] = createRngChannel(runState.trialSeed || generateTrialSeed(), channel);
   }
   return nextRngValue(runState.rngState.channels[channel]);
+}
+
+function getRunRandomInt(max, channel = "route") {
+  const limit = Math.floor(Number(max) || 0);
+  if (limit <= 0) return 0;
+  return Math.floor(getRunRandom(channel) * limit);
+}
+
+function pickWithRunRandom(items, channel = "route") {
+  if (!Array.isArray(items) || !items.length) return null;
+  return items[getRunRandomInt(items.length, channel)] ?? items[0] ?? null;
+}
+
+function sampleWithRunRandom(items, count, channel = "route") {
+  return sample(items, count, () => getRunRandom(channel));
 }
 
 function setRecordingMode(value, { silent = false } = {}) {
@@ -2198,14 +2215,14 @@ function gainOrdinaryRelic(id, sourceName = "命途所得") {
   return id;
 }
 
-function gainRandomOrdinaryRelic(sourceName = "命途所得") {
+function gainRandomOrdinaryRelic(sourceName = "命途所得", channel = "reward") {
   const available = ORDINARY_RELIC_IDS.filter((id) => !hasOrdinaryRelic(id));
   if (!available.length) return null;
-  return gainOrdinaryRelic(sample(available, 1)[0], sourceName);
+  return gainOrdinaryRelic(sampleWithRunRandom(available, 1, channel)[0], sourceName);
 }
 
 // V0.9.9.2 遗物掉落"可选"：掉落点只登记待抉择遗物，统一在回到命途图(showMapScreen)时弹窗，玩家收取/舍弃。
-function pickRandomAvailableRelicId() {
+function pickRandomAvailableRelicId(channel = "reward") {
   // V0.9.9.2 Batch4 按流派偏发：候选 = 通用 + 当前英雄专属流派，未拥有。专属遗物只对该流派英雄掉落。
   const heroFaction = runState?.heroId; // fate/blood/poison/longevity
   const available = ORDINARY_RELIC_IDS.filter((id) => {
@@ -2213,7 +2230,7 @@ function pickRandomAvailableRelicId() {
     const f = ORDINARY_RELICS[id].faction || "common";
     return f === "common" || f === heroFaction;
   });
-  return available.length ? sample(available, 1)[0] : null;
+  return available.length ? sampleWithRunRandom(available, 1, channel)[0] : null;
 }
 // V0.9.9.2 残势续燃：开局取上场留存的命势（取后即清），仅命势英雄 + 持有该遗物。
 function fateRemnantCarry() {
@@ -2222,9 +2239,9 @@ function fateRemnantCarry() {
   runState.carriedFate = 0;
   return carried;
 }
-function queueRelicOffer(sourceName) {
+function queueRelicOffer(sourceName, channel = "reward") {
   if (!runState) return null;
-  const id = pickRandomAvailableRelicId();
+  const id = pickRandomAvailableRelicId(channel);
   if (!id) return null;
   runState.pendingRelicOffer = { relicId: id, source: sourceName };
   return id;
@@ -2286,18 +2303,17 @@ function notifyRelicTrigger(relicId, detail = "", delay = 0) {
   else fire();
 }
 
-function getRandomPoisonCardKey() {
+function getRandomPoisonCardKey(channel = "reward") {
   const pool = [
     "greenMiasma", "insectSwarm", "moltingShell", "poisonReturn",
     "armorMeltPoison", "mutantPoison",
   ].filter((key) => CARD_LIBRARY[key]);
-  return sample(pool, 1)[0] || "armorMeltPoison";
+  return sampleWithRunRandom(pool, 1, channel)[0] || "armorMeltPoison";
 }
 
-function removeRandomDeckCard() {
-  // TODO: 事件结果随机待接入统一 RNG。
+function removeRandomDeckCard(channel = "event") {
   if (!runState || runState.deckCards.length <= 6) return null;
-  const index = Math.floor(Math.random() * runState.deckCards.length);
+  const index = getRunRandomInt(runState.deckCards.length, channel);
   const [removed] = runState.deckCards.splice(index, 1);
   syncRunDeckKeys();
   return removed || null;
@@ -2791,7 +2807,7 @@ function createBattleState() {
   };
   if (hasOrdinaryRelic("greenPouchBug")) {
     const poisonCards = deck.filter((card) => card.type === "poison" || card.typeName.includes("毒道"));
-    const target = sample(poisonCards, 1)[0];
+    const target = sampleWithRunRandom(poisonCards, 1, "reward")[0];
     if (target) {
       target.cost = Math.max(0, target.cost - 1);
       target.temporaryCostReduction = 1;
@@ -2868,7 +2884,7 @@ function createBattleState() {
       lastConvertTurn: null, // V0.9.8.4 转毒冷却计时（每战重置，防串场）
       towerPressure: enemyHpMultiplier > 1,
     },
-    drawPile: shuffle(deck),
+    drawPile: shuffle(deck, () => getRunRandom("draw")),
     discardPile: [],
     hand: [],
   };
@@ -3408,10 +3424,10 @@ function beginNewRunFresh() {
   startNewRun();
 }
 
-function getRandomRewardCardKey({ rare = false } = {}) {
+function getRandomRewardCardKey({ rare = false, channel = "reward" } = {}) {
   const exclusive = HERO_EXCLUSIVE_CARD_KEYS[runState.heroId] || [];
   const pool = rare ? [...ADVANCED_CARD_KEYS, ...V08_COMMON_CARD_KEYS, ...exclusive] : [...STANDARD_REWARD_CARD_KEYS, ...exclusive];
-  return sample(pool, 1)[0] || "moonBlade";
+  return sampleWithRunRandom(pool, 1, channel)[0] || "moonBlade";
 }
 
 function healRunHp(amount, sourceName) {
@@ -3445,11 +3461,11 @@ function removeDeckEntryById(instanceId) {
   return removed;
 }
 
-function removeRandomBasicCard() {
+function removeRandomBasicCard(channel = "event") {
   const basics = new Set(["moonBlade", "ironSkin", "wineWorm", "burningEssence", "bloodBlade"]);
   const candidates = runState.deckCards.filter((entry) => basics.has(entry.originalKey || entry.key));
   if (!candidates.length || runState.deckCards.length <= 6) return null;
-  const target = sample(candidates, 1)[0];
+  const target = sampleWithRunRandom(candidates, 1, channel)[0];
   return removeDeckEntryById(target.instanceId);
 }
 
@@ -3723,11 +3739,11 @@ function getLayer2ThemeText(kind) {
 }
 
 /* 抽取一个主题普通战敌人（带去重，避免一局重复太多） */
-function pickLayer2Normal(theme, used) {
+function pickLayer2Normal(theme, used, channel = "route") {
   const pool = (LAYER2_THEME_POOLS[theme]?.normals || LAYER2_THEME_POOLS.miasma.normals)
     .filter((id) => ENEMY_LIBRARY[id]);
   const fresh = pool.filter((id) => !used.has(id));
-  const id = (fresh.length ? fresh : pool)[Math.floor(Math.random() * (fresh.length ? fresh.length : pool.length))] || pool[0];
+  const id = pickWithRunRandom(fresh.length ? fresh : pool, channel) || pool[0];
   used.add(id);
   return id;
 }
@@ -3755,7 +3771,7 @@ function createLayer2MapState(theme) {
       icon: "兽", name: ENEMY_LIBRARY[n3]?.name || "生态凶影", description: LAYER2_NODE_TEXT.battle },
   ];
   /* 段2：精英(高风险高奖，必选其一路) + 机缘事件 + 软节点(休整|蛊坊，随机其一)，三选其一，保证 ≥2 软/硬可选无死路 */
-  const softNode = Math.random() < 0.5
+  const softNode = getRunRandom("route") < 0.5
     ? { id: "l2-2-c", step: 2, type: "shop", layer2: true, l2theme: theme, icon: "坊", name: theme === "miasma" ? "瘴林暗坊" : "血沼残坊", description: LAYER2_NODE_TEXT.shop }
     : { id: "l2-2-c", step: 2, type: "rest", layer2: true, l2theme: theme, icon: "息", name: theme === "miasma" ? "瘴隙喘息" : "血泊偷生", description: LAYER2_NODE_TEXT.rest };
   const seg2 = [
@@ -3946,12 +3962,12 @@ function getLayer3ThemeText(kind) {
 }
 
 /* 抽取一个主题普通战敌人（带去重，镜像 pickLayer2Normal） */
-function pickLayer3Normal(theme, used) {
+function pickLayer3Normal(theme, used, channel = "route") {
   const pool = (LAYER3_THEME_POOLS[theme]?.normals || LAYER3_THEME_POOLS.bone.normals)
     .filter((id) => ENEMY_LIBRARY[id]);
   if (!pool.length) return null;
   const fresh = pool.filter((id) => !used.has(id));
-  const id = (fresh.length ? fresh : pool)[Math.floor(Math.random() * (fresh.length ? fresh.length : pool.length))] || pool[0];
+  const id = pickWithRunRandom(fresh.length ? fresh : pool, channel) || pool[0];
   used.add(id);
   return id;
 }
@@ -3976,7 +3992,7 @@ function createLayer3MapState(theme) {
       icon: "兽", name: ENEMY_LIBRARY[n3]?.name || "绝域凶影", description: LAYER3_NODE_TEXT.battle },
   ];
   /* 段2：精英(高风险高奖) + 机缘事件 + 软节点(休整|蛊坊，随机其一)，三选其一无死路 */
-  const softNode = Math.random() < 0.5
+  const softNode = getRunRandom("route") < 0.5
     ? { id: "l3-2-c", step: 2, type: "shop", layer3: true, l3theme: theme, icon: "坊", name: theme === "bone" ? "骨阶残坊" : "蜂蜡残坊", description: LAYER3_NODE_TEXT.shop }
     : { id: "l3-2-c", step: 2, type: "rest", layer3: true, l3theme: theme, icon: "息", name: theme === "bone" ? "塔隙喘息" : "蜂舍偷生", description: LAYER3_NODE_TEXT.rest };
   const seg2 = [
@@ -4258,12 +4274,12 @@ function generateLayer3RewardChoices(route) {
     out.push("returnLife"); used.add("returnLife");
   }
   while (out.length < 3 && favored.length) {
-    const k = takeUniqueRandom(favored, used);
+    const k = takeUniqueRandom(favored, used, "reward");
     if (!k) break;
     out.push(k); used.add(k);
   }
   while (out.length < 3) {
-    const k = getRandomRewardCardKey({ rare: Math.random() < 0.4 });
+    const k = getRandomRewardCardKey({ rare: getRunRandom("reward") < 0.4, channel: "reward" });
     if (!k) break;
     if (!used.has(k)) { out.push(k); used.add(k); }
     if (used.size > 30) break;
@@ -4426,12 +4442,12 @@ function generateLayer2RewardChoices(route) {
   }
   /* 主题卡优先填满到 3 张（favored 充足时整页主题卡；不足则余位走通用池） */
   while (out.length < 3 && favored.length) {
-    const k = takeUniqueRandom(favored, used);
+    const k = takeUniqueRandom(favored, used, "reward");
     if (!k) break;
     out.push(k); used.add(k);
   }
   while (out.length < 3) {
-    const k = getRandomRewardCardKey({ rare: Math.random() < 0.35 });
+    const k = getRandomRewardCardKey({ rare: getRunRandom("reward") < 0.35, channel: "reward" });
     if (!k) break;
     if (!used.has(k)) { out.push(k); used.add(k); }
     if (used.size > 30) break;
@@ -4505,7 +4521,7 @@ function openChanceEvent() {
     const __l3Pool = LAYER3_THEME_EVENTS[runState.layer3.theme];
     if (Array.isArray(__l3Pool) && __l3Pool.length) __eventPool = __l3Pool;
   }
-  const event = sample(__eventPool, 1)[0];
+  const event = sampleWithRunRandom(__eventPool, 1, "event")[0];
   runState.activeEventId = event.id;
   dom.mapScreen?.classList.add("hidden");
   dom.resultOverlay.querySelector(".result-card").className = "result-card map-result";
@@ -4548,7 +4564,7 @@ function resolveChanceChoice(index) {
   switch (option.kind) {
     case "rareCard": {
       const lost = reduceRunHpSafely(8);
-      const key = getRandomRewardCardKey({ rare: true });
+      const key = getRandomRewardCardKey({ rare: true, channel: "reward" });
       addRunDeckCard(key);
       resultText = `井底旧蜕划破掌心，你失去 ${lost} 点生命，获得「${CARD_LIBRARY[key].name}」。`;
       break;
@@ -4563,7 +4579,7 @@ function resolveChanceChoice(index) {
     case "attackInsight": {
       const attacks = runState.deckCards.filter((entry) => CARD_LIBRARY[entry.key]?.category === "attack");
       if (attacks.length) {
-        const target = sample(attacks, 1)[0];
+        const target = sampleWithRunRandom(attacks, 1, "event")[0];
         target.damageBonus = (target.damageBonus || 0) + 3;
         resultText = `残碑杀诀烙入「${CARD_LIBRARY[target.key].name}」，本局伤害 +3。`;
         addLog(`残碑悟道：${CARD_LIBRARY[target.key].name}本局伤害 +3。`, "positive-log");
@@ -4573,7 +4589,7 @@ function resolveChanceChoice(index) {
       break;
     }
     case "cardNextHurt": {
-      const key = getRandomRewardCardKey();
+      const key = getRandomRewardCardKey({ channel: "reward" });
       addRunDeckCard(key);
       runState.nextBattleHpLoss += 4;
       resultText = `蛊卵孵出「${CARD_LIBRARY[key].name}」，下一场战斗开始会反噬 4 点生命。`;
@@ -4612,14 +4628,14 @@ function resolveChanceChoice(index) {
         resultText = "蛊石不足，商队收起货箱。";
         break;
       }
-      const key = getRandomRewardCardKey();
+      const key = getRandomRewardCardKey({ channel: "reward" });
       addRunDeckCard(key);
       resultText = `你花费 ${option.cost || 10} 蛊石，购得「${CARD_LIBRARY[key].name}」。`;
       addLog(`断桥商队：购得${CARD_LIBRARY[key].name}。`, "positive-log");
       break;
     }
     case "stealMaterialEnemyBuff": {
-      const id = sample(MATERIAL_IDS, 1)[0];
+      const id = sampleWithRunRandom(MATERIAL_IDS, 1, "reward")[0];
       gainMaterial(id, 1, event.name);
       runState.nextBattleEnemyAttackBonus += 2;
       resultText = `残箱中藏着「${MATERIALS[id].name}」，但商队怨蛊惊动了前路；下一场敌人攻击 +2。`;
@@ -4631,7 +4647,7 @@ function resolveChanceChoice(index) {
         gainGuStones(8, event.name);
         resultText = `血签已认过旧主，你失去 ${lost} 点生命，只从签灰中取到 8 蛊石。`;
       } else {
-        const relicId = queueRelicOffer(event.name);
+        const relicId = queueRelicOffer(event.name, "reward");
         runState.eventRelicGained = Boolean(relicId);
         resultText = relicId
           ? `血签入掌，你失去 ${lost} 点生命，得遗物「${ORDINARY_RELICS[relicId].name}」之机——回命途图时可抉择收取。`
@@ -4641,13 +4657,13 @@ function resolveChanceChoice(index) {
     }
     case "lifespanTwoMaterials": {
       reduceRunLifespan(1);
-      const ids = [sample(MATERIAL_IDS, 1)[0], sample(MATERIAL_IDS, 1)[0]];
+      const ids = [sampleWithRunRandom(MATERIAL_IDS, 1, "reward")[0], sampleWithRunRandom(MATERIAL_IDS, 1, "reward")[0]];
       ids.forEach((id) => gainMaterial(id, 1, event.name));
       resultText = `血签换材，你失去 1 点寿元，获得${ids.map((id) => MATERIALS[id].name).join("与")}。`;
       break;
     }
     case "removeAnyCard": {
-      const removed = removeRandomDeckCard();
+      const removed = removeRandomDeckCard("event");
       resultText = removed ? `遗骸炉火吞去「${CARD_LIBRARY[removed.key].name}」。` : "卡组已接近最低数量，旧炉没有吞噬你的蛊。";
       if (removed) addLog(`蛊师遗骸：移除${CARD_LIBRARY[removed.key].name}。`, "positive-log");
       break;
@@ -4658,9 +4674,8 @@ function resolveChanceChoice(index) {
         resultText = "蛊匣里没有可炼化的蛊，小炉自行熄灭。";
         break;
       }
-      const target = sample(candidates, 1)[0];
-      // TODO: 事件结果随机待接入统一 RNG。
-      const backlash = Math.random() < 0.2;
+      const target = sampleWithRunRandom(candidates, 1, "refine")[0];
+      const backlash = getRunRandom("refine") < 0.2;
       const result = backlash ? applyBacklashFurnace(target) : applyStableFurnace(target, null, `遗骸小炉：${getDisplayCardName(target.key, getUpgradeLevel(target))}炉火转稳。`);
       resultText = backlash
         ? `小炉逆冲，${getCompactCardTitle(target)}遭遇反噬。`
@@ -4669,7 +4684,7 @@ function resolveChanceChoice(index) {
       break;
     }
     case "poisonCard": {
-      const key = getRandomPoisonCardKey();
+      const key = getRandomPoisonCardKey("reward");
       addRunDeckCard(key);
       resultText = `毒潭吐出「${CARD_LIBRARY[key].name}」，已纳入蛊囊。`;
       addLog(`毒潭照影：获得${CARD_LIBRARY[key].name}。`, "poison-log");
@@ -4691,16 +4706,16 @@ function resolveChanceChoice(index) {
     }
     case "boneFragmentDefense": {
       const __pool = ["ironSkin", "mysticCarapace", "shellRemnant", "moltedArmor", "fixedFate", "moltingShell"].filter((k) => CARD_LIBRARY[k]);
-      const key = sample(__pool, 1)[0] || "ironSkin";
+      const key = sampleWithRunRandom(__pool, 1, "reward")[0] || "ironSkin";
       addRunDeckCard(key);
       resultText = `铃下残片凝出「${CARD_LIBRARY[key].name}」，已纳入蛊囊。`;
       addLog(`断铃石龛：获得防御蛊${CARD_LIBRARY[key].name}。`, "positive-log");
       break;
     }
     case "boneScrollArmorOrHp": {
-      if (Math.random() < 0.5) {
+      if (getRunRandom("event") < 0.5) {
         const __pool = ["ironSkin", "mysticCarapace", "shellRemnant", "moltedArmor", "fixedFate", "moltingShell"].filter((k) => CARD_LIBRARY[k]);
-        const key = sample(__pool, 1)[0] || "ironSkin";
+        const key = sampleWithRunRandom(__pool, 1, "reward")[0] || "ironSkin";
         addRunDeckCard(key);
         resultText = `护身诀化作「${CARD_LIBRARY[key].name}」，烙入蛊囊。`;
         addLog(`骨阶残卷：获得防御蛊${CARD_LIBRARY[key].name}。`, "positive-log");
@@ -4732,14 +4747,14 @@ function resolveChanceChoice(index) {
       resultText = `蜡烟熏散蜂群，暖息回养，恢复 ${healRunHp(10, event.name)} 点生命。`;
       break;
     case "honeyPoisonCard": {
-      const key = getRandomPoisonCardKey();
+      const key = getRandomPoisonCardKey("reward");
       addRunDeckCard(key);
       resultText = `噬蜜残蛊化作「${CARD_LIBRARY[key].name}」，已纳入蛊囊。`;
       addLog(`噬蜜残蛊：获得${CARD_LIBRARY[key].name}。`, "poison-log");
       break;
     }
     case "honeyBurnRemoveOrStones": {
-      const removed = removeRandomDeckCard();
+      const removed = removeRandomDeckCard("event");
       if (removed) {
         resultText = `蜂火逼蛊，焚去「${CARD_LIBRARY[removed.key].name}」。`;
         addLog(`噬蜜残蛊：移除${CARD_LIBRARY[removed.key].name}。`, "positive-log");
@@ -4839,7 +4854,7 @@ function resolveRestChoice(choice) {
     return;
   }
   if (choice === "material") {
-    const id = sample(MATERIAL_IDS, 1)[0];
+    const id = sampleWithRunRandom(MATERIAL_IDS, 1, "reward")[0];
     gainMaterial(id, 1, runState.currentNode.name);
     gainGuStones(5, runState.currentNode.name);
     completeRestChoice("添火入炉", `获得${MATERIALS[id].name}与 5 蛊石。`);
@@ -5043,7 +5058,7 @@ function buyShopMaterial() {
   const state = getShopState();
   if (state.material || !spendShopStones(11)) return;
   state.material = true;
-  const id = sample(MATERIAL_IDS, 1)[0];
+  const id = sampleWithRunRandom(MATERIAL_IDS, 1, "reward")[0];
   gainMaterial(id, 1, "蛊坊购材");
   renderShop();
 }
@@ -5570,9 +5585,8 @@ function drawToHandSize(targetSize) {
 }
 
 function chooseEnemyIntent() {
-  // TODO: 敌人意图随机待接入统一 RNG。
   const keys = Object.keys(game.enemy.definition.actions);
-  game.enemy.intent = keys[Math.floor(Math.random() * keys.length)];
+  game.enemy.intent = keys[getRunRandomInt(keys.length, "intent")];
 }
 
 function getCurrentEnemyAction() {
@@ -5796,6 +5810,11 @@ function playCardSfx(card) {
 
 // 更新公告（只记正式版本；最新的放最前）。
 const UPDATE_LOG = [
+  { v: "V0.9.10", title: "命途种子可复现", notes: [
+    "命途种子接入统一 RNG：路线、奖励、事件、蛊坊材料、炼蛊结果、敌人意图等关键随机更稳定",
+    "同一种子下可复现主要路线与关键抉择结果，便于群内挑战、复盘和反馈定位",
+    "保留新局种子生成与启动氛围字幕的即时随机，不影响正式游玩"
+  ] },
   { v: "V0.9.9.5", title: "局内 UI 收口", notes: [
     "手机横屏战斗页重排玩家面板：生命与真元等关键数值更紧凑，立绘不再被手牌压住",
     "玩家加成与随身遗物条移到立绘下方，以小标签保留状态信息",
@@ -6945,7 +6964,7 @@ function discardRandomHand(count, sourceName) {
   let discarded = 0;
   for (let i = 0; i < count; i += 1) {
     if (!game.hand.length) break;
-    const index = Math.floor(Math.random() * game.hand.length);
+    const index = getRunRandomInt(game.hand.length, "draw");
     const [card] = game.hand.splice(index, 1);
     game.discardPile.push(card);
     discarded += 1;
@@ -7279,7 +7298,7 @@ function resolveAttack(card, baseDamage, detail = "") {
   const preCritDamage = (baseMultiplier > 1 ? Math.round(modifiedBase * baseMultiplier) : modifiedBase) + lifespanBonus;
   // V0.9.9.2 暴击：按暴击率掷骰，命中则最终伤害 ×CRIT_MULTIPLIER（在护甲抵挡之前）
   const critChance = getAttackCritChance(card);
-  const isCrit = critChance > 0 && Math.random() < critChance;
+  const isCrit = critChance > 0 && getRunRandom("combat") < critChance;
   let damage = isCrit ? Math.round(preCritDamage * CRIT_MULTIPLIER) : preCritDamage;
   // V0.9.9.2 通用增幅：险中契(生命<50% +25%) / 孤勇符(手牌≤2 +30%)
   let __relicMul = 1;
@@ -7824,18 +7843,18 @@ function finishBattle(victory) {
       runState.eliteDefeated = true;
       unlockLorePage("direGuard");
       gainGuStones(16, "精英战胜利");
-      const eliteMaterial = sample(MATERIAL_IDS, 1)[0];
+      const eliteMaterial = sampleWithRunRandom(MATERIAL_IDS, 1, "reward")[0];
       gainMaterial(eliteMaterial, 1, "精英战利品");
-      const eliteRelic = queueRelicOffer("精英战利品");
+      const eliteRelic = queueRelicOffer("精英战利品", "reward");
       runState.lastBattleRewards = { type: "elite", stones: 16, materialId: eliteMaterial, relicId: eliteRelic, furnace: true };
       addLog(`精英：${game.enemy.definition.name}已败，蛊炉机会已开启。`, "important");
     } else if (runState.currentNode?.type === "defy") {
       // V0.9.8.6 逆命节点：高风险高回报——比精英更厚（24石+材料+遗物+蛊炉），选牌保底稀有（见 generateCardRewardChoices）
       runState.eliteDefeated = true;
       gainGuStones(24, "逆命搏杀胜利"); // 逆命敌随层不同（一层血纹狼王/二三层生态精英），不复用 direGuard 图鉴页避免串台
-      const defyMaterial = sample(MATERIAL_IDS, 1)[0];
+      const defyMaterial = sampleWithRunRandom(MATERIAL_IDS, 1, "reward")[0];
       gainMaterial(defyMaterial, 1, "逆命战利品");
-      const defyRelic = queueRelicOffer("逆命战利品");
+      const defyRelic = queueRelicOffer("逆命战利品", "reward");
       runState.lastBattleRewards = { type: "defy", stones: 24, materialId: defyMaterial, relicId: defyRelic, furnace: true };
       addLog(`逆命搏杀：${game.enemy.definition.name}伏诛，你以命换厚赏，蛊炉机会已开启。`, "important");
     } else if (runState.currentNode?.type === "battle") {
@@ -7944,11 +7963,10 @@ function openCardReward() {
   dom.resultPrimaryButton.classList.add("hidden");
 }
 
-function takeUniqueRandom(pool, used) {
-  // TODO: 奖励池随机待接入统一 RNG。
+function takeUniqueRandom(pool, used, channel = "reward") {
   const available = pool.filter((key) => !used.has(key));
   if (!available.length) return null;
-  return available[Math.floor(Math.random() * available.length)];
+  return pickWithRunRandom(available, channel);
 }
 
 function generateCardRewardChoices(heroId) {
@@ -7966,7 +7984,7 @@ function generateCardRewardChoices(heroId) {
   }
 
   if (runState?.trialMode === "demo" && exclusivePool.length) {
-    const demoKey = takeUniqueRandom(exclusivePool, used);
+    const demoKey = takeUniqueRandom(exclusivePool, used, "reward");
     if (demoKey) {
       choices.push(demoKey);
       used.add(demoKey);
@@ -7975,16 +7993,16 @@ function generateCardRewardChoices(heroId) {
 
   // V0.9.8.6 逆命节点：选牌保底一张稀有（搏命厚赏）
   if (runState?.currentNode?.type === "defy") {
-    const defyRare = takeUniqueRandom(rarePool, used);
+    const defyRare = takeUniqueRandom(rarePool, used, "reward");
     if (defyRare) { choices.push(defyRare); used.add(defyRare); }
   }
 
   while (choices.length < 3) {
-    const preferRare = Math.random() < (0.3 + (getModeTuning().rareBoost || 0)); // V0.9.8.3 精英模式提升稀有牌出现率
+    const preferRare = getRunRandom("reward") < (0.3 + (getModeTuning().rareBoost || 0)); // V0.9.8.3 精英模式提升稀有牌出现率
     let key = preferRare
-      ? takeUniqueRandom(rarePool, used)
-      : takeUniqueRandom(commonPool, used);
-    if (!key) key = takeUniqueRandom(preferRare ? commonPool : rarePool, used);
+      ? takeUniqueRandom(rarePool, used, "reward")
+      : takeUniqueRandom(commonPool, used, "reward");
+    if (!key) key = takeUniqueRandom(preferRare ? commonPool : rarePool, used, "reward");
     if (!key) break;
     choices.push(key);
     used.add(key);
@@ -8004,8 +8022,7 @@ function renderMaterialChoice(id, { disabled = false } = {}) {
 }
 
 function generateMaterialRewardChoices() {
-  // TODO: 奖励池随机待接入统一 RNG。
-  return sample(MATERIAL_IDS, 3);
+  return sampleWithRunRandom(MATERIAL_IDS, 3, "reward");
 }
 
 function openMaterialReward() {
@@ -8391,9 +8408,8 @@ function reduceRunLifespan(amount) {
 }
 
 function applyBacklashFurnace(entry) {
-  // TODO: 炼蛊结果随机待接入统一 RNG。
   const options = ["damageCard", "hurtPlayer", "loseLifespan", "skewCard"];
-  const result = options[Math.floor(Math.random() * options.length)];
+  const result = options[getRunRandomInt(options.length, "refine")];
   const cardName = getDisplayCardName(entry.key, getUpgradeLevel(entry));
   runState.backlashCount = (runState.backlashCount || 0) + 1;
   getRunStats().backlashes += 1;
@@ -8431,8 +8447,7 @@ function consumeFurnaceAshMitigation() {
 }
 
 function resolveFurnacePlan(entry, plan) {
-  // TODO: 炼蛊结果随机待接入统一 RNG。
-  const roll = Math.random() * 100;
+  const roll = getRunRandom("refine") * 100;
   if (roll < plan.probabilities.stable) return applyStableFurnace(entry, plan.materialId);
   if (roll < plan.probabilities.stable + plan.probabilities.mutation) {
     if (plan.mutationAllowed) return applyMutationFurnace(entry, plan.materialId);
