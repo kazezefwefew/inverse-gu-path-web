@@ -8721,3 +8721,174 @@ body.boot-active { overflow: hidden; }
   .run-sec-grid { gap: 6px 10px; }
   .result-card:not(.map-result) { max-height: calc(100vh - 16px); max-height: calc(100dvh - 16px); }
 }
+
+/* V0.9.9.5 局内 UI 收口：手机横屏下重新排布双方信息，避免玩家立绘被手牌压住。 */
+body.mobile-combat-safe .player-panel,
+body.mobile-combat-safe .enemy-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  gap: 4px;
+}
+
+body.mobile-combat-safe .player-panel .panel-heading,
+body.mobile-combat-safe .enemy-panel .enemy-heading {
+  order: 0;
+  margin-bottom: 0;
+}
+
+body.mobile-combat-safe .player-panel .vital-block,
+body.mobile-combat-safe .enemy-panel .vital-block {
+  order: 1;
+  margin: 0;
+}
+
+body.mobile-combat-safe .player-panel .resource-grid {
+  order: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  margin: 0;
+  min-height: 0;
+}
+
+body.mobile-combat-safe .player-panel .resource {
+  flex: 1 1 calc(50% - 3px);
+  min-width: 0;
+  min-height: 22px;
+  padding: 2px 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  border-color: rgba(189, 162, 109, 0.18);
+  background: rgba(8, 18, 13, 0.68);
+}
+
+body.mobile-combat-safe .player-panel .resource-icon {
+  display: none;
+}
+
+body.mobile-combat-safe .player-panel .resource span:not(.resource-icon) {
+  flex: 0 1 auto;
+  min-width: 0;
+  color: #a7926a;
+  font-size: clamp(9px, 1.9dvh, 11px);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+body.mobile-combat-safe .player-panel .resource strong {
+  margin-left: auto;
+  color: var(--paper);
+  font-size: clamp(12px, 2.6dvh, 15px);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+body.mobile-combat-safe .player-panel .player-portrait {
+  order: 3;
+  flex: 1 1 auto;
+  min-height: clamp(68px, 18dvh, 96px);
+  max-height: clamp(82px, 24dvh, 132px);
+  margin: 2px 0 0;
+}
+
+body.mobile-combat-safe .enemy-panel .enemy-portrait {
+  order: 2;
+  flex: 1 1 auto;
+  min-height: clamp(72px, 19dvh, 104px);
+  max-height: clamp(88px, 25dvh, 138px);
+  margin: 2px 0 0;
+}
+
+body.mobile-combat-safe .player-panel #buffList {
+  order: 4;
+  margin: 0;
+  max-height: clamp(24px, 7dvh, 44px);
+  overflow: auto;
+}
+
+body.mobile-combat-safe .player-panel #combatRelicStrip {
+  order: 5;
+  margin: 0;
+  max-height: clamp(22px, 6dvh, 36px);
+  overflow: auto;
+}
+
+body.mobile-combat-safe .enemy-panel #enemyPower {
+  order: 3;
+  margin: 0;
+}
+
+body.mobile-combat-safe .enemy-panel #enemyStatusList {
+  order: 4;
+  max-height: clamp(24px, 7dvh, 44px);
+  margin: 0;
+  overflow: auto;
+}
+
+body.mobile-combat-safe .player-panel .stat-line,
+body.mobile-combat-safe .enemy-panel .stat-line {
+  font-size: clamp(9px, 1.9dvh, 11px);
+  line-height: 1.15;
+  margin-bottom: 2px;
+}
+
+body.mobile-combat-safe .player-panel .stat-line strong,
+body.mobile-combat-safe .enemy-panel .stat-line strong {
+  font-size: clamp(12px, 2.5dvh, 15px);
+}
+
+body.mobile-combat-safe .player-panel .bar,
+body.mobile-combat-safe .enemy-panel .bar {
+  height: clamp(6px, 1.7dvh, 9px);
+}
+
+body.mobile-combat-safe .combat-relic-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+}
+
+body.mobile-combat-safe .combat-relic-chip {
+  min-width: 0;
+  padding: 2px 5px;
+  font-size: 9px;
+  line-height: 1.1;
+}
+
+body.mobile-combat-safe .buff-tag,
+body.mobile-combat-safe .enemy-status-list .buff-tag {
+  padding: 2px 5px;
+  font-size: clamp(9px, 1.8dvh, 10.5px);
+  line-height: 1.1;
+  max-width: 100%;
+}
+
+@media (max-width: 960px) and (max-height: 440px) and (orientation: landscape) {
+  body.mobile-combat-safe .game-shell {
+    grid-template-columns: clamp(116px, 22vw, 154px) minmax(0, 1fr) clamp(112px, 21vw, 150px);
+  }
+
+  body.mobile-combat-safe .player-panel,
+  body.mobile-combat-safe .enemy-panel {
+    padding: 5px;
+  }
+
+  body.mobile-combat-safe .player-panel .player-portrait {
+    min-height: clamp(62px, 17dvh, 88px);
+    max-height: clamp(76px, 23dvh, 116px);
+  }
+
+  body.mobile-combat-safe .enemy-panel .enemy-portrait {
+    min-height: clamp(66px, 18dvh, 92px);
+    max-height: clamp(78px, 24dvh, 120px);
+  }
+
+  body.mobile-combat-safe .player-panel #buffList,
+  body.mobile-combat-safe .enemy-panel #enemyStatusList {
+    max-height: 30px;
+  }
+}

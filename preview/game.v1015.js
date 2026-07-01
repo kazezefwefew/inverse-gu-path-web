@@ -1203,7 +1203,7 @@ const LORE_SKIP_ANIMATION_STORAGE_KEY = "reverseGu.lore.skipAnimation";
 const RECORDING_MODE_STORAGE_KEY = "reverseGu.recordingMode.enabled";
 const TRIAL_MODE_STORAGE_KEY = "reverseGu.trial.mode";
 const TRIAL_SEED_STORAGE_KEY = "reverseGu.trial.seedDraft";
-const GAME_VERSION = "V0.9.9.4 匿名统计接入";
+const GAME_VERSION = "V0.9.9.5 局内 UI 收口";
 window.GAME_VERSION = GAME_VERSION;
 // V0.9.8.6 地图深化：每层 4 段 → 6 段（路更长、岔更密、中段内容更易玩到）。
 // 不变量：Boss 永在末段（BOSS_ROUTE_STEP===MAX_ROUTE_STEP），REST 为临门软段（末段-1）。
@@ -5796,6 +5796,11 @@ function playCardSfx(card) {
 
 // 更新公告（只记正式版本；最新的放最前）。
 const UPDATE_LOG = [
+  { v: "V0.9.9.5", title: "局内 UI 收口", notes: [
+    "手机横屏战斗页重排玩家面板：生命与真元等关键数值更紧凑，立绘不再被手牌压住",
+    "玩家加成与随身遗物条移到立绘下方，以小标签保留状态信息",
+    "敌人面板同步压缩，横屏下优先显示生命、意图与关键状态"
+  ] },
   { v: "V0.9.9.4", title: "匿名统计接入", notes: [
     "新增仅开发者可见的匿名访问统计：记录访问、开始游玩与在线心跳，用于判断试玩人数与时段分布",
     "统计不在游戏内显示，不记录姓名、账号、IP 或卡组细节；玩家界面与战斗数值不受影响",
