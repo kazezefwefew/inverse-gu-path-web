@@ -12,11 +12,11 @@
   </style>
   <meta name="description" content="原创暗黑东方奇幻卡牌肉鸽原型《逆命蛊途》">
   <title>逆命蛊途 · 命途塔试炼</title>
-  <script>window.__NMG_BUILD__ = "v0.9.9.1b";</script>
-  <link rel="stylesheet" href="style.v0996.css">
+  <script>window.__NMG_BUILD__ = "v0.9.9.2";</script>
+  <link rel="stylesheet" href="style.v0995.css">
   <script src="audio.v0979.js" defer></script>
-  <script src="gu_catalog.js?v=v1001" defer></script>
-  <script src="game.v1008.js" defer></script>
+  <script src="gu_catalog.js?v=v1002" defer></script>
+  <script src="game.v1012.js" defer></script>
   <script>
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.getRegistrations().then(function (rs) { rs.forEach(function (r) { r.unregister(); }); }).catch(function () {});
@@ -90,7 +90,7 @@
       <span class="start-moon"></span>
     </div>
     <div class="start-content">
-      <p class="start-kicker">原创暗黑东方卡牌肉鸽 · V0.9.9 寿道·朝暮</p>
+      <p class="start-kicker">原创暗黑东方卡牌肉鸽 · V0.9.9.2 万蛊遗物</p>
       <div class="start-logo" aria-hidden="true"><span>蛊</span></div>
       <h1 id="startTitle">逆命蛊途</h1>
       <p class="start-subtitle">以蛊为刃，以命为薪。命途塔中，从来没有天命之人。</p>
@@ -143,6 +143,20 @@
       <div class="overwrite-confirm-actions">
         <button id="overwriteConfirmCancel" type="button">取消</button>
         <button id="overwriteConfirmOk" type="button">开新局（覆盖）</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- V0.9.9.2 遗物掉落可选：回到命途图时弹出，玩家自行收取/舍弃 -->
+  <div id="relicOfferOverlay" class="relic-offer-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="relicOfferTitle">
+    <div class="relic-offer-card">
+      <p id="relicOfferSource" class="relic-offer-source">命途所得</p>
+      <div id="relicOfferChip" class="relic-offer-chip relic-gold"><b id="relicOfferGlyph">遗</b></div>
+      <h3 id="relicOfferTitle">遗物</h3>
+      <p id="relicOfferDesc" class="relic-offer-desc">效果说明</p>
+      <div class="relic-offer-actions">
+        <button id="relicOfferDecline" type="button">舍之不取</button>
+        <button id="relicOfferAccept" type="button">收入囊中</button>
       </div>
     </div>
   </div>
@@ -319,6 +333,7 @@
         <span id="activeRelicGlyph">玉</span>
         <p><small>本命遗物</small><strong id="activeRelicName">寒玉髓</strong></p>
       </div>
+      <div id="combatRelicStrip" class="combat-relic-strip" aria-live="polite"></div>
     </section>
 
     <section class="arena-panel" aria-labelledby="battleInfoTitle">

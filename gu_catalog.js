@@ -775,7 +775,7 @@ window.GU_CATALOG = [
     habitat: "蛰居寿宴残烛、停灵长明灯将尽的炉膛。", feeding: "啖主人当场焚去的寿数，焚得越多养得越凶。", temperament: "贪烈嗜燃，主焚则喜，主惜寿则蔫。",
     evolution: "焚寿成瘾可蜕「燃命蝎」，一蜇燃尽半生。", synergy: "与「回光蛊」及「焚寿燃命」同流，焚得越狠尾毒越烈。", counteredBy: "本场未焚寿则尾针空乏、伤平平；寿尽则反噬其主。",
     dropsFrom: "命途中阶、寿道蛊奖励选牌（朝暮专属）。", unlockCondition: "蛊囊中曾收容此蛊即录入。",
-    gameplayEffect: "消耗 2 寿元，造成 6 点伤害；本场每焚去 1 点寿元额外 +2（含本次）。", image: "",
+    gameplayEffect: "消耗 2 寿元，造成 6 点伤害；本场每焚去 1 点寿元额外 +2（含本次）。", image: "assets/codex/gu/lifespan-pyre-gu.webp",
   },
   {
     id: "gu_erodeage", category: "gu", cardKey: "erodeAge",
@@ -785,7 +785,7 @@ window.GU_CATALOG = [
     habitat: "潜居古冢棺缝、岁气未散的枯骨之间。", feeding: "吸敌身岁气、转哺主人寿元，不啖凡食。", temperament: "阴冷而恋主，咬定不松，所夺必有所还。",
     evolution: "久吸可蜕「噬寿蛭」，一口夺敌数岁、回主更丰。", synergy: "与「续命蛊」「枯荣蛊」同养，边战边续、寿元长青。", counteredBy: "敌身岁气稀薄（傀儡尸物）则吸而无获，回寿甚微。",
     dropsFrom: "命途中阶、寿道蛊奖励选牌（朝暮专属）。", unlockCondition: "蛊囊中曾收容此蛊即录入。",
-    gameplayEffect: "造成 8 点伤害，并夺回 2 点寿元（不超过上限）。", image: "",
+    gameplayEffect: "造成 8 点伤害，并夺回 2 点寿元（不超过上限）。", image: "assets/codex/gu/age-gnaw-gu.webp",
   },
   {
     id: "gu_focallife", category: "gu", cardKey: "focalLife",
@@ -795,7 +795,7 @@ window.GU_CATALOG = [
     habitat: "绕飞将熄的长明灯、临终人榻前的烛影。", feeding: "啖主人大段焚去的寿元，化作翅上回光。", temperament: "静极而烈，不动则已，一动倾尽。",
     evolution: "可蜕「殒光蛾」，回光更亮而焚寿更巨。", synergy: "与「焚寿蛊」「裂魂蛊」同出，借翻倍一举倾尽爆发。", counteredBy: "寿元不足则唤之不应；翻倍仅及本回合，过则光熄。",
     dropsFrom: "命途中阶、寿道蛊奖励选牌（朝暮专属）。", unlockCondition: "蛊囊中曾收容此蛊即录入。",
-    gameplayEffect: "消耗 3 寿元，本回合攻击蛊伤害翻倍。", image: "",
+    gameplayEffect: "消耗 3 寿元，本回合攻击蛊伤害翻倍。", image: "assets/codex/gu/last-flare-gu.webp",
   },
   {
     id: "gu_mulberryfield", category: "gu", cardKey: "mulberryField",
@@ -805,7 +805,7 @@ window.GU_CATALOG = [
     habitat: "伏于古井深潭、沧桑变迁的废墟地脉。", feeding: "食主焚之寿，吐为加于敌身的岁月。", temperament: "迟缓而执拗，加诸敌身的衰老从不收回。",
     evolution: "久养可蜕「沧桑龟」，一息令敌老去数纪。", synergy: "与拖延、护甲流同行，敌势愈衰则己愈稳。", counteredBy: "对无血肉、不知老朽的尸傀效力大减。",
     dropsFrom: "命途中阶、寿道蛊奖励选牌（朝暮专属）。", unlockCondition: "蛊囊中曾收容此蛊即录入。",
-    gameplayEffect: "消耗 1 寿元，使敌人衰老 3（攻击意图永久 -3，可叠加）。", image: "",
+    gameplayEffect: "消耗 1 寿元，使敌人衰老 3（攻击意图永久 -3，可叠加）。", image: "assets/codex/gu/aeon-dust-gu.webp",
   },
   {
     id: "gu_prolonglife", category: "gu", cardKey: "prolongLife",
@@ -815,7 +815,7 @@ window.GU_CATALOG = [
     habitat: "栖于松柏古观、福寿碑前的清气之地。", feeding: "不夺人寿，唯采天地间游离的零散岁气。", temperament: "温驯而惜命，所续之寿不溢上限、不可强求。",
     evolution: "久养可蜕「延龄鹤」，一渡续回更丰，亦能解他人寿厄。", synergy: "与「焚寿蛊」「回光蛊」一焚一续成环，焚得起也续得回。", counteredBy: "寿元已满则无可续；续命非治病，挡不住当下的刀。",
     dropsFrom: "命途中阶、寿道蛊奖励选牌（朝暮专属）。", unlockCondition: "蛊囊中曾收容此蛊即录入。",
-    gameplayEffect: "恢复 6 点寿元（不超过上限）。", image: "",
+    gameplayEffect: "恢复 6 点寿元（不超过上限）。", image: "assets/codex/gu/life-extend-gu.webp",
   },
 
   /* ===== 蛊修列传（category="hero"，无 cardKey，恒显；走 renderHeroDetail 专属版式）===== */
