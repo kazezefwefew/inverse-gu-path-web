@@ -1203,7 +1203,8 @@ const LORE_SKIP_ANIMATION_STORAGE_KEY = "reverseGu.lore.skipAnimation";
 const RECORDING_MODE_STORAGE_KEY = "reverseGu.recordingMode.enabled";
 const TRIAL_MODE_STORAGE_KEY = "reverseGu.trial.mode";
 const TRIAL_SEED_STORAGE_KEY = "reverseGu.trial.seedDraft";
-const GAME_VERSION = "V0.9.9.3 血沼续航校准";
+const GAME_VERSION = "V0.9.9.4 匿名统计接入";
+window.GAME_VERSION = GAME_VERSION;
 // V0.9.8.6 地图深化：每层 4 段 → 6 段（路更长、岔更密、中段内容更易玩到）。
 // 不变量：Boss 永在末段（BOSS_ROUTE_STEP===MAX_ROUTE_STEP），REST 为临门软段（末段-1）。
 // 这样 floor===MAX_ROUTE_STEP 的 Boss/结算兜底仍只在 Boss 段成立，无需大改判定。
@@ -5795,6 +5796,10 @@ function playCardSfx(card) {
 
 // 更新公告（只记正式版本；最新的放最前）。
 const UPDATE_LOG = [
+  { v: "V0.9.9.4", title: "匿名统计接入", notes: [
+    "新增仅开发者可见的匿名访问统计：记录访问、开始游玩与在线心跳，用于判断试玩人数与时段分布",
+    "统计不在游戏内显示，不记录姓名、账号、IP 或卡组细节；玩家界面与战斗数值不受影响",
+  ] },
   { v: "V0.9.9.3", title: "血沼续航校准", notes: [
     "血泥傀、血衣祭蛊者等血沼敌人的蓄势护甲加入上限，避免护甲无限累积导致僵局",
     "下调血泥傀、血衣祭蛊者、血衣蛊母的过量吸血，保留血沼续航压迫但不再拖成打不死",

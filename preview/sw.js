@@ -1,16 +1,19 @@
 "use strict";
-/* 逆命蛊途 PWA service worker：让网页可“添加到主屏幕”后全屏离线运行。
-   预缓存核心壳文件，其余资源（立绘/音频）首次访问后运行时缓存。 */
-const CACHE = "niming-pwa-v0.9.2.8.10";
+
+// 《逆命蛊途》PWA service worker：只预缓存当前网页试玩核心文件。
+const CACHE = "niming-pwa-v0.9.9.4";
 const CORE = [
   "./",
   "./index.html",
   "./manifest.json",
   "./icon-192.png",
   "./icon-512.png",
-  "./style.v092810.css",
-  "./audio.v092810.js",
-  "./game.v092810.js",
+  "./style.v0995.css",
+  "./audio.v0979.js",
+  "./gu_catalog.js",
+  "./telemetry.v0001.js",
+  "./game.v1014.js",
+  "./version.json",
 ];
 
 self.addEventListener("install", (event) => {
@@ -22,7 +25,7 @@ self.addEventListener("install", (event) => {
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys()
-      .then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))))
+      .then((keys) => Promise.all(keys.filter((key) => key !== CACHE).map((key) => caches.delete(key))))
       .then(() => self.clients.claim())
   );
 });
@@ -39,7 +42,7 @@ self.addEventListener("fetch", (event) => {
           caches.open(CACHE).then((cache) => cache.put(req, copy)).catch(() => {});
         }
         return resp;
-      }).catch(() => caches.match("./index.html"));
+      }).catch(() => caches.match("./index.html"))
     })
   );
 });
