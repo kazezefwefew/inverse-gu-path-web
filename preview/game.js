@@ -1,7 +1,7 @@
 "use strict";
 
 /*
- * 《逆命蛊途》V0.9.11.2「固定种子路线回归」
+ * 《逆命蛊途》V0.9.11.3「手机全屏按钮恢复」
  * 结构说明：
  * 1. CARD_LIBRARY / ENEMY_LIBRARY / RELICS / REFINEMENTS 只保存数据；
  * 2. game 保存单场战斗状态，runState 保存完整命途试炼的继承数据；
@@ -1203,7 +1203,7 @@ const LORE_SKIP_ANIMATION_STORAGE_KEY = "reverseGu.lore.skipAnimation";
 const RECORDING_MODE_STORAGE_KEY = "reverseGu.recordingMode.enabled";
 const TRIAL_MODE_STORAGE_KEY = "reverseGu.trial.mode";
 const TRIAL_SEED_STORAGE_KEY = "reverseGu.trial.seedDraft";
-const GAME_VERSION = "V0.9.11.2 固定种子路线回归";
+const GAME_VERSION = "V0.9.11.3 手机全屏按钮恢复";
 window.GAME_VERSION = GAME_VERSION;
 // V0.9.11 路线系统抽象：把“总段数 / 临门段 / Boss 段 / 死亡分段”集中到单一配置。
 // 后续扩展多幕、多 Boss 或非固定终段时，优先改 ROUTE_STAGE_CONFIG 与辅助函数，不再新增散落的 step 硬编码。
@@ -5897,6 +5897,11 @@ function playCardSfx(card) {
 
 // 更新公告（只记正式版本；最新的放最前）。
 const UPDATE_LOG = [
+  { v: "V0.9.11.3", title: "手机全屏按钮恢复", notes: [
+    "手机横屏试玩重新提供“满屏”按钮，便于隐藏浏览器地址栏、释放战斗区域。",
+    "竖屏仍显示横屏提示；桌面端继续保留原有全屏按钮。",
+    "本次不新增玩法、不改数值，只修复移动端全屏入口缺失问题。",
+  ] },
   { v: "V0.9.11.2", title: "固定种子路线回归", notes: [
     "新增开发用路线回归检查脚本，固定校验六段路线配置、Boss 段、临门段和三层地图自检入口。",
     "本次不新增玩法、不改数值、不改奖励，只降低后续路线扩展时接错段或漏校验的风险。",
