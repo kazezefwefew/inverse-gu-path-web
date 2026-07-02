@@ -8892,3 +8892,66 @@ body.mobile-combat-safe .enemy-status-list .buff-tag {
     max-height: 30px;
   }
 }
+
+/* ===================== 万蛊录任务转正（V0.9.12）===================== */
+.codex-task-card.is-done { border-color: rgba(176, 139, 76, 0.45); }
+.codex-task-card.is-claimable { box-shadow: 0 0 18px rgba(176, 139, 76, 0.16), inset 0 0 16px rgba(176, 139, 76, 0.08); }
+.codex-task-card.is-claimed {
+  border-color: rgba(111, 176, 127, 0.42);
+  background: linear-gradient(145deg, rgba(21, 39, 27, 0.92), rgba(8, 13, 10, 0.94));
+}
+.codex-task-stamp {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 54px;
+  padding: 3px 8px;
+  border: 1px solid rgba(176, 139, 76, 0.42);
+  border-radius: 999px;
+  color: #e4c27a;
+  background: rgba(176, 139, 76, 0.08);
+  font: 600 12px "KaiTi", "STKaiti", serif;
+  white-space: nowrap;
+}
+.codex-task-card.is-claimed .codex-task-stamp {
+  color: #9fd29e;
+  border-color: rgba(111, 176, 127, 0.46);
+  background: rgba(77, 132, 82, 0.12);
+}
+.codex-task-note {
+  margin: 0 0 10px;
+  color: rgba(213, 199, 163, 0.78);
+  font: 600 13px "KaiTi", "STKaiti", serif;
+}
+.codex-task-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+.codex-task-claim {
+  min-height: 32px;
+  padding: 6px 13px;
+  border: 1px solid rgba(176, 139, 76, 0.36);
+  color: rgba(224, 210, 178, 0.74);
+  background: rgba(20, 24, 18, 0.74);
+  font: 700 13px "KaiTi", "STKaiti", serif;
+  cursor: default;
+}
+.codex-task-claim.is-ready {
+  cursor: pointer;
+  color: #f1d48a;
+  border-color: rgba(213, 168, 75, 0.72);
+  background: linear-gradient(135deg, rgba(102, 48, 28, 0.76), rgba(31, 45, 27, 0.86));
+  box-shadow: 0 0 14px rgba(213, 168, 75, 0.16);
+}
+.codex-task-claim.is-ready:hover {
+  color: #fff2bd;
+  border-color: rgba(238, 196, 91, 0.9);
+  transform: translateY(-1px);
+}
+.codex-task-claim:disabled { opacity: 0.72; }
+
+@media (max-width: 1024px) and (max-height: 600px) and (orientation: landscape) {
+  .codex-task-actions { justify-content: stretch; }
+  .codex-task-claim { width: 100%; min-height: 36px; }
+}

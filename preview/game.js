@@ -1,7 +1,7 @@
 "use strict";
 
 /*
- * 《逆命蛊途》V0.9.11.2「固定种子路线回归」
+ * 《逆命蛊途》V0.9.12「万蛊录任务转正」
  * 结构说明：
  * 1. CARD_LIBRARY / ENEMY_LIBRARY / RELICS / REFINEMENTS 只保存数据；
  * 2. game 保存单场战斗状态，runState 保存完整命途试炼的继承数据；
@@ -1203,7 +1203,7 @@ const LORE_SKIP_ANIMATION_STORAGE_KEY = "reverseGu.lore.skipAnimation";
 const RECORDING_MODE_STORAGE_KEY = "reverseGu.recordingMode.enabled";
 const TRIAL_MODE_STORAGE_KEY = "reverseGu.trial.mode";
 const TRIAL_SEED_STORAGE_KEY = "reverseGu.trial.seedDraft";
-const GAME_VERSION = "V0.9.11.2 固定种子路线回归";
+const GAME_VERSION = "V0.9.12 万蛊录任务转正";
 window.GAME_VERSION = GAME_VERSION;
 // V0.9.11 路线系统抽象：把“总段数 / 临门段 / Boss 段 / 死亡分段”集中到单一配置。
 // 后续扩展多幕、多 Boss 或非固定终段时，优先改 ROUTE_STAGE_CONFIG 与辅助函数，不再新增散落的 step 硬编码。
@@ -5897,6 +5897,11 @@ function playCardSfx(card) {
 
 // 更新公告（只记正式版本；最新的放最前）。
 const UPDATE_LOG = [
+  { v: "V0.9.12", title: "万蛊录任务转正", notes: [
+    "万蛊录里的图鉴任务从预告状态转为正式轻目标，达成后可领取图鉴印记。",
+    "图鉴印记只做收藏和记录，不改变卡组、奖励池、敌人强度或战斗数值。",
+    "蛊虫详情会显示相关图鉴任务的进行中、可领取或已领取状态，便于内测玩家按路线补录。"
+  ] },
   { v: "V0.9.11.2", title: "固定种子路线回归", notes: [
     "新增开发用路线回归检查脚本，固定校验六段路线配置、Boss 段、临门段和三层地图自检入口。",
     "本次不新增玩法、不改数值、不改奖励，只降低后续路线扩展时接错段或漏校验的风险。",
@@ -6157,6 +6162,19 @@ function openWanGuLu() {
 function closeWanGuLu() { if (wanGuLuEl) wanGuLuEl.classList.add("hidden"); }
 
 function onWanGuLuClick(event) {
+  const claimBtn = event.target.closest("[data-codex-claim]");
+  if (claimBtn) {
+    const taskId = claimBtn.dataset.codexClaim;
+    const result = codexClaimTask(taskId);
+    if (result && result.ok) {
+      try { playUiSfx(); } catch (err) { /* 忽略音效失败 */ }
+      if (typeof addJourneyLog === "function") addJourneyLog(`万蛊录：领取图鉴印记「${result.taskName || "未名"}」。`, "positive-log");
+    } else if (typeof devNotify === "function") {
+      devNotify((result && result.message) || "图鉴印记尚不可领取。", "system-log");
+    }
+    renderWanGuLu();
+    return;
+  }
   const tabBtn = event.target.closest("[data-gu-tab]");
   if (tabBtn) {
     const cat = GU_CATEGORIES.find((c) => c.id === tabBtn.dataset.guTab);
@@ -6600,6 +6618,120 @@ function renderGuTaskLink(item) {
   if (!body) return "";
   return '<section class="wangulu-sec"><h4>相关图鉴任务</h4>' + body + '<p class="wangulu-task-foot">皆为预埋，后续版本开放，当前不发奖励。</p></section>';
 }
+/* ===================== 万蛊录 · 图鉴任务转正（V0.9.12）=====================
+   只授予收藏印记，不改卡牌、奖励池、战斗数值或初始牌组。旧版预埋渲染在此处被覆盖。 */
+function codexTaskStore() {
+  const data = codexLoad(CODEX_TASKS_KEY);
+  if (!data.claimed || typeof data.claimed !== "object" || Array.isArray(data.claimed)) data.claimed = {};
+  if (!data.claimedAt || typeof data.claimedAt !== "object" || Array.isArray(data.claimedAt)) data.claimedAt = {};
+  return data;
+}
+function codexTaskRewardName(task) {
+  return "图鉴印记「" + ((task && task.name) || "未名") + "」";
+}
+function codexGetClaimedMap() {
+  return codexTaskStore().claimed || {};
+}
+function codexIsTaskClaimed(taskId) {
+  const claimed = codexGetClaimedMap();
+  return Boolean(taskId && claimed[taskId]);
+}
+function codexTaskState(task) {
+  const progress = codexTaskProgress(task);
+  const claimed = codexIsTaskClaimed(task && task.id);
+  const claimable = Boolean(progress.done && !claimed);
+  return {
+    progress,
+    claimed,
+    claimable,
+    label: claimed ? "已领取" : (claimable ? "可领取" : "进行中"),
+    rewardName: codexTaskRewardName(task),
+  };
+}
+function codexClaimTask(taskId) {
+  const task = codexTaskById(taskId);
+  if (!task) return { ok: false, message: "未找到这则图鉴任务。" };
+  const state = codexTaskState(task);
+  if (state.claimed) return { ok: false, message: "这枚图鉴印记已经领取。" };
+  if (!state.claimable) return { ok: false, message: "图鉴任务尚未达成。" };
+  const data = codexTaskStore();
+  data.claimed[task.id] = true;
+  data.claimedAt[task.id] = new Date().toISOString();
+  codexSave(CODEX_TASKS_KEY, data);
+  return { ok: true, taskName: task.name, rewardName: state.rewardName };
+}
+function codexClaimedCount() {
+  const claimed = codexGetClaimedMap();
+  return CODEX_TASKS.filter((task) => claimed[task.id]).length;
+}
+
+/* 总览：同步显示图鉴任务领取进度。 */
+function renderCodexOverview() {
+  const cat = window.GU_CATALOG || [];
+  const d = getDiscoveredGuKeys();
+  const total = cat.length;
+  const battleSeen = cat.filter((it) => it.category === "gu" && isGuUnlocked(it, d)).length;
+  const battleTotal = cat.filter((it) => it.category === "gu").length;
+  const ecoTotal = cat.filter((it) => it.category === "eco").length;
+  let loreSeen = 0;
+  try { loreSeen = (typeof LORE_PAGES !== "undefined" ? LORE_PAGES : []).filter((p) => isLoreUnlocked(p.id)).length; } catch (err) { loreSeen = 0; }
+  const claimedTasks = codexClaimedCount();
+  const cell = (k, v) => '<div class="codex-progress-cell"><span class="codex-progress-num">' + escGu(v) + '</span><span class="codex-progress-k">' + escGu(k) + '</span></div>';
+  return '<p class="wangulu-counter">蛊道进境 · 残卷所窥，不过初篇</p>'
+    + '<div class="codex-progress">'
+    + cell("已收录蛊虫", total)
+    + cell("已见战斗蛊", battleSeen + ' / ' + battleTotal)
+    + cell("已见生态蛊", ecoTotal)
+    + cell("已读残卷", loreSeen + ' / ' + (typeof LORE_PAGES !== "undefined" ? LORE_PAGES.length : 0))
+    + cell("图鉴任务 · 已领", claimedTasks + ' / ' + CODEX_TASKS.length)
+    + '</div>'
+    + '<p class="codex-overview-verse">完成图鉴任务可领取图鉴印记。<br>印记只作收藏与记录，不改变战斗数值。</p>';
+}
+
+/* 图鉴任务列表：真实进度 + 可领取收藏印记。 */
+function renderCodexTasks() {
+  const cards = CODEX_TASKS.map((task) => {
+    const state = codexTaskState(task);
+    const p = state.progress;
+    const pct = p.target ? Math.round((p.cur / p.target) * 100) : 0;
+    const cardCls = "codex-task-card" + (p.done ? " is-done" : "") + (state.claimable ? " is-claimable" : "") + (state.claimed ? " is-claimed" : "");
+    const action = state.claimed
+      ? '<button type="button" class="codex-task-claim" disabled>已领取</button>'
+      : (state.claimable
+        ? '<button type="button" class="codex-task-claim is-ready" data-codex-claim="' + escGu(task.id) + '">领取图鉴印记</button>'
+        : '<button type="button" class="codex-task-claim" disabled>尚未达成</button>');
+    const progText = state.claimed ? "已领取图鉴印记" : (state.claimable ? "可领取图鉴印记" : "继续探索命途");
+    return '<div class="' + cardCls + '">'
+      + '<div class="codex-task-head"><h4>' + escGu(task.name) + '</h4><span class="codex-task-stamp">' + escGu(state.label) + '</span></div>'
+      + '<p class="codex-task-cond"><span class="codex-task-k">达成条件</span>' + escGu(task.condition) + '</p>'
+      + '<p class="codex-task-reward"><span class="codex-task-k">任务奖励</span>' + escGu(state.rewardName) + ' · 永久收进万蛊录，不影响战斗数值。</p>'
+      + '<div class="codex-task-bar"><span class="codex-task-bar-fill" style="width:' + pct + '%"></span></div>'
+      + '<p class="codex-task-prog">当前进度 ' + escGu(p.cur) + ' / ' + escGu(p.target) + '（' + escGu(progText) + '）</p>'
+      + '<div class="codex-task-actions">' + action + '</div>'
+      + '</div>';
+  }).join("");
+  return '<p class="wangulu-counter">图鉴任务 · 已领 ' + codexClaimedCount() + ' / ' + CODEX_TASKS.length + ' 则</p>'
+    + '<p class="codex-task-note">领取图鉴印记只改变万蛊录收藏进度，不改卡组、奖励、敌人或战斗数值。</p>'
+    + '<div class="codex-task-list">' + cards + '</div>';
+}
+
+/* 蛊虫详情中的相关任务：展示真实领取状态。 */
+function renderGuTaskLink(item) {
+  if (!item) return "";
+  const meta = guCodexMeta(item);
+  const task = codexTaskById(meta.relatedTaskId);
+  let body = "";
+  if (task) {
+    const state = codexTaskState(task);
+    body += '<div class="wangulu-task-link"><span class="wangulu-task-name">' + escGu(task.name) + '</span><span class="wangulu-task-state">' + escGu(state.label) + '</span></div>';
+  }
+  if (!meta.isImplemented) {
+    body += '<div class="wangulu-task-link"><span class="wangulu-task-name">生态异闻</span><span class="wangulu-task-state">尚未成为战斗蛊牌</span></div>';
+  }
+  if (!body) return "";
+  return '<section class="wangulu-sec"><h4>相关图鉴任务</h4>' + body + '<p class="wangulu-task-foot">图鉴任务只授收藏印记，不改变战斗数值。</p></section>';
+}
+
 let updateLogEl = null;
 function showUpdateLog() {
   if (!updateLogEl) {
