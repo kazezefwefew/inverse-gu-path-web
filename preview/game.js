@@ -1203,14 +1203,69 @@ const LORE_SKIP_ANIMATION_STORAGE_KEY = "reverseGu.lore.skipAnimation";
 const RECORDING_MODE_STORAGE_KEY = "reverseGu.recordingMode.enabled";
 const TRIAL_MODE_STORAGE_KEY = "reverseGu.trial.mode";
 const TRIAL_SEED_STORAGE_KEY = "reverseGu.trial.seedDraft";
-const GAME_VERSION = "V0.9.10 命途种子可复现";
+const GAME_VERSION = "V0.9.11 路线系统抽象";
 window.GAME_VERSION = GAME_VERSION;
-// V0.9.8.6 地图深化：每层 4 段 → 6 段（路更长、岔更密、中段内容更易玩到）。
-// 不变量：Boss 永在末段（BOSS_ROUTE_STEP===MAX_ROUTE_STEP），REST 为临门软段（末段-1）。
-// 这样 floor===MAX_ROUTE_STEP 的 Boss/结算兜底仍只在 Boss 段成立，无需大改判定。
-const MAX_ROUTE_STEP = 6;
-const BOSS_ROUTE_STEP = 6;
-const REST_ROUTE_STEP = 5;
+// V0.9.11 路线系统抽象：把“总段数 / 临门段 / Boss 段 / 死亡分段”集中到单一配置。
+// 后续扩展多幕、多 Boss 或非固定终段时，优先改 ROUTE_STAGE_CONFIG 与辅助函数，不再新增散落的 step 硬编码。
+const ROUTE_STAGE_CONFIG = Object.freeze({
+  maxStep: 6,
+  bossStep: 6,
+  restStep: 5,
+  earlyEndStep: 2,
+  midEndStep: 4,
+  layerDefaultName: "命途塔",
+});
+const MAX_ROUTE_STEP = ROUTE_STAGE_CONFIG.maxStep;
+const BOSS_ROUTE_STEP = ROUTE_STAGE_CONFIG.bossStep;
+const REST_ROUTE_STEP = ROUTE_STAGE_CONFIG.restStep;
+function getRouteMaxStep() {
+  return ROUTE_STAGE_CONFIG.maxStep;
+}
+function getBossRouteStep() {
+  return ROUTE_STAGE_CONFIG.bossStep;
+}
+function getRestRouteStep() {
+  return ROUTE_STAGE_CONFIG.restStep;
+}
+function clampRouteStep(step) {
+  const n = Number(step) || 1;
+  return Math.max(1, Math.min(getRouteMaxStep(), n));
+}
+function getNextRouteStep(step) {
+  return clampRouteStep((Number(step) || 1) + 1);
+}
+function isBossRouteStep(step) {
+  return Number(step) === getBossRouteStep();
+}
+function isRestRouteStep(step) {
+  return Number(step) === getRestRouteStep();
+}
+function getRouteSteps() {
+  return Array.from({ length: getRouteMaxStep() }, (_, index) => index + 1);
+}
+function isBossRouteNode(node) {
+  return !!node && (node.type === "boss" || isBossRouteStep(node.step));
+}
+function isCurrentBossRoute() {
+  return runState?.currentNode?.type === "boss" || isBossRouteStep(runState?.floor);
+}
+function getRouteStageTitle(step, { layerName = "", layerActive = false } = {}) {
+  if (layerActive) {
+    if (isBossRouteStep(step)) return `末段 · ${layerName || "深径"}之主`;
+    if (isRestRouteStep(step)) return `第 ${step} 段 · 临门`;
+    return `第 ${step} 段 · ${layerName || "深径"}`;
+  }
+  if (isRestRouteStep(step)) return `第 ${step} 段 · 临门分岔`;
+  if (isBossRouteStep(step)) return `第 ${step} 段 · 尸盘门`;
+  return `第 ${step} 段`;
+}
+function getRoutePhaseBand(step) {
+  const n = Number(step) || 0;
+  if (n <= 0) return "unknown";
+  if (n <= ROUTE_STAGE_CONFIG.earlyEndStep) return "early";
+  if (n <= ROUTE_STAGE_CONFIG.midEndStep) return "middle";
+  return "late";
+}
 const TRIAL_MODES = Object.freeze({
   normal: { id: "normal", name: "正常模式", brief: "随机路线、奖励与机缘。", note: "适合正常试玩。" },
   demo: { id: "demo", name: "录屏演示模式", brief: "路线更稳定，自动开启录屏模式。", note: "适合录制展示。" },
@@ -2781,9 +2836,8 @@ function createRunState() {
 }
 
 function getEnemyIdForFloor(floor) {
-  // TODO: 后续多幕路线扩展时抽象 finalNode / bossNode。
   if (runState?.currentNode?.enemyId) return runState.currentNode.enemyId;
-  if (floor === MAX_ROUTE_STEP) return "corpsepuppet";
+  if (isBossRouteStep(floor)) return "corpsepuppet";
   return runState.normalEnemyOrder[floor - 1];
 }
 
@@ -3136,28 +3190,28 @@ function getNodeCompleteNotice(node) {
 function renderMapScreen() {
   if (!runState || !dom.mapRoute) return;
   updateGuStoneDisplays();
-  const stepText = runState.currentRouteStep <= MAX_ROUTE_STEP ? `第 ${runState.currentRouteStep} 段` : "终局";
+  const stepText = runState.currentRouteStep <= getRouteMaxStep() ? `第 ${runState.currentRouteStep} 段` : "终局";
   const __isL2Map = runState.layer === 2 || runState.layer2?.active;
   dom.mapDescription.textContent = __isL2Map
     ? (runState.currentRouteStep === 1
         ? "生态歧路重新铺开，两头凶影各踞一径。择一而行，另一岔路将闭。"
         : runState.currentRouteStep === 2
           ? "深处再裂：迎生态精英、探机缘，或入残灯蛊坊。"
-          : runState.currentRouteStep === BOSS_ROUTE_STEP
+          : isBossRouteStep(runState.currentRouteStep)
             ? "生态之主盘踞末路，破之则深行已尽。"
-            : runState.currentRouteStep === REST_ROUTE_STEP
+            : isRestRouteStep(runState.currentRouteStep)
               ? "临门：残卷遗落于此，拾之倾向此径之道，或在此偷得一息。"
               : "生态深处岔口交错：凶影、机缘、蛊坊与逆命搏杀错落，择一而行。")
     : (runState.currentRouteStep === 1
     ? "塔路初分，凶兽各踞一阶。择一而行，另一岔路将闭。"
     : runState.currentRouteStep === 2
       ? "命途再裂：取机缘、入蛊坊，或迎血煞精英。"
-      : runState.currentRouteStep === BOSS_ROUTE_STEP
+      : isBossRouteStep(runState.currentRouteStep)
         ? "尸盘已转，守关者在塔顶等你。"
-        : runState.currentRouteStep === REST_ROUTE_STEP
+        : isRestRouteStep(runState.currentRouteStep)
           ? "临门分岔：再搏一场，或在塔隙中稍作休整。"
           : "命途深处岔口交错：凶影、机缘、蛊坊与逆命搏杀错落，择一而行。");
-  dom.mapHint.textContent = runState.currentRouteStep <= MAX_ROUTE_STEP
+  dom.mapHint.textContent = runState.currentRouteStep <= getRouteMaxStep()
     ? "选择发亮节点继续；灰暗岔路本局不再开启。"
     : "命途已尽，等待结算。";
   if (dom.mapStatus) {
@@ -3169,8 +3223,7 @@ function renderMapScreen() {
       <span><em>材料</em><strong>${getMapMaterialSummary()}</strong></span>`;
   }
   if (dom.mapProgress) {
-    // TODO: 后续多幕路线扩展时继续抽象 finalNode / bossNode。
-    dom.mapProgress.innerHTML = Array.from({ length: MAX_ROUTE_STEP }, (_, index) => index + 1).map((step) => {
+    dom.mapProgress.innerHTML = getRouteSteps().map((step) => {
       const state = step < runState.currentRouteStep ? "completed" : step === runState.currentRouteStep ? "current" : "locked";
       return `<span class="${state}">${state === "completed" ? "✓" : step}<small>第 ${step} 段</small></span>`;
     }).join("<i></i>");
@@ -3191,9 +3244,7 @@ function renderMapScreen() {
     }).join("");
     const isL2 = runState.layer === 2 || runState.layer2?.active;
     const l2Name = runState.layer2?.routeName || "生态深径";
-    const segmentTitle = isL2
-      ? (step === BOSS_ROUTE_STEP ? `末段 · ${l2Name}之主` : step === REST_ROUTE_STEP ? `第 ${step} 段 · 临门` : `第 ${step} 段 · ${l2Name}`)
-      : (step === REST_ROUTE_STEP ? `第 ${step} 段 · 临门分岔` : step === BOSS_ROUTE_STEP ? `第 ${step} 段 · 尸盘门` : `第 ${step} 段`);
+    const segmentTitle = getRouteStageTitle(step, { layerName: l2Name, layerActive: isL2 });
     return `<section class="map-segment segment-step-${step} ${lineClass}">
       <div class="map-segment-label"><span>${segmentTitle}</span><i></i></div>
       <div class="map-node-row">${nodes}</div>
@@ -3311,7 +3362,7 @@ function completeCurrentNodeAndReturnMap() {
     }
   }
   addLog(`命途记录：${runState.lastMapNotice}。`, "important");
-  runState.currentRouteStep = Math.min(MAX_ROUTE_STEP, node.step + 1);
+  runState.currentRouteStep = getNextRouteStep(node.step);
   runState.currentNode = null;
   showMapScreen();
 }
@@ -3321,7 +3372,7 @@ function completeCurrentBattleNode() {
   const node = runState.currentNode;
   if (!runState.completedNodes.includes(node.id)) runState.completedNodes.push(node.id);
   if (!runState.routeHistory.includes(node.name)) runState.routeHistory.push(node.name);
-  runState.currentRouteStep = Math.min(MAX_ROUTE_STEP, node.step + 1);
+  runState.currentRouteStep = getNextRouteStep(node.step);
 }
 
 function startNewRun() {
@@ -4092,7 +4143,7 @@ function layer3CompleteNodeAndReturnMap() {
     return;
   }
   runState.lastMapNotice = `第三层 · ${node.name}已了`;
-  runState.currentRouteStep = Math.min(MAX_ROUTE_STEP, node.step + 1);
+  runState.currentRouteStep = getNextRouteStep(node.step);
   runState.currentNode = null;
   showMapScreen();
 }
@@ -4328,7 +4379,7 @@ function layer2CompleteNodeAndReturnMap() {
     return;
   }
   runState.lastMapNotice = `第二层 · ${node.name}已了`;
-  runState.currentRouteStep = Math.min(MAX_ROUTE_STEP, node.step + 1);
+  runState.currentRouteStep = getNextRouteStep(node.step);
   runState.currentNode = null;
   showMapScreen();
 }
@@ -4789,7 +4840,7 @@ function openRestNode() {
   hideRewardPanels();
   const __l2Rest = runState.layer3?.active ? getLayer3ThemeText("rest") : (runState.layer2?.active ? getLayer2ThemeText("rest") : null);
   dom.resultSeal.textContent = "息";
-  dom.resultEyebrow.textContent = __l2Rest ? __l2Rest.eyebrow : `第 ${node?.step ?? REST_ROUTE_STEP} 段 · ${node?.step === REST_ROUTE_STEP ? "临门分岔" : "塔隙休整"}`; // V0.9.8.6：段4 也有休整节点，按真实 step 标段号
+  dom.resultEyebrow.textContent = __l2Rest ? __l2Rest.eyebrow : `第 ${node?.step ?? getRestRouteStep()} 段 · ${isRestRouteStep(node?.step) ? "临门分岔" : "塔隙休整"}`; // V0.9.11：段位判断走路线配置，段4/临门休整都可复用
   dom.resultTitle.textContent = node?.name || (__l2Rest ? __l2Rest.title : "休整节点");
   dom.resultDescription.textContent = "塔隙只容一息。选一件事，便继续前行。";
   dom.resultTurns.textContent = "—";
@@ -5155,8 +5206,7 @@ function removeShopCard(instanceId) {
 
 function startFloorBattle() {
   if (!runState) return;
-  // TODO: 后续多幕路线扩展时抽象 finalNode / bossNode。
-  const isBossNode = runState.currentNode?.type === "boss" || runState.floor === MAX_ROUTE_STEP;
+  const isBossNode = isCurrentBossRoute();
   const isDefyNode = runState.currentNode?.type === "defy"; // V0.9.8.6 逆命节点：当作高强度战，借 Boss 级 BGM/时长烘托
   // V0.9.8.5：第二/三层按路线放专属 BGM（整层含 Boss 用同一关卡曲）；第一层仍用通用 battle/boss。
   let musicScene;
@@ -5810,6 +5860,11 @@ function playCardSfx(card) {
 
 // 更新公告（只记正式版本；最新的放最前）。
 const UPDATE_LOG = [
+  { v: "V0.9.11", title: "路线系统抽象", notes: [
+    "多层六段路线的总段数、临门段、Boss 段判断集中到路线配置里，减少散落硬编码",
+    "本次不新增节点、不改数值，主要为后续多 Boss、第二幕和每日命局做底层收束",
+    "同步更新版本与反馈信息，便于内测时定位当前构建"
+  ] },
   { v: "V0.9.10", title: "命途种子可复现", notes: [
     "命途种子接入统一 RNG：路线、奖励、事件、蛊坊材料、炼蛊结果、敌人意图等关键随机更稳定",
     "同一种子下可复现主要路线与关键抉择结果，便于群内挑战、复盘和反馈定位",
@@ -7889,7 +7944,7 @@ function finishBattle(victory) {
       layer2CompleteNodeAndReturnMap();
       return;
     }
-    if (runState.currentNode?.type === "boss" || runState.floor === MAX_ROUTE_STEP) {
+    if (isCurrentBossRoute()) {
       unlockLorePage("unfinished");
       completeCurrentBattleNode();
       // 一层 Boss 胜利不再强制结算：先弹「命途未尽」让玩家选结算/深入
@@ -8710,7 +8765,7 @@ function getRouteNodeByStep(step) {
 }
 
 function getThirdStepChoiceSummary() {
-  const node = getRouteNodeByStep(REST_ROUTE_STEP);
+  const node = getRouteNodeByStep(getRestRouteStep());
   if (!node) return "尚未抵达";
   if (node.type === "rest") return `休整节点：${node.name}`;
   if (node.type === "battle") return `凶兽节点：${node.name}`;
@@ -8835,10 +8890,11 @@ function generateRunTitle(stats, runState, cleared) {
   if (poison > 0 && poison >= blood && poison >= armor) return wrap("毒蛊成势", "毒雾缠经，敌命自内而溃，此局毒势已成。");
   if (blood > 0 && blood >= poison && blood >= armor) return wrap("血灯将熄", "以血换刃，灯火将熄而锋芒未钝。");
   if (armor > 0 && armor >= poison && armor >= blood) return wrap("铁壳负命", "壳厚如山，你以坚守背负这条逆命之途。");
-  // ⑧ 一层前/中后期死亡（互斥阈值，V0.9.8.6 随 6 段重标定：≤2 前段 / 3-4 中段 / ≥5 临门·Boss 段）
-  if (!cleared && floor > 0 && floor <= 2) return wrap("初入蛊途", "刚踏入命途塔，你便折损于浅滩。");
-  if (!cleared && floor >= 3 && floor <= 4) return wrap("蛊道未稳", "蛊道未稳，行至中途便难以为继。");
-  if (!cleared && floor >= 5) return wrap("命途多舛", "你已走得很远，命途却仍多舛难测。");
+  // ⑧ 一层前/中后期死亡：阈值走 ROUTE_STAGE_CONFIG，后续扩展路线时只改配置。
+  const routeBand = getRoutePhaseBand(floor);
+  if (!cleared && routeBand === "early") return wrap("初入蛊途", "刚踏入命途塔，你便折损于浅滩。");
+  if (!cleared && routeBand === "middle") return wrap("蛊道未稳", "蛊道未稳，行至中途便难以为继。");
+  if (!cleared && routeBand === "late") return wrap("命途多舛", "你已走得很远，命途却仍多舛难测。");
   // 兜底
   return wrap("断途行者", "残卷未尽，蛊路可再行。");
 }
@@ -9855,14 +9911,14 @@ function renderBuffs() {
 }
 
 function renderTowerProgress() {
-  const floor = Math.min(MAX_ROUTE_STEP, runState?.currentRouteStep || runState?.floor || 1);
-  const parts = Array.from({ length: MAX_ROUTE_STEP }, (_, index) => index + 1).map((number) => {
+  const floor = clampRouteStep(runState?.currentRouteStep || runState?.floor || 1);
+  const parts = getRouteSteps().map((number) => {
     const state = number < floor ? "completed" : number === floor ? "current" : "locked";
     const node = `<span class="tower-node ${state}" aria-label="第 ${number} 段${state === "completed" ? "已完成" : state === "current" ? "当前" : "未解锁"}">${state === "completed" ? "✓" : number}</span>`;
-    const link = number < MAX_ROUTE_STEP ? `<i class="tower-link ${floor > number ? "completed" : ""}"></i>` : "";
+    const link = number < getRouteMaxStep() ? `<i class="tower-link ${floor > number ? "completed" : ""}"></i>` : "";
     return `${node}${link}`;
   });
-  dom.towerProgress.innerHTML = `${parts.join("")}<span class="tower-floor-label">命途图进度<strong>第 ${floor} 段 / 第 ${MAX_ROUTE_STEP} 段</strong></span>`;
+  dom.towerProgress.innerHTML = `${parts.join("")}<span class="tower-floor-label">命途图进度<strong>第 ${floor} 段 / 第 ${getRouteMaxStep()} 段</strong></span>`;
 }
 
 function getDeckStats() {
@@ -9912,7 +9968,7 @@ function renderDeckOverlay() {
   dom.deckSummary.innerHTML = `
     <span>当前卡组总数 <strong>${stats.total}</strong></span>
     <span>已炼化 <strong>${stats.upgraded}</strong></span>
-    <span>当前命途 <strong>第 ${Math.min(MAX_ROUTE_STEP, runState.currentRouteStep)} 段</strong></span>
+    <span>当前命途 <strong>第 ${clampRouteStep(runState.currentRouteStep)} 段</strong></span>
     <span>命途种子 <strong>${runState.trialSeed || "无"}</strong></span>
     <span>蛊石 <strong>${runState.guStones}</strong></span>
     <span>普通遗物 <strong>${runState.ordinaryRelics.length}</strong></span>
@@ -10763,7 +10819,7 @@ function bindEvents() {
       resetLogChannel("battle", "战斗铭刻已清。");
       return;
     }
-    resetLogChannel("battle", `第 ${Math.min(MAX_ROUTE_STEP, runState?.currentRouteStep || runState?.floor || 1)} 段：${game.player.definition.name}对阵${game.enemy.definition.name}。`);
+    resetLogChannel("battle", `第 ${clampRouteStep(runState?.currentRouteStep || runState?.floor || 1)} 段：${game.player.definition.name}对阵${game.enemy.definition.name}。`);
     addLog(`当前第 ${game.turn} 回合；生命 ${game.player.hp}/${game.player.maxHp}，敌人生命 ${game.enemy.hp}/${game.enemy.maxHp}。`, "system-log");
   });
   dom.cardRewardChoices.addEventListener("click", (event) => {
