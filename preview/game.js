@@ -1203,7 +1203,7 @@ const LORE_SKIP_ANIMATION_STORAGE_KEY = "reverseGu.lore.skipAnimation";
 const RECORDING_MODE_STORAGE_KEY = "reverseGu.recordingMode.enabled";
 const TRIAL_MODE_STORAGE_KEY = "reverseGu.trial.mode";
 const TRIAL_SEED_STORAGE_KEY = "reverseGu.trial.seedDraft";
-const GAME_VERSION = "V0.9.11 路线系统抽象";
+const GAME_VERSION = "V0.9.11.1 路线回归校验";
 window.GAME_VERSION = GAME_VERSION;
 // V0.9.11 路线系统抽象：把“总段数 / 临门段 / Boss 段 / 死亡分段”集中到单一配置。
 // 后续扩展多幕、多 Boss 或非固定终段时，优先改 ROUTE_STAGE_CONFIG 与辅助函数，不再新增散落的 step 硬编码。
@@ -1265,6 +1265,40 @@ function getRoutePhaseBand(step) {
   if (n <= ROUTE_STAGE_CONFIG.earlyEndStep) return "early";
   if (n <= ROUTE_STAGE_CONFIG.midEndStep) return "middle";
   return "late";
+}
+function validateRouteMapState(mapState, context = "route") {
+  const issues = [];
+  if (!mapState || !Array.isArray(mapState.segments)) {
+    console.warn(`[RouteCheck] ${context}: mapState.segments 缺失。`);
+    return mapState;
+  }
+  if (mapState.segments.length !== getRouteMaxStep()) {
+    issues.push(`段数 ${mapState.segments.length} ≠ ${getRouteMaxStep()}`);
+  }
+  mapState.segments.forEach((segment, index) => {
+    const expectedStep = index + 1;
+    if (!Array.isArray(segment) || !segment.length) {
+      issues.push(`第 ${expectedStep} 段为空`);
+      return;
+    }
+    segment.forEach((node) => {
+      if (!node || Number(node.step) !== expectedStep) {
+        issues.push(`节点 ${node?.id || "未知"} step=${node?.step || "-"}，应为 ${expectedStep}`);
+      }
+    });
+  });
+  const bossSegment = mapState.segments[getBossRouteStep() - 1] || [];
+  if (!bossSegment.some((node) => node?.type === "boss")) {
+    issues.push(`第 ${getBossRouteStep()} 段缺少 Boss 节点`);
+  }
+  const restSegment = mapState.segments[getRestRouteStep() - 1] || [];
+  if (!restSegment.length) {
+    issues.push(`第 ${getRestRouteStep()} 段临门段为空`);
+  }
+  if (issues.length) {
+    console.warn(`[RouteCheck] ${context}: ${issues.join("；")}`);
+  }
+  return mapState;
 }
 const TRIAL_MODES = Object.freeze({
   normal: { id: "normal", name: "正常模式", brief: "随机路线、奖励与机缘。", note: "适合正常试玩。" },
@@ -2763,6 +2797,7 @@ function createRunState() {
   const seed = getSeedForNextRun();
   const mode = trialMode;
   const rngState = createRunRngState(seed);
+  const mapState = validateRouteMapState(createMapState({ seed, mode, random: () => nextRngValue(rngState.channels.route) }), "layer1");
   return {
     floor: 1,
     status: "running",
@@ -2783,7 +2818,7 @@ function createRunState() {
     normalEnemyOrder: shuffle(NORMAL_ENEMY_IDS, () => nextRngValue(rngState.channels.enemyOrder)),
     defeatedEnemies: [],
     guStones: 20,
-    mapState: createMapState({ seed, mode, random: () => nextRngValue(rngState.channels.route) }),
+    mapState,
     currentNode: null,
     completedNodes: [],
     lockedNodes: [],
@@ -3881,6 +3916,7 @@ function enterLayer2Map(routeId) {
   };
   /* 用第二层地图替换一层地图（一层地图体验不受影响：此时一层已结束） */
   runState.mapState = createLayer2MapState(theme);
+  validateRouteMapState(runState.mapState, `layer2:${routeId}`);
   runState.currentRouteStep = 1;
   runState.completedNodes = [];
   runState.lockedNodes = [];
@@ -4102,6 +4138,7 @@ function enterLayer3Map(routeId) {
   };
   /* 用第三层地图替换地图（此时一层/二层已结束，体验不受影响） */
   runState.mapState = createLayer3MapState(theme);
+  validateRouteMapState(runState.mapState, `layer3:${routeId}`);
   runState.currentRouteStep = 1;
   runState.completedNodes = [];
   runState.lockedNodes = [];
@@ -5860,6 +5897,11 @@ function playCardSfx(card) {
 
 // 更新公告（只记正式版本；最新的放最前）。
 const UPDATE_LOG = [
+  { v: "V0.9.11.1", title: "路线回归校验", notes: [
+    "新增路线结构自检：新局、第二层、第三层地图生成后会检查段数、节点 step、临门段和 Boss 段",
+    "本次不新增内容、不改数值，只给路线系统加一道开发期保险，避免后续扩展时段数写散",
+    "同步网页试玩版本，方便反馈时确认当前构建"
+  ] },
   { v: "V0.9.11", title: "路线系统抽象", notes: [
     "多层六段路线的总段数、临门段、Boss 段判断集中到路线配置里，减少散落硬编码",
     "本次不新增节点、不改数值，主要为后续多 Boss、第二幕和每日命局做底层收束",
