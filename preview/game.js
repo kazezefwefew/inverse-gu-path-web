@@ -1,7 +1,7 @@
 "use strict";
 
 /*
- * 《逆命蛊途》V0.9.2.1「网页试玩首轮反馈修复」
+ * 《逆命蛊途》V0.9.11.2「固定种子路线回归」
  * 结构说明：
  * 1. CARD_LIBRARY / ENEMY_LIBRARY / RELICS / REFINEMENTS 只保存数据；
  * 2. game 保存单场战斗状态，runState 保存完整命途试炼的继承数据；
@@ -1203,7 +1203,7 @@ const LORE_SKIP_ANIMATION_STORAGE_KEY = "reverseGu.lore.skipAnimation";
 const RECORDING_MODE_STORAGE_KEY = "reverseGu.recordingMode.enabled";
 const TRIAL_MODE_STORAGE_KEY = "reverseGu.trial.mode";
 const TRIAL_SEED_STORAGE_KEY = "reverseGu.trial.seedDraft";
-const GAME_VERSION = "V0.9.11.1 路线回归校验";
+const GAME_VERSION = "V0.9.11.2 固定种子路线回归";
 window.GAME_VERSION = GAME_VERSION;
 // V0.9.11 路线系统抽象：把“总段数 / 临门段 / Boss 段 / 死亡分段”集中到单一配置。
 // 后续扩展多幕、多 Boss 或非固定终段时，优先改 ROUTE_STAGE_CONFIG 与辅助函数，不再新增散落的 step 硬编码。
@@ -5897,6 +5897,11 @@ function playCardSfx(card) {
 
 // 更新公告（只记正式版本；最新的放最前）。
 const UPDATE_LOG = [
+  { v: "V0.9.11.2", title: "固定种子路线回归", notes: [
+    "新增开发用路线回归检查脚本，固定校验六段路线配置、Boss 段、临门段和三层地图自检入口。",
+    "本次不新增玩法、不改数值、不改奖励，只降低后续路线扩展时接错段或漏校验的风险。",
+    "网页试玩与正式发布目录同步更新，方便内测反馈确认已进入路线回归构建。",
+  ] },
   { v: "V0.9.11.1", title: "路线回归校验", notes: [
     "新增路线结构自检：新局、第二层、第三层地图生成后会检查段数、节点 step、临门段和 Boss 段",
     "本次不新增内容、不改数值，只给路线系统加一道开发期保险，避免后续扩展时段数写散",
