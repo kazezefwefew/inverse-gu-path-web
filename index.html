@@ -13,23 +13,25 @@
   <meta name="description" content="原创暗黑东方奇幻卡牌肉鸽原型《逆命蛊途》">
   <title>逆命蛊途 · 命途塔试炼</title>
   <script>
-    window.__NMG_BUILD__ = "v0.9.11.3";
-    window.NMG_GAME_VERSION = "V0.9.11.3 手机全屏按钮恢复";
+    window.__NMG_BUILD__ = "v0.9.11.2";
+    window.NMG_GAME_VERSION = "V0.9.11.2 固定种子路线回归";
     window.NMG_TELEMETRY_ENDPOINT = "https://nmg-analytics.nmg-analytics-kaan.workers.dev/ingest";
   </script>
-  <link rel="stylesheet" href="style.v0998.css">
+  <link rel="stylesheet" href="style.v0997.css">
   <script src="audio.v0979.js" defer></script>
   <script src="gu_catalog.js?v=v1002" defer></script>
   <script src="telemetry.v0001.js" defer></script>
-  <script src="game.v1020.js" defer></script>
+  <script src="game.v1019.js" defer></script>
   <script>
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.getRegistrations().then(function (rs) { rs.forEach(function (r) { r.unregister(); }); }).catch(function () {});
       if (window.caches && caches.keys) { caches.keys().then(function (ks) { ks.forEach(function (k) { caches.delete(k); }); }).catch(function () {}); }
     }
     (function () {
-      // V0.9.11.3：桌面显示「全屏」，手机横屏显示「满屏」；竖屏和已全屏时隐藏。
+      // V0.9.8.7：全屏按钮仅在「桌面·非触屏·宽屏」创建——手机/触屏/窄屏本已全屏，且该按钮浮于左下会压住手牌第一张，故不创建（窄屏再由 CSS @media 兜底隐藏）。桌面保留全屏功能。
       if (!window.matchMedia) return;
+      if (window.matchMedia("(pointer: coarse)").matches) return;
+      if (window.matchMedia("(max-width: 820px)").matches) return;
       var el = document.documentElement;
       var req = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen;
       if (!req) return;
@@ -38,42 +40,15 @@
       fsBtn.textContent = "全屏";
       fsBtn.className = "pwa-fs-button";
       function inFs() { return document.fullscreenElement || document.webkitFullscreenElement; }
-      function isMobileLandscape() {
-        var w = window.innerWidth || document.documentElement.clientWidth || 0;
-        var h = window.innerHeight || document.documentElement.clientHeight || 0;
-        var coarse = window.matchMedia("(pointer: coarse)").matches;
-        return coarse && w > h && w <= 1180 && h <= 650;
-      }
-      function isDesktopFullscreenEligible() {
-        var coarse = window.matchMedia("(pointer: coarse)").matches;
-        return !coarse && !window.matchMedia("(max-width: 820px)").matches;
-      }
       function sync() {
-        if (inFs() || (!isMobileLandscape() && !isDesktopFullscreenEligible())) {
-          fsBtn.style.display = "none";
-          fsBtn.setAttribute("aria-hidden", "true");
-          return;
-        }
-        fsBtn.style.display = "inline-flex";
-        fsBtn.removeAttribute("aria-hidden");
-        fsBtn.textContent = isMobileLandscape() ? "满屏" : "全屏";
+        if (inFs()) { fsBtn.style.display = "none"; }
+        else { fsBtn.style.display = "inline-flex"; fsBtn.textContent = "全屏"; }
       }
       fsBtn.addEventListener("click", function () {
-        try {
-          if (!inFs()) {
-            var result = req.call(el);
-            if (result && typeof result.catch === "function") {
-              result.catch(function (err) { console.warn("[fullscreen]", err && err.message ? err.message : err); });
-            }
-          }
-        } catch (err) {
-          console.warn("[fullscreen]", err && err.message ? err.message : err);
-        }
+        try { if (!inFs()) { req.call(el); } } catch (err) {}
       });
       document.addEventListener("fullscreenchange", sync);
       document.addEventListener("webkitfullscreenchange", sync);
-      window.addEventListener("resize", sync);
-      window.addEventListener("orientationchange", sync);
       (document.body || document.documentElement).appendChild(fsBtn);
       sync();
     })();
@@ -120,7 +95,7 @@
       <span class="start-moon"></span>
     </div>
     <div class="start-content">
-      <p class="start-kicker">原创暗黑东方卡牌肉鸽 · V0.9.11.3 手机全屏按钮恢复</p>
+      <p class="start-kicker">原创暗黑东方卡牌肉鸽 · V0.9.11.2 固定种子路线回归</p>
       <div class="start-logo" aria-hidden="true"><span>蛊</span></div>
       <h1 id="startTitle">逆命蛊途</h1>
       <p class="start-subtitle">以蛊为刃，以命为薪。命途塔中，从来没有天命之人。</p>
@@ -624,7 +599,7 @@
       <button id="settingsCloseButton" class="deck-close-button" type="button" aria-label="关闭设置">×</button>
       <p class="deck-eyebrow">试玩包设置</p>
       <h2 id="settingsTitle">设置</h2>
-      <p id="settingsVersion" class="settings-version">当前版本：V0.9.11.3 手机全屏按钮恢复</p>
+      <p id="settingsVersion" class="settings-version">当前版本：V0.9.11.2 固定种子路线回归</p>
       <div class="settings-list">
         <button id="settingsMusicToggle" type="button">音乐：开</button>
         <label class="settings-volume" for="settingsVolume">
