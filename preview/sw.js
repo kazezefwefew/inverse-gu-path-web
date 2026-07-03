@@ -1,18 +1,18 @@
 "use strict";
 
 // 《逆命蛊途》PWA service worker：只预缓存当前网页试玩核心文件。
-const CACHE = "niming-pwa-v0.9.16-satchel";
+const CACHE = "niming-pwa-v0.9.16.1-map-focus";
 const CORE = [
   "./",
   "./index.html",
   "./manifest.json",
   "./icon-192.png",
   "./icon-512.png",
-  "./style.v1003.css",
+  "./style.v1004.css",
   "./audio.v0979.js",
   "./gu_catalog.js",
   "./telemetry.v0001.js",
-  "./game.v1027.js",
+  "./game.v1028.js",
   "./version.json",
 ];
 
