@@ -13,15 +13,15 @@
   <meta name="description" content="原创暗黑东方奇幻卡牌肉鸽原型《逆命蛊途》">
   <title>逆命蛊途 · 命途塔试炼</title>
   <script>
-    window.__NMG_BUILD__ = "v0.9.15";
-    window.NMG_GAME_VERSION = "V0.9.15 路线残卷与所求";
+    window.__NMG_BUILD__ = "v0.9.16";
+    window.NMG_GAME_VERSION = "V0.9.16 蛊囊";
     window.NMG_TELEMETRY_ENDPOINT = "https://nmg-analytics.nmg-analytics-kaan.workers.dev/ingest";
   </script>
-  <link rel="stylesheet" href="style.v1002.css">
+  <link rel="stylesheet" href="style.v1003.css">
   <script src="audio.v0979.js" defer></script>
   <script src="gu_catalog.js?v=v1002" defer></script>
   <script src="telemetry.v0001.js" defer></script>
-  <script src="game.v1026.js" defer></script>
+  <script src="game.v1027.js" defer></script>
   <script>
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.getRegistrations().then(function (rs) { rs.forEach(function (r) { r.unregister(); }); }).catch(function () {});
@@ -356,6 +356,7 @@
         <h2 id="battleInfoTitle">此战，唯有一方能离开</h2>
         <p id="battleMessage" class="battle-message" aria-live="polite">山魈伏在阴影中，正窥伺你的破绽。</p>
       </div>
+      <div id="satchelStrip" class="satchel-strip hidden" aria-label="蛊囊（点击使用消耗品）"></div>
       <div class="pile-status" aria-label="牌堆状态">
         <div><span>牌堆</span><strong id="drawCount">5</strong></div>
         <i aria-hidden="true"></i>
