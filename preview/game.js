@@ -1,7 +1,7 @@
 "use strict";
 
 /*
- * 《逆命蛊途》V0.9.16.1「命途图回卷」
+ * 《逆命蛊途》V0.9.17「入塔旧因」
  * 结构说明：
  * 1. CARD_LIBRARY / ENEMY_LIBRARY / RELICS / REFINEMENTS 只保存数据；
  * 2. game 保存单场战斗状态，runState 保存完整命途试炼的继承数据；
@@ -1003,6 +1003,61 @@ const CHANCE_EVENTS = Object.freeze([
   },
 ]);
 
+const HERO_CHANCE_EVENTS = Object.freeze({
+  fate: Object.freeze([
+    {
+      id: "fateBrokenThread",
+      heroId: "fate",
+      name: "断命旧线",
+      story: "塔壁垂下一缕灰白命线，线头缠着一枚早该熄灭的名签。签上没有姓名，只写着一个死字。",
+      options: [
+        { label: "割线入囊", detail: "失去 4 点生命，获得 1 个命丝和 1 张命势蛊。", kind: "heroFateThreadCard" },
+        { label: "顺线调息", detail: "恢复 8 点生命。", kind: "heal", amount: 8 },
+        { label: "不认旧命", detail: "不碰命线，直接离开。", kind: "leave" },
+      ],
+    },
+  ]),
+  blood: Object.freeze([
+    {
+      id: "bloodDebtShrine",
+      heroId: "blood",
+      name: "血债小祠",
+      story: "小祠里供着半截红绳，绳下压着旧契。绛妄一靠近，契上的血字便倒着爬回她掌心。",
+      options: [
+        { label: "咬回血契", detail: "失去 6 点生命，血煞上限 +1，并获得 1 个血砂。", kind: "heroBloodOathLimit" },
+        { label: "挑走灯灰", detail: "获得 1 个血砂和 1 个腐液。", kind: "bloodMaterials" },
+        { label: "踢翻小祠", detail: "不再认这笔血债，直接离开。", kind: "leave" },
+      ],
+    },
+  ]),
+  poison: Object.freeze([
+    {
+      id: "poisonSleeveWell",
+      heroId: "poison",
+      name: "袖底毒井",
+      story: "井水无波，却映出青蟒幼时被万毒噬身的影子。井底毒虫没有扑来，只伏低触须，像在等他认主。",
+      options: [
+        { label: "令毒认主", detail: "获得 1 张毒道卡和 1 个腐液；下一场战斗开局失去 2 点生命。", kind: "heroPoisonClaim" },
+        { label: "借井调息", detail: "恢复 6 点生命。", kind: "heal", amount: 6 },
+        { label: "封井而走", detail: "不取井毒，直接离开。", kind: "leave" },
+      ],
+    },
+  ]),
+  longevity: Object.freeze([
+    {
+      id: "longevityBorrowedLamp",
+      heroId: "longevity",
+      name: "借寿残灯",
+      story: "一盏残灯悬在无风处，灯芯像白发一样卷曲。朝暮听见灯里有人问：借一息寿，换一分亮，可敢？",
+      options: [
+        { label: "借灯炼蛊", detail: "失去 1 点寿元，随机一张可炼化的卡稳定炼化 +1。", kind: "heroLongevityLampRefine" },
+        { label: "收灯中魂", detail: "失去 1 点寿元，获得 1 个残魂。", kind: "lifespanMaterial", materialId: "remnantSoul" },
+        { label: "吹灯离开", detail: "不借寿火，直接离开。", kind: "leave" },
+      ],
+    },
+  ]),
+});
+
 /* ===================== V0.9.8 第三层主题机缘事件（加性，仅在 runState.layer3.active 时按 theme 分流；离开走默认 leave；随机牌只用真实 CARD_LIBRARY key） ===================== */
 const LAYER3_THEME_EVENTS = Object.freeze({
   bone: [
@@ -1230,7 +1285,7 @@ const LORE_SKIP_ANIMATION_STORAGE_KEY = "reverseGu.lore.skipAnimation";
 const RECORDING_MODE_STORAGE_KEY = "reverseGu.recordingMode.enabled";
 const TRIAL_MODE_STORAGE_KEY = "reverseGu.trial.mode";
 const TRIAL_SEED_STORAGE_KEY = "reverseGu.trial.seedDraft";
-const GAME_VERSION = "V0.9.16.1 命途图回卷";
+const GAME_VERSION = "V0.9.17 入塔旧因";
 window.GAME_VERSION = GAME_VERSION;
 // V0.9.11 路线系统抽象：把“总段数 / 临门段 / Boss 段 / 死亡分段”集中到单一配置。
 // 后续扩展多幕、多 Boss 或非固定终段时，优先改 ROUTE_STAGE_CONFIG 与辅助函数，不再新增散落的 step 硬编码。
@@ -1453,6 +1508,7 @@ const KEYWORD_HELP = Object.freeze({
   寿道: "以寿元为燃料的流派：焚寿驱动蛊术，寿元越低越凶。",
 });
 
+// V0.9.17 hero chance events tutorial line.
 const TUTORIAL_PAGES = Object.freeze([
   {
     title: "选择蛊修",
@@ -1461,6 +1517,7 @@ const TUTORIAL_PAGES = Object.freeze([
       "绛妄：用生命换血煞，靠血道蛊打出爆发。",
       "青蟒：不断施毒，拖回合让毒性耗死敌人。",
       "朝暮：焚寿燃命，寿元越低蛊术越凶——但寿元归零即陨。",
+      "机缘节点有机会遇到当前蛊修的专属机缘，会更贴近这名角色的旧因与流派代价。",
     ],
   },
   {
@@ -1635,6 +1692,8 @@ function createRunStats() {
     bossPoisonSuppressedLayers: 0,
     bossHighestPoison: 0,
     bossPhase2Triggered: false,
+    heroEvents: 0,
+    lastHeroEvent: "",
     layer2Entered: false,
     layer2Route: "",
     layer2BossDefeated: false,
@@ -3446,11 +3505,11 @@ function getMapMaterialSummary() {
     .filter((id) => (runState.materials[id] || 0) > 0)
     .map((id) => `${MATERIALS[id].name}x${runState.materials[id]}`)
     .join("、");
-  return owned || `材料 ${total}`;
+  return owned || String(total);
 }
 
 function getMapDefeatedSummary() {
-  return runState?.defeatedEnemies?.length ? runState.defeatedEnemies.join("、") : "尚未伏诛";
+  return runState?.defeatedEnemies?.length ? runState.defeatedEnemies.join("、") : "0";
 }
 
 function getMapNodeStateLabel(node, state) {
@@ -4931,6 +4990,7 @@ function getEventChoiceTone(option) {
     "rareCard", "cardNextHurt", "lifespanMaterial", "bloodMaterials", "bloodLimit",
     "stealMaterialEnemyBuff", "hurtRelic", "lifespanTwoMaterials", "randomUpgradeBacklash", "poisonBloodResidue",
     "boneBellChime", "waxStonesPoison", "boneScrollImprint",
+    "heroFateThreadCard", "heroBloodOathLimit", "heroPoisonClaim", "heroLongevityLampRefine",
   ].includes(option.kind)) return "risk";
   if (["material", "heal", "stones", "removeBasic", "buyRandomCard", "removeAnyCard", "poisonCard",
     "boneFragmentDefense", "boneScrollArmorOrHp", "waxSmokeHeal", "honeyPoisonCard", "honeyBurnRemoveOrStones"].includes(option.kind)) return "steady";
@@ -4949,18 +5009,43 @@ function getEventMapNotice(event, option, resultText) {
   if (option?.kind === "stealMaterialEnemyBuff") return "你夺得一味材料，但惊动了后路";
   if (option?.kind === "hurtRelic") return "血签落定，一件遗物入囊";
   if (option?.kind === "poisonBloodResidue") return "毒血残留，腐液入囊";
+  if (option?.kind === "heroFateThreadCard") return "旧命线入囊，命丝随身";
+  if (option?.kind === "heroBloodOathLimit") return "血契回咬，血煞更深";
+  if (option?.kind === "heroPoisonClaim") return "井毒认主，腐液入囊";
+  if (option?.kind === "heroLongevityLampRefine") return "寿灯借火，炉火转稳";
   if (option?.kind === "leave") return `${event.name}：你安全离开`;
   return `${event.name}已定`;
 }
 
-function openChanceEvent() {
-  /* V0.9.8 第三层：按主题分流到骨塔/蜂窟专属机缘事件；非三层或无池则回退正常事件池。 */
-  let __eventPool = CHANCE_EVENTS;
+function getChanceEventPool() {
   if (runState?.layer3?.active && typeof LAYER3_THEME_EVENTS !== "undefined") {
-    const __l3Pool = LAYER3_THEME_EVENTS[runState.layer3.theme];
-    if (Array.isArray(__l3Pool) && __l3Pool.length) __eventPool = __l3Pool;
+    const layer3Pool = LAYER3_THEME_EVENTS[runState.layer3.theme];
+    if (Array.isArray(layer3Pool) && layer3Pool.length) return layer3Pool;
   }
-  const event = sampleWithRunRandom(__eventPool, 1, "event")[0];
+  const heroPool = HERO_CHANCE_EVENTS[runState?.heroId] || [];
+  return heroPool.length ? [...CHANCE_EVENTS, ...heroPool] : CHANCE_EVENTS;
+}
+
+function findChanceEventById(id) {
+  let event = CHANCE_EVENTS.find((item) => item.id === id);
+  if (event) return event;
+  for (const pool of Object.values(HERO_CHANCE_EVENTS)) {
+    event = (pool || []).find((item) => item.id === id);
+    if (event) return event;
+  }
+  if (typeof LAYER3_THEME_EVENTS !== "undefined") {
+    Object.keys(LAYER3_THEME_EVENTS).some((theme) => {
+      const hit = (LAYER3_THEME_EVENTS[theme] || []).find((item) => item.id === id);
+      if (hit) { event = hit; return true; }
+      return false;
+    });
+  }
+  return event || null;
+}
+
+function openChanceEvent() {
+  const event = sampleWithRunRandom(getChanceEventPool(), 1, "event")[0];
+  if (!event) return;
   runState.activeEventId = event.id;
   dom.mapScreen?.classList.add("hidden");
   dom.resultOverlay.querySelector(".result-card").className = "result-card map-result";
@@ -4988,17 +5073,15 @@ function openChanceEvent() {
 }
 
 function resolveChanceChoice(index) {
-  let event = CHANCE_EVENTS.find((item) => item.id === runState?.activeEventId);
-  if (!event && typeof LAYER3_THEME_EVENTS !== "undefined") {
-    Object.keys(LAYER3_THEME_EVENTS).some((__t) => {
-      const __hit = (LAYER3_THEME_EVENTS[__t] || []).find((e) => e.id === runState?.activeEventId);
-      if (__hit) { event = __hit; return true; }
-      return false;
-    });
-  }
+  const event = findChanceEventById(runState?.activeEventId);
   const option = event?.options?.[Number(index)];
   if (!event || !option) return;
   dom.eventChoices.querySelectorAll("button").forEach((button) => { button.disabled = true; });
+  if (event.heroId) {
+    const stats = getRunStats();
+    stats.heroEvents = (stats.heroEvents || 0) + 1;
+    stats.lastHeroEvent = event.name;
+  }
   let resultText = "";
   switch (option.kind) {
     case "rareCard": {
@@ -5134,6 +5217,46 @@ function resolveChanceChoice(index) {
       gainMaterial("rotLiquid", 1, event.name);
       resultText = "毒血残留入体：下一场战斗开局失去 3 点生命，获得腐液。";
       break;
+    case "heroFateThreadCard": {
+      const lost = reduceRunHpSafely(4);
+      gainMaterial("fateSilk", 1, event.name);
+      const pool = (HERO_EXCLUSIVE_CARD_KEYS.fate || []).filter((key) => CARD_LIBRARY[key]);
+      const key = pickWithRunRandom(pool, "reward") || "fateThread";
+      addRunDeckCard(key);
+      resultText = `旧命线割入掌心，你失去 ${lost} 点生命，获得命丝与「${CARD_LIBRARY[key].name}」。`;
+      addLog(`断命旧线：获得命丝与${CARD_LIBRARY[key].name}。`, "positive-log");
+      break;
+    }
+    case "heroBloodOathLimit": {
+      const lost = reduceRunHpSafely(6);
+      runState.bloodMaxBonus = (runState.bloodMaxBonus || 0) + 1;
+      gainMaterial("bloodSand", 1, event.name);
+      resultText = `旧契咬回血肉，你失去 ${lost} 点生命，血煞上限 +1，并获得血砂。`;
+      addLog("血债小祠：血煞上限 +1，获得血砂。", "blood-log");
+      break;
+    }
+    case "heroPoisonClaim": {
+      const key = getRandomPoisonCardKey("reward");
+      addRunDeckCard(key);
+      gainMaterial("rotLiquid", 1, event.name);
+      runState.nextBattleHpLoss += 2;
+      resultText = `井底毒虫伏入袖中，「${CARD_LIBRARY[key].name}」认你为主；你获得腐液，下一场战斗开局失去 2 点生命。`;
+      addLog(`袖底毒井：获得${CARD_LIBRARY[key].name}与腐液。`, "poison-log");
+      break;
+    }
+    case "heroLongevityLampRefine": {
+      reduceRunLifespan(1);
+      const candidates = getUpgradeableDeckEntries();
+      if (candidates.length) {
+        const target = sampleWithRunRandom(candidates, 1, "refine")[0];
+        const result = applyStableFurnace(target, null, `借寿残灯：${getDisplayCardName(target.key, getUpgradeLevel(target))}借火炼成。`);
+        resultText = `寿灯借走一息寿数，炉火转稳：${result.title}。`;
+      } else {
+        gainMaterial("remnantSoul", 1, event.name);
+        resultText = "寿灯无蛊可炼，只吐出一缕残魂；你失去 1 点寿元，获得残魂。";
+      }
+      break;
+    }
 
     /* ===== V0.9.8 第三层主题机缘事件分支（加性，全 || 兜底） ===== */
     case "boneBellChime": {
@@ -5208,7 +5331,7 @@ function resolveChanceChoice(index) {
       addLog(`${event.name}：安全离开。`, "system-log");
   }
   runState.eventHistory.push(`${event.name}：${option.label}`);
-  addLog(`${event.name}：${option.label}。${stripTags(resultText)}`, option.kind === "leave" ? "system-log" : "important");
+  addLog(`${event.name}：${option.label}。${stripTags(resultText)}`, event.heroId ? "important" : (option.kind === "leave" ? "system-log" : "important"));
   runState.lastEventNotice = getEventMapNotice(event, option, resultText);
   addLogToChannel("journey", `命途札记：${runState.lastEventNotice}。`, "system-log");
   dom.eventResult.textContent = resultText;
@@ -6281,6 +6404,12 @@ function playCardSfx(card) {
 
 // 更新公告（只记正式版本；最新的放最前）。
 const UPDATE_LOG = [
+  { v: "V0.9.17", title: "入塔旧因", notes: [
+    "新增第一批角色专属机缘：无名逆命者、绛妄、青蟒、朝暮各有 1 个只在对应蛊修局内混入的机缘事件。",
+    "专属机缘围绕入塔旧因与流派代价展开：命线、血契、袖毒、寿灯分别对应命势、血道、毒道与寿道收益。",
+    "本局统计、结算页和复制反馈会记录专属机缘触发次数，方便内测复盘；第三层主题机缘仍保持骨塔/蜂窟生态池。",
+    "修复首次战斗引导可能盖住奖励卡牌的问题，胜利进入奖励/结算层前会自动收起引导浮层。",
+  ] },
   { v: "V0.9.16.1", title: "命途图回卷", notes: [
     "命途图回图体验修复：战斗、机缘、蛊坊、休整等节点结束后，回到命途图会自动定位到当前第 N 段，并给当前段一次短暂高亮。",
     "修复手机端路线较长时，每段结束后需要手动上滑寻找下一段的问题；本次不改战斗数值、掉落与敌人强度。",
@@ -8631,6 +8760,8 @@ function finishBattle(victory) {
   const card = dom.resultOverlay.querySelector(".result-card");
   card.className = `result-card ${victory ? "victory" : "defeat"}`;
   hideRewardPanels();
+  // 战斗引导浮层固定在战斗页上；进入奖励/结算弹窗前必须收起，避免盖住奖励按钮。
+  closeBattleCoach(false);
   dom.resultPrimaryButton.classList.add("hidden");
   dom.resultSecondaryButton.classList.add("hidden");
 
@@ -9800,6 +9931,7 @@ function getRunStatsHtml() {
     ["命途种子", runState.trialSeed || "无"],
     ["临门段选择", getThirdStepChoiceSummary()],
     ["休整结果", getRestResultSummary()],
+    ["专属机缘", stats.heroEvents || 0],
     ["战斗场数", stats.battleCount],
     ["总回合数", stats.totalTurns],
     ["Boss 回合", stats.bossTurns || "尚未遭遇"],
@@ -9855,6 +9987,7 @@ function getRunStatsCopyText(cleared = runState?.status === "cleared") {
     `新增万蛊录条目（已遇敌怪/首领）：${(typeof layer2LoadBestiary === "function" ? layer2LoadBestiary().size : 0)}`,
     `临门段选择：${getThirdStepChoiceSummary()}`,
     `休整结果：${getRestResultSummary()}`,
+    `专属机缘：${stats.heroEvents || 0}`,
     `是否通关：${cleared ? "是" : "否"}`,
     `总回合：${stats.totalTurns}`,
     `Boss 回合：${stats.bossTurns || 0}`,
@@ -9939,6 +10072,7 @@ function getFeedbackInfoText(cleared = runState?.status === "cleared") {
     `新增万蛊录条目（已遇敌怪/首领）：${(typeof layer2LoadBestiary === "function" ? layer2LoadBestiary().size : 0)}`,
     `临门段选择：${getThirdStepChoiceSummary()}`,
     `休整结果：${getRestResultSummary()}`,
+    `专属机缘：${stats.heroEvents || 0}`,
     `最终生命：${safeFeedbackText(`${runState.currentHp} / ${runState.maxHp}`)}`,
     `最终蛊石：${runState.guStones || 0}`,
     `最终卡组数量：${runState.deckCards?.length || 0}`,
@@ -10111,6 +10245,7 @@ function showRunConclusion(cleared) {
         <div><span>命途种子</span><strong>${runState.trialSeed || "无"}</strong></div>
         <div><span>临门段选择</span><strong>${getThirdStepChoiceSummary() || "无"}</strong></div>
         <div><span>休整结果</span><strong>${getRestResultSummary() || "无"}</strong></div>
+        <div><span>专属机缘</span><strong>${stats.heroEvents || 0}</strong></div>
         <div class="wide"><span>${cleared ? "击败敌人" : `抵达第 ${runState.floor || 0} 段 · 已击败`}</span><strong>${defeated}</strong></div>
         <div class="wide"><span>材料与蛊石</span><strong>${materialText} · 蛊石 ${runState.guStones || 0}</strong></div>
         <div class="wide"><span>获得遗物</span><strong>${relicText}</strong></div>
