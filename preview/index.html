@@ -13,15 +13,15 @@
   <meta name="description" content="原创暗黑东方奇幻卡牌肉鸽原型《逆命蛊途》">
   <title>逆命蛊途 · 命途塔试炼</title>
   <script>
-    window.__NMG_BUILD__ = "v0.9.24.1";
-    window.NMG_GAME_VERSION = "V0.9.24.1 离线护符";
+    window.__NMG_BUILD__ = "v0.9.25";
+    window.NMG_GAME_VERSION = "V0.9.25 存档保险";
     window.NMG_TELEMETRY_ENDPOINT = "https://nmg-analytics.nmg-analytics-kaan.workers.dev/ingest";
   </script>
-  <link rel="stylesheet" href="style.v1016.css">
+  <link rel="stylesheet" href="style.v1017.css">
   <script src="audio.v0979.js" defer></script>
   <script src="gu_catalog.js?v=v1002" defer></script>
   <script src="telemetry.v0001.js" defer></script>
-  <script src="game.v1043.js" defer></script>
+  <script src="game.v1044.js" defer></script>
   <script>
     /* V0.9.24 离线护符：注册 Service Worker——玩家成功进过一次游戏后，断网/连接被
      * 重置也能离线开玩（github.io 在部分网络下被间歇性重置）。version.json 由 SW
@@ -127,7 +127,7 @@
       <span class="start-moon"></span>
     </div>
     <div class="start-content">
-      <p class="start-kicker">原创暗黑东方卡牌肉鸽 · V0.9.24.1 离线护符</p>
+      <p class="start-kicker">原创暗黑东方卡牌肉鸽 · V0.9.25 存档保险</p>
       <div class="start-logo" aria-hidden="true"><span>蛊</span></div>
       <h1 id="startTitle">逆命蛊途</h1>
       <p class="start-subtitle">以蛊为刃，以命为薪。命途塔中，从来没有天命之人。</p>
@@ -552,24 +552,34 @@
         <div id="shopOverview" class="shop-overview"></div>
         <div id="shopCardChoices" class="shop-card-choices"></div>
         <div id="shopActions" class="shop-actions"></div>
-        <div id="shopRemovePanel" class="shop-remove-panel hidden">
-          <p>选择一张蛊牌移除。卡组不能少于 6 张。</p>
-          <div id="shopRemoveChoices" class="shop-remove-choices"></div>
-          <div id="shopRemoveConfirm" class="shop-remove-confirm hidden">
-            <strong>确认焚去此蛊？</strong>
-            <p id="shopRemoveConfirmText"></p>
-            <div class="shop-remove-confirm-actions">
-              <button id="shopConfirmRemoveButton" type="button">确认移除</button>
-              <button id="shopBackRemoveButton" class="reward-skip" type="button">返回</button>
-            </div>
-          </div>
-          <button id="shopCancelRemoveButton" class="reward-skip" type="button">返回蛊坊</button>
-        </div>
       </div>
       <div id="runSummary" class="run-summary hidden"></div>
       <textarea id="feedbackCopyFallback" class="feedback-copy-fallback hidden" readonly aria-label="内测反馈信息"></textarea>
       <button id="resultPrimaryButton" type="button">开启炼蛊</button>
       <button id="resultSecondaryButton" class="result-secondary hidden" type="button">返回命途</button>
+    </div>
+  </div>
+
+  <!-- V0.9.25 删卡选牌独立弹窗（P0-2）：原先内嵌在蛊坊长列表末尾，点了按钮看不见列表、确认条还溢出面板。
+       现升格全屏弹窗，蛊坊删卡与休整整理蛊匣共用（内部 id 全部沿用，逻辑零改）。 -->
+  <div id="removePickerOverlay" class="remove-picker-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="removePickerTitle">
+    <div class="remove-picker-card">
+      <button id="removePickerClose" class="deck-close-button" type="button" aria-label="关闭选牌">×</button>
+      <p class="deck-eyebrow" id="removePickerEyebrow">蛊坊 · 焚牌删卡</p>
+      <h2 id="removePickerTitle">选一只蛊焚去</h2>
+      <div id="shopRemovePanel" class="shop-remove-panel hidden">
+        <p>选择一张蛊牌移除。卡组不能少于 6 张。</p>
+        <div id="shopRemoveChoices" class="shop-remove-choices"></div>
+        <div id="shopRemoveConfirm" class="shop-remove-confirm hidden">
+          <strong>确认焚去此蛊？</strong>
+          <p id="shopRemoveConfirmText"></p>
+          <div class="shop-remove-confirm-actions">
+            <button id="shopConfirmRemoveButton" type="button">确认移除</button>
+            <button id="shopBackRemoveButton" class="reward-skip" type="button">返回</button>
+          </div>
+        </div>
+        <button id="shopCancelRemoveButton" class="reward-skip" type="button">返回蛊坊</button>
+      </div>
     </div>
   </div>
 
@@ -652,7 +662,7 @@
       <button id="settingsCloseButton" class="deck-close-button" type="button" aria-label="关闭设置">×</button>
       <p class="deck-eyebrow">试玩包设置</p>
       <h2 id="settingsTitle">设置</h2>
-        <p id="settingsVersion" class="settings-version">当前版本：V0.9.24.1 离线护符</p>
+        <p id="settingsVersion" class="settings-version">当前版本：V0.9.25 存档保险</p>
       <div class="settings-list">
         <button id="settingsMusicToggle" type="button">音乐：开</button>
         <label class="settings-volume" for="settingsVolume">
@@ -667,6 +677,17 @@
           <button id="settingsRestartButton" type="button">重新开始当前试炼</button>
         </div>
         <button id="settingsPrologueButton" type="button">重看序章</button>
+        <!-- V0.9.25 存档保险：全量备份/恢复（导出=复制+下载双通道；导入=校验和把关+先自动备份现档） -->
+        <div class="settings-save-tools" aria-label="存档备份与恢复">
+          <button id="settingsSaveExport" type="button">备份存档（复制并下载）</button>
+          <button id="settingsSaveImportToggle" type="button" aria-expanded="false">恢复存档…</button>
+          <div id="settingsSaveImportBox" class="settings-save-import hidden">
+            <textarea id="settingsSaveImportText" rows="3" placeholder="把存档码粘贴到这里，或选择备份文件"></textarea>
+            <input id="settingsSaveImportFile" type="file" accept=".txt,.json">
+            <button id="settingsSaveImportRun" type="button">校验并导入（会先自动下载当前档备份）</button>
+            <p id="settingsSaveImportMsg" class="settings-save-msg"></p>
+          </div>
+        </div>
         <button id="settingsTutorialResetButton" class="settings-reset-action" type="button">重置新手提示</button>
         <button id="settingsLoreResetButton" class="settings-reset-action" type="button">重置残卷解锁</button>
       </div>
