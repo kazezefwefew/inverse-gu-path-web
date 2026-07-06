@@ -13,19 +13,51 @@
   <meta name="description" content="原创暗黑东方奇幻卡牌肉鸽原型《逆命蛊途》">
   <title>逆命蛊途 · 命途塔试炼</title>
   <script>
-    window.__NMG_BUILD__ = "v0.9.23";
-    window.NMG_GAME_VERSION = "V0.9.23 蛊庐·家";
+    window.__NMG_BUILD__ = "v0.9.24";
+    window.NMG_GAME_VERSION = "V0.9.24 离线护符";
     window.NMG_TELEMETRY_ENDPOINT = "https://nmg-analytics.nmg-analytics-kaan.workers.dev/ingest";
   </script>
-  <link rel="stylesheet" href="style.v1014.css">
+  <link rel="stylesheet" href="style.v1015.css">
   <script src="audio.v0979.js" defer></script>
   <script src="gu_catalog.js?v=v1002" defer></script>
   <script src="telemetry.v0001.js" defer></script>
-  <script src="game.v1041.js" defer></script>
+  <script src="game.v1042.js" defer></script>
   <script>
+    /* V0.9.24 离线护符：注册 Service Worker——玩家成功进过一次游戏后，断网/连接被
+     * 重置也能离线开玩（github.io 在部分网络下被间歇性重置）。version.json 由 SW
+     * 直连网络、绝不缓存，V0.9.8.8 更新闸行为不变。
+     * （此处曾是 PWA 回退时的"注销 SW+清空缓存"代码——那次的坑在于旧 SW 连
+     *  version.json 都缓存；新 sw.js 已绕开，勿再整段注销。） */
     if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.getRegistrations().then(function (rs) { rs.forEach(function (r) { r.unregister(); }); }).catch(function () {});
-      if (window.caches && caches.keys) { caches.keys().then(function (ks) { ks.forEach(function (k) { caches.delete(k); }); }).catch(function () {}); }
+      /* resource timing 缓冲区默认约 250 条即停录，本作资源多、懒加载晚——放大上限，
+       * 否则首访补录的清单会被静默截断 */
+      try { if (performance.setResourceTimingBufferSize) performance.setResourceTimingBufferSize(600); } catch (e) {}
+      window.addEventListener("load", function () {
+        navigator.serviceWorker.register("./sw.js").catch(function () {});
+        /* 首访补录：SW 首次安装时本页资源已加载完（不经 SW，不会自动进缓存）。
+         * 把已加载的同源资源清单发给 SW 补录，让"第一次访问"之后就具备离线能力。
+         * 分三轮增量发（Set 去重），兜住 boot-loader 之后的懒加载，不重复劳动。 */
+        navigator.serviceWorker.ready.then(function (reg) {
+          var reported = {};
+          function report() {
+            try {
+              if (!reg.active || !window.performance || !performance.getEntriesByType) return;
+              var fresh = [];
+              performance.getEntriesByType("resource").forEach(function (e) {
+                var u = e.name;
+                if (reported[u]) return;
+                if (u.indexOf(location.origin + "/") !== 0) return; // 只补同源 http(s)，滤掉跨域/blob:/data:
+                reported[u] = 1;
+                fresh.push(u);
+              });
+              if (fresh.length) reg.active.postMessage({ type: "NMG_CACHE_URLS", urls: fresh });
+            } catch (err) {}
+          }
+          setTimeout(report, 3000);
+          setTimeout(report, 15000);
+          setTimeout(report, 45000);
+        }).catch(function () {});
+      });
     }
     (function () {
       // V0.9.8.7：全屏按钮仅在「桌面·非触屏·宽屏」创建——手机/触屏/窄屏本已全屏，且该按钮浮于左下会压住手牌第一张，故不创建（窄屏再由 CSS @media 兜底隐藏）。桌面保留全屏功能。
@@ -95,7 +127,7 @@
       <span class="start-moon"></span>
     </div>
     <div class="start-content">
-      <p class="start-kicker">原创暗黑东方卡牌肉鸽 · V0.9.23 蛊庐·家</p>
+      <p class="start-kicker">原创暗黑东方卡牌肉鸽 · V0.9.24 离线护符</p>
       <div class="start-logo" aria-hidden="true"><span>蛊</span></div>
       <h1 id="startTitle">逆命蛊途</h1>
       <p class="start-subtitle">以蛊为刃，以命为薪。命途塔中，从来没有天命之人。</p>
@@ -602,7 +634,7 @@
     </div>
   </div>
 
-  <!-- V0.9.23 蛊庐·家：局外养蛊（材料带出/孵卵真实时间/两格带入/蛊斗喂养），内容由 renderGulu 渲染 -->
+  <!-- V0.9.23.1 蛊庐·家：局外养蛊（材料带出/孵卵真实时间/两格带入/蛊斗喂养），内容由 renderGulu 渲染 -->
   <div id="guluOverlay" class="gulu-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="guluTitle">
     <i class="ember-field gulu-embers" aria-hidden="true"></i>
     <div class="gulu-card">
@@ -620,7 +652,7 @@
       <button id="settingsCloseButton" class="deck-close-button" type="button" aria-label="关闭设置">×</button>
       <p class="deck-eyebrow">试玩包设置</p>
       <h2 id="settingsTitle">设置</h2>
-        <p id="settingsVersion" class="settings-version">当前版本：V0.9.23 蛊庐·家</p>
+        <p id="settingsVersion" class="settings-version">当前版本：V0.9.24 离线护符</p>
       <div class="settings-list">
         <button id="settingsMusicToggle" type="button">音乐：开</button>
         <label class="settings-volume" for="settingsVolume">
