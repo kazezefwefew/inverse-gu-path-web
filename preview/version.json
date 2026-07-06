@@ -1,5 +1,5 @@
 {
-  "build": "v0.9.23",
-  "version": "V0.9.23 蛊庐·家",
+  "build": "v0.9.24",
+  "version": "V0.9.24 离线护符",
   "note": "游戏内更新闸读取本文件；部署时必须让 build 与当前 index.html 的 __NMG_BUILD__ 保持一致。"
 }
