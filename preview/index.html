@@ -486,6 +486,14 @@
           <h3>炼蛊收获</h3>
         </div>
         <div id="cardRewardChoices" class="card-reward-choices"></div>
+        <!-- V0.9.31 两段式：选中先高亮不落袋，确认才入组、可重选，防误触 -->
+        <div id="cardRewardConfirm" class="reward-confirm hidden">
+          <p id="cardRewardConfirmText" class="reward-confirm-text"></p>
+          <div class="reward-confirm-actions">
+            <button id="cardRewardConfirmButton" type="button">确认收纳</button>
+            <button id="cardRewardReselectButton" class="reward-skip" type="button">重选</button>
+          </div>
+        </div>
         <button id="skipRewardButton" class="reward-skip" type="button">舍弃收获</button>
       </div>
       <div id="materialRewardPanel" class="material-reward-panel hidden">
@@ -494,6 +502,13 @@
           <h3>炼蛊材料</h3>
         </div>
         <div id="materialRewardChoices" class="material-reward-choices"></div>
+        <div id="materialRewardConfirm" class="reward-confirm hidden">
+          <p id="materialRewardConfirmText" class="reward-confirm-text"></p>
+          <div class="reward-confirm-actions">
+            <button id="materialRewardConfirmButton" type="button">确认取材</button>
+            <button id="materialRewardReselectButton" class="reward-skip" type="button">重选</button>
+          </div>
+        </div>
         <button id="skipMaterialButton" class="reward-skip" type="button">不取材料</button>
       </div>
       <div id="refinePanel" class="refine-panel hidden">
