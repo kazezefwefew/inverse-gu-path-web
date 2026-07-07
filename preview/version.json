@@ -1,5 +1,5 @@
 {
-  "build": "v0.9.27",
-  "version": "V0.9.27 攻防与治理",
+  "build": "v0.9.28",
+  "version": "V0.9.28 蛊庐生命化",
   "note": "游戏内更新闸读取本文件；部署时必须让 build 与当前 index.html 的 __NMG_BUILD__ 保持一致。"
 }
