@@ -1,5 +1,5 @@
 {
-  "build": "v0.9.31",
-  "version": "V0.9.31 防误触与万蛊录横排",
+  "build": "v0.9.32",
+  "version": "V0.9.32 防误触批2",
   "note": "游戏内更新闸读取本文件；部署时必须让 build 与当前 index.html 的 __NMG_BUILD__ 保持一致。"
 }
