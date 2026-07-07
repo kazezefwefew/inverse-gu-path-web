@@ -13,15 +13,15 @@
   <meta name="description" content="原创暗黑东方奇幻卡牌肉鸽原型《逆命蛊途》">
   <title>逆命蛊途 · 命途塔试炼</title>
   <script>
-    window.__NMG_BUILD__ = "v0.9.28";
-    window.NMG_GAME_VERSION = "V0.9.28 蛊庐生命化";
+    window.__NMG_BUILD__ = "v0.9.29";
+    window.NMG_GAME_VERSION = "V0.9.29 香火供奉";
     window.NMG_TELEMETRY_ENDPOINT = "https://nmg-analytics.nmg-analytics-kaan.workers.dev/ingest";
   </script>
-  <link rel="stylesheet" href="style.v1018.css">
-  <script src="audio.v0980.js" defer></script>
+  <link rel="stylesheet" href="style.v1019.css">
+  <script src="audio.v0981.js" defer></script>
   <script src="gu_catalog.js?v=v1002" defer></script>
   <script src="telemetry.v0001.js" defer></script>
-  <script src="game.v1047.js" defer></script>
+  <script src="game.v1048.js" defer></script>
   <script>
     /* V0.9.24 离线护符：注册 Service Worker——玩家成功进过一次游戏后，断网/连接被
      * 重置也能离线开玩（github.io 在部分网络下被间歇性重置）。version.json 由 SW
@@ -127,7 +127,7 @@
       <span class="start-moon"></span>
     </div>
     <div class="start-content">
-      <p class="start-kicker">原创暗黑东方卡牌肉鸽 · V0.9.28 蛊庐生命化</p>
+      <p class="start-kicker">原创暗黑东方卡牌肉鸽 · V0.9.29 香火供奉</p>
       <div class="start-logo" aria-hidden="true"><span>蛊</span></div>
       <h1 id="startTitle">逆命蛊途</h1>
       <p class="start-subtitle">以蛊为刃，以命为薪。命途塔中，从来没有天命之人。</p>
@@ -583,6 +583,22 @@
     </div>
   </div>
 
+  <!-- V0.9.29 香火供奉：自愿赞助入口（微信收款码单通道，纯赠与、不解锁任何内容）。三处入口共用本弹窗。 -->
+  <div id="xianghuoOverlay" class="xianghuo-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="xianghuoTitle">
+    <div class="xianghuo-card">
+      <button id="xianghuoClose" class="deck-close-button" type="button" aria-label="关闭">×</button>
+      <p class="deck-eyebrow">蛊庐 · 长明灯</p>
+      <h2 id="xianghuoTitle">香火供奉</h2>
+      <p class="xianghuo-lore">蛊庐这盏长明灯，烧的是香火、续的是更新。若这趟命途曾让你驻足片刻，可随手添一炷——蛊修在此谢过。<span class="xianghuo-wink">（纯自愿、不图回报，更不会拿半张蛊牌来赎你钱包）</span></p>
+      <div class="xianghuo-qr-frame">
+        <span class="xianghuo-qr-fallback" aria-hidden="true">收款码待供奉<br><small>若长时间空白，请更新到最新版</small></span>
+        <img class="xianghuo-qr" data-src="assets/xianghuo/qr_wechat.v1.png" alt="微信供奉收款码" decoding="async" onerror="this.remove()">
+      </div>
+      <p class="xianghuo-guide">微信扫码供奉 · 手机可长按图片保存后，于微信「扫一扫 · 相册」识别</p>
+      <p class="xianghuo-sign">香火有情，蛊修铭记。</p>
+    </div>
+  </div>
+
   <div id="deckOverlay" class="deck-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="deckTitle">
     <div class="deck-card">
       <button id="deckCloseButton" class="deck-close-button" type="button" aria-label="关闭蛊囊">×</button>
@@ -662,7 +678,7 @@
       <button id="settingsCloseButton" class="deck-close-button" type="button" aria-label="关闭设置">×</button>
       <p class="deck-eyebrow">试玩包设置</p>
       <h2 id="settingsTitle">设置</h2>
-        <p id="settingsVersion" class="settings-version">当前版本：V0.9.28 蛊庐生命化</p>
+        <p id="settingsVersion" class="settings-version">当前版本：V0.9.29 香火供奉</p>
       <div class="settings-list">
         <button id="settingsMusicToggle" type="button">音乐：开</button>
         <label class="settings-volume" for="settingsVolume">
@@ -677,6 +693,7 @@
           <button id="settingsRestartButton" type="button">重新开始当前试炼</button>
         </div>
         <button id="settingsPrologueButton" type="button">重看序章</button>
+        <button id="settingsXianghuoButton" class="settings-xianghuo-button" type="button" data-xianghuo-open="settings">香火供奉 · 支持作者</button>
         <!-- V0.9.27 攻防与治理：全量备份/恢复（导出=复制+下载双通道；导入=校验和把关+先自动备份现档） -->
         <div class="settings-save-tools" aria-label="存档备份与恢复">
           <button id="settingsSaveExport" type="button">备份存档（复制并下载）</button>
