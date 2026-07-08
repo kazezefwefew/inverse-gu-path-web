@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>《逆命蛊途》玩家反馈</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #080b09;
+      --panel: #111912;
+      --panel-2: #172119;
+      --line: #344532;
+      --gold: #c8aa66;
+      --green: #8dcc92;
+      --red: #d07462;
+      --text: #efe5cc;
+      --muted: #aaa089;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at 16% 0, rgba(70, 98, 64, 0.35), transparent 32%), var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+      line-height: 1.6;
+    }
+    main { width: min(980px, calc(100% - 28px)); margin: 0 auto; padding: 28px 0 44px; }
+    header { margin-bottom: 18px; }
+    .kicker { color: var(--gold); font-size: 14px; letter-spacing: .08em; }
+    h1 { margin: 6px 0 8px; font-size: clamp(28px, 5vw, 44px); line-height: 1.12; color: var(--gold); }
+    p { margin: 0 0 10px; }
+    a { color: var(--green); }
+    .notice, form {
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(17, 25, 18, .94), rgba(11, 15, 12, .96));
+      border-radius: 10px;
+      padding: 16px;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, .26);
+    }
+    .notice { margin-bottom: 14px; color: var(--muted); }
+    .notice strong { color: var(--text); }
+    form { display: grid; gap: 14px; }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    label { display: grid; gap: 6px; color: var(--muted); font-size: 14px; }
+    label span { color: var(--text); font-weight: 700; }
+    input, select, textarea, button {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #0b100c;
+      color: var(--text);
+      padding: 10px 11px;
+      font: inherit;
+    }
+    textarea { min-height: 110px; resize: vertical; }
+    .feedback-copy { min-height: 170px; font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace; font-size: 13px; }
+    .honeypot { position: absolute; left: -10000px; top: auto; width: 1px; height: 1px; overflow: hidden; }
+    .hint { color: var(--muted); font-size: 13px; }
+    .actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    button {
+      width: auto;
+      min-width: 160px;
+      cursor: pointer;
+      color: #151008;
+      background: linear-gradient(180deg, #dcc47f, #b99243);
+      border-color: #e2ca86;
+      font-weight: 800;
+    }
+    button:disabled { opacity: .62; cursor: wait; }
+    .msg { min-height: 24px; color: var(--muted); }
+    .msg.ok { color: var(--green); }
+    .msg.err { color: var(--red); }
+    .full { grid-column: 1 / -1; }
+    @media (max-width: 760px) {
+      main { width: min(100% - 20px, 980px); padding-top: 18px; }
+      .grid { grid-template-columns: 1fr; }
+      button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div class="kicker">NIMINGUTU.COM</div>
+      <h1>《逆命蛊途》玩家反馈</h1>
+      <p>正式入口：<a href="https://nimingutu.com/">https://nimingutu.com/</a></p>
+    </header>
+
+    <section class="notice" aria-label="提交说明">
+      <p><strong>遇到打不开、白屏、安卓安装、存档、音频、卡死或玩法异常，可以在这里提交。</strong></p>
+      <p>如果已经通关或殒落，请先在结算页点“复制反馈信息”，再粘贴到下面。联系方式可以不填；后台不保存玩家 IP。</p>
+      <p id="versionLine">正在读取当前正式版本...</p>
+    </section>
+
+    <form id="feedbackForm">
+      <input class="honeypot" type="text" name="nickname" autocomplete="off" tabindex="-1" aria-hidden="true" />
+      <input type="hidden" id="version" name="version" />
+      <input type="hidden" id="build" name="build" />
+      <input type="hidden" id="pageUrl" name="pageUrl" />
+
+      <div class="grid">
+        <label>
+          <span>问题类型</span>
+          <select id="category" name="category" required>
+            <option value="bug">Bug / 玩法异常</option>
+            <option value="open">打不开</option>
+            <option value="blank">白屏</option>
+            <option value="android">安卓 App</option>
+            <option value="save">存档 / 迁移</option>
+            <option value="audio">音频 / BGM</option>
+            <option value="stuck">卡死 / 按钮无响应</option>
+            <option value="suggestion">建议</option>
+            <option value="other">其他</option>
+          </select>
+        </label>
+
+        <label>
+          <span>入口</span>
+          <select id="platform" name="platform" required>
+            <option value="web">网页</option>
+            <option value="android">安卓 App</option>
+            <option value="taptap">TapTap</option>
+            <option value="wechat">微信群链接</option>
+            <option value="other">其他</option>
+          </select>
+        </label>
+
+        <label>
+          <span>设备</span>
+          <input id="device" name="device" maxlength="120" placeholder="例如：小米 14 / iPhone 15 / Windows 电脑" />
+        </label>
+
+        <label>
+          <span>浏览器或系统</span>
+          <input id="browser" name="browser" maxlength="120" placeholder="例如：Chrome / Edge / 安卓 14 WebView" />
+        </label>
+      </div>
+
+      <label class="full">
+        <span>一句话说明</span>
+        <input id="summary" name="summary" maxlength="160" required placeholder="例如：安卓 App 打开后一直白屏" />
+      </label>
+
+      <label class="full">
+        <span>复现步骤 / 发生位置</span>
+        <textarea id="details" name="details" maxlength="3000" placeholder="请写清楚从哪里点进去、点了什么、预期是什么、实际发生了什么。"></textarea>
+      </label>
+
+      <label class="full">
+        <span>游戏内复制反馈信息</span>
+        <textarea id="feedbackText" class="feedback-copy" name="feedbackText" maxlength="9000" placeholder="通关或殒落后，点结算页“复制反馈信息”，粘贴到这里。没有也可以先提交复现步骤。"></textarea>
+      </label>
+
+      <div class="grid">
+        <label>
+          <span>截图 / 录屏链接</span>
+          <input id="mediaLink" name="mediaLink" maxlength="400" placeholder="可选：网盘、TapTap 动态或群文件链接" />
+        </label>
+
+        <label>
+          <span>联系方式</span>
+          <input id="contact" name="contact" maxlength="160" placeholder="可选：方便追问即可，不建议填写隐私信息" />
+        </label>
+      </div>
+
+      <div class="actions">
+        <button id="submitButton" type="submit">提交反馈</button>
+        <div id="message" class="msg" role="status" aria-live="polite"></div>
+      </div>
+      <p class="hint">提交后会进入开发者私密反馈后台。紧急卡死问题仍建议在群里附截图或录屏提醒。</p>
+    </form>
+  </main>
+
+  <script>
+    const FEEDBACK_ENDPOINT = "https://nmg-analytics.nmg-analytics-kaan.workers.dev/feedback";
+    const form = document.getElementById("feedbackForm");
+    const message = document.getElementById("message");
+    const submitButton = document.getElementById("submitButton");
+    const versionInput = document.getElementById("version");
+    const buildInput = document.getElementById("build");
+    const pageUrlInput = document.getElementById("pageUrl");
+    const versionLine = document.getElementById("versionLine");
+
+    pageUrlInput.value = location.href;
+
+    function guessPlatform() {
+      const ua = navigator.userAgent || "";
+      if (/wv|Android/i.test(ua)) return "android";
+      return "web";
+    }
+
+    document.getElementById("platform").value = guessPlatform();
+    document.getElementById("browser").value = navigator.userAgent.slice(0, 120);
+
+    fetch("/version.json", { cache: "no-store" })
+      .then((res) => res.ok ? res.json() : null)
+      .then((data) => {
+        if (!data) throw new Error("no version");
+        versionInput.value = data.version || "";
+        buildInput.value = data.build || "";
+        versionLine.textContent = "当前正式版本：" + (data.version || data.build || "未读取到版本号");
+      })
+      .catch(() => {
+        versionLine.textContent = "未能自动读取版本号，仍可提交反馈。";
+      });
+
+    function setMessage(text, type) {
+      message.textContent = text;
+      message.className = "msg " + (type || "");
+    }
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      setMessage("正在提交...", "");
+      submitButton.disabled = true;
+      const data = Object.fromEntries(new FormData(form).entries());
+      try {
+        const response = await fetch(FEEDBACK_ENDPOINT, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok || !result.ok) {
+          throw new Error(result.error || "submit_failed");
+        }
+        setMessage(result.id ? "已提交，编号 #" + result.id + "。" : "已提交。", "ok");
+        form.reset();
+        pageUrlInput.value = location.href;
+        document.getElementById("platform").value = guessPlatform();
+      } catch (error) {
+        const text = error.message === "missing_content"
+          ? "请至少填写一句话说明、复现步骤或复制反馈信息。"
+          : "提交失败。请稍后重试，或把截图和复制反馈发到群里。";
+        setMessage(text, "err");
+      } finally {
+        submitButton.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
