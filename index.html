@@ -13,15 +13,21 @@
   <meta name="description" content="原创暗黑东方奇幻卡牌肉鸽原型《逆命蛊途》">
   <title>逆命蛊途 · 命途塔试炼</title>
   <script>
-    window.__NMG_BUILD__ = "v0.9.35";
-    window.NMG_GAME_VERSION = "V0.9.35 辟圃·日课·天品随行";
+    window.__NMG_BUILD__ = "v0.9.36a";
+    window.NMG_GAME_VERSION = "V0.9.36a 适龄提示与合规打磨";
     window.NMG_TELEMETRY_ENDPOINT = "https://nmg-analytics.nmg-analytics-kaan.workers.dev/ingest";
+    // V0.9.36 平台标志：web=网页版（香火可见）。小游戏包设 "minigame" 仅做【运行时】隐藏香火入口。
+    // ⚠ 打包小游戏发行包时【还须在构建期物理剥离】：删除下方 #xianghuoOverlay 整段 + 设置页香火按钮，
+    // 且不打包 assets/xianghuo/qr_wechat*.png——小游戏严禁外部收款码，仅翻此 flag 不删字节，审核仍能在包内查到收款码。
+    window.NMG_PLATFORM = window.NMG_PLATFORM || "web";
+    // 失败安全兜底：非 web 平台给根节点打标，CSS 据此彻底藏香火三入口（不依赖任何 JS 执行完成）。
+    if (window.NMG_PLATFORM !== "web") { try { document.documentElement.classList.add("nmg-noxianghuo"); } catch (e) {} }
   </script>
-  <link rel="stylesheet" href="style.v1024.css">
+  <link rel="stylesheet" href="style.v1025.css">
   <script src="audio.v0982.js" defer></script>
   <script src="gu_catalog.js?v=v1002" defer></script>
   <script src="telemetry.v0001.js" defer></script>
-  <script src="game.v1054.js" defer></script>
+  <script src="game.v1057.js" defer></script>
   <script>
     /* V0.9.24 离线护符：注册 Service Worker——玩家成功进过一次游戏后，断网/连接被
      * 重置也能离线开玩（github.io 在部分网络下被间歇性重置）。version.json 由 SW
@@ -127,7 +133,8 @@
       <span class="start-moon"></span>
     </div>
     <div class="start-content">
-      <p class="start-kicker">原创暗黑东方卡牌肉鸽 · V0.9.35 辟圃·日课·天品随行</p>
+      <p class="start-kicker">原创暗黑东方卡牌肉鸽 · V0.9.36a 适龄提示与合规打磨</p>
+      <p class="start-agehint">适龄提示 · 建议 <span data-age-num>16</span> 周岁以上 · 纯单机、不含实物交易</p>
       <div class="start-logo" aria-hidden="true"><span>蛊</span></div>
       <h1 id="startTitle">逆命蛊途</h1>
       <p class="start-subtitle">以蛊为刃，以命为薪。命途塔中，从来没有天命之人。</p>
@@ -622,6 +629,18 @@
     </div>
   </div>
 
+  <!-- V0.9.36 合规·年龄门槛：首次进入弹一次「适龄提示 + 年龄确认」，确认后记住不再弹。仅「确认进入」可关闭（无背景/Esc 退出）。年龄数字由 game.js SUGGESTED_AGE 注入（data-age-num）。 -->
+  <div id="ageGateOverlay" class="age-gate-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="ageGateTitle">
+    <div class="age-gate-card">
+      <p class="age-gate-eyebrow">适龄提示</p>
+      <div class="age-gate-badge" aria-hidden="true"><span data-age-num>16</span>+</div>
+      <h2 id="ageGateTitle">入塔之前</h2>
+      <p class="age-gate-body">《逆命蛊途》为<strong>暗黑东方奇幻</strong>题材原创单机卡牌游戏，含战斗、蛊毒、生死与赌命等暗黑意象，<strong>建议 <span data-age-num>16</span> 周岁以上</strong>体验。本作为纯单机作品、不含实物交易；「香火供奉」为纯自愿打赏，不解锁任何游戏内容。</p>
+      <p class="age-gate-confirm-line">请确认你已年满 <span data-age-num>16</span> 周岁并知晓上述提示。</p>
+      <button id="ageGateConfirm" class="age-gate-confirm" type="button">我已年满 <span data-age-num>16</span> 周岁 · 入塔</button>
+    </div>
+  </div>
+
   <div id="deckOverlay" class="deck-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="deckTitle">
     <div class="deck-card">
       <button id="deckCloseButton" class="deck-close-button" type="button" aria-label="关闭蛊囊">×</button>
@@ -701,7 +720,7 @@
       <button id="settingsCloseButton" class="deck-close-button" type="button" aria-label="关闭设置">×</button>
       <p class="deck-eyebrow">试玩包设置</p>
       <h2 id="settingsTitle">设置</h2>
-        <p id="settingsVersion" class="settings-version">当前版本：V0.9.35 辟圃·日课·天品随行</p>
+        <p id="settingsVersion" class="settings-version">当前版本：V0.9.36a 适龄提示与合规打磨</p>
       <div class="settings-list">
         <button id="settingsMusicToggle" type="button">音乐：开</button>
         <label class="settings-volume" for="settingsVolume">
