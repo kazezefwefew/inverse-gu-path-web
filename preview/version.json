@@ -1,5 +1,5 @@
 {
-  "build": "v0.9.33",
-  "version": "V0.9.33 手感与说明",
+  "build": "v0.9.34",
+  "version": "V0.9.34 神化归墟立绘·夜鸣调优",
   "note": "游戏内更新闸读取本文件；部署时必须让 build 与当前 index.html 的 __NMG_BUILD__ 保持一致。"
 }
