@@ -1,0 +1,1308 @@
+"use strict";
+/* =====================================================================
+ * 《逆命蛊途》静态数据模块  nmg-data.js  (V0.9.36 批次B-1 模块化·首抽)
+ * 从 game.js 抽出的纯静态数据前缀：CARD_LIBRARY … REFINEMENTS。
+ * ⚠ 必须在 game.js 之前加载（index.html 里排在 game.vXXXX.js 之前）——
+ *   本块含顶层立即执行（给每张卡注入 effectType），且 game.js 后段构造期会读这些常量；
+ *   排到 game.js 之后会 TDZ 白屏。改这里同样走快照三步（build.mjs 已纳管 nmg-data 族）。
+ * ===================================================================== */
+
+const CARD_LIBRARY = {
+  // 原始五类卡牌：完整保留第一版效果。
+  moonBlade: {
+    name: "月刃蛊", cost: 1, type: "attack", category: "attack", typeName: "攻击蛊",
+    glyph: "月", art: "刃", effect: "对敌人造成 <em>6</em> 点伤害",
+  },
+  ironSkin: {
+    name: "铁皮蛊", cost: 1, type: "defense", category: "defense", typeName: "防御蛊",
+    glyph: "铁", art: "甲", effect: "获得 <em>7</em> 点防御",
+  },
+  wineWorm: {
+    name: "酒虫", cost: 1, type: "utility", category: "utility", typeName: "辅助蛊",
+    glyph: "酒", art: "酿", effect: "下一张攻击蛊的伤害<em>翻倍</em>。",
+  },
+  bloodBlade: {
+    name: "血刃蛊", cost: 1, type: "blood", category: "attack", typeName: "血道攻击",
+    glyph: "血", art: "煞", effect: "失去 <em>3</em> 点生命，造成 <em>13 + 当前血煞</em> 点伤害，获得 <em>1</em> 层血煞",
+  },
+  burningEssence: {
+    name: "燃元蛊", cost: 0, type: "utility", category: "utility", typeName: "燃命蛊",
+    glyph: "燃", art: "元", effect: "获得 <em>2</em> 点真元并抽 <em>1</em> 张牌，失去 <em>2</em> 点生命",
+  },
+
+  // 通用进阶牌池：作为战后奖励的 40% 通用来源，不混入其他角色专属牌。
+  heartEater: {
+    name: "噬心蛊", cost: 2, type: "attack", category: "attack", typeName: "血道攻击",
+    glyph: "噬", art: "心", effect: "造成 <em>12</em> 点伤害；血煞不少于 2 层时改为 <em>20</em>",
+  },
+  bloodReversal: {
+    name: "逆血蛊", cost: 2, type: "blood", category: "attack", typeName: "血道攻击蛊",
+    glyph: "逆", art: "血", effect: "失去 <em>5</em> 点生命，造成 <em>16 + 血煞×2</em> 点伤害，获得 <em>1</em> 层血煞",
+  },
+  bloodTide: {
+    name: "血潮蛊", cost: 2, type: "blood", category: "attack", typeName: "血道攻击",
+    glyph: "潮", art: "涌", effect: "造成 <em>5 + 血煞×3</em> 点伤害",
+  },
+  lifeFlame: {
+    name: "寿火蛊", cost: 0, type: "attack", category: "attack", typeName: "寿道攻击",
+    glyph: "寿", art: "烬", lifespanCost: 1, effect: "消耗 <em>1</em> 寿元，造成 <em>10</em> 点伤害",
+  },
+  witheredBloom: {
+    name: "枯荣蛊", cost: 1, type: "utility", category: "utility", typeName: "寿道秘蛊",
+    glyph: "荣", art: "生", lifespanCost: 2, effect: "消耗 <em>2</em> 寿元，恢复 <em>10</em> 点生命",
+  },
+  essenceGathering: {
+    name: "聚元蛊", cost: 1, type: "utility", category: "utility", typeName: "元道辅助",
+    glyph: "聚", art: "炁", effect: "获得 <em>2</em> 点真元并抽 <em>1</em> 张牌",
+  },
+  mysticCarapace: {
+    name: "玄甲蛊", cost: 2, type: "defense", category: "defense", typeName: "防御蛊",
+    glyph: "玄", art: "壳", effect: "获得 <em>16</em> 点防御",
+  },
+  returnLife: {
+    name: "返命蛊", cost: 2, type: "utility", category: "utility", typeName: "血道疗愈",
+    glyph: "返", art: "命", bloodCost: 3, effect: "消耗 <em>3</em> 层血煞，恢复 <em>16</em> 点生命",
+  },
+  swarmBite: {
+    name: "群蛊噬", cost: 1, type: "attack", category: "attack", typeName: "攻击蛊",
+    glyph: "群", art: "噬", effect: "造成 <em>4</em> 点伤害；本回合此前每出 1 张牌，追加 <em>3</em>",
+  },
+  meridianShift: {
+    name: "移窍蛊", cost: 0, type: "utility", category: "utility", typeName: "辅助蛊",
+    glyph: "窍", art: "迁", effect: "失去 <em>3</em> 点生命，抽 <em>2</em> 张牌",
+  },
+
+  // V0.8：通用构筑牌。所有角色都可在奖励与蛊坊中获得，用于扩大跨流派组合。
+  armorBreaker: {
+    name: "破甲蛊", cost: 1, type: "attack", category: "attack", typeName: "攻击蛊",
+    glyph: "破", art: "甲", effect: "造成 <em>5</em> 点伤害；若敌人有防御，额外造成 <em>6</em> 点伤害",
+  },
+  yuanReturn: {
+    name: "回元蛊", cost: 0, type: "utility", category: "utility", typeName: "辅助蛊",
+    glyph: "回", art: "元", effect: "获得 <em>1</em> 点真元；本回合下一张辅助蛊抽 <em>1</em> 张牌",
+  },
+  shellRemnant: {
+    name: "残壳蛊", cost: 1, type: "defense", category: "defense", typeName: "护甲蛊",
+    glyph: "壳", art: "残", effect: "获得 <em>6</em> 点防御；若本回合已受伤，额外获得 <em>6</em> 点防御",
+  },
+  guFeeding: {
+    name: "饲蛊术", cost: 1, type: "utility", category: "utility", typeName: "辅助蛊",
+    glyph: "饲", art: "蛊", effect: "抽 <em>2</em> 张牌，然后弃 <em>1</em> 张牌",
+  },
+  soulCrack: {
+    name: "裂魂蛊", cost: 2, type: "attack", category: "attack", typeName: "攻击蛊",
+    glyph: "裂", art: "魂", lifespanCost: 1, effect: "造成 <em>18</em> 点伤害；失去 <em>1</em> 点寿元",
+  },
+  armorMeltPoison: {
+    name: "蚀甲蛊", cost: 1, type: "poison", category: "attack", typeName: "毒道攻击蛊",
+    glyph: "蚀", art: "甲", effect: "造成 <em>3</em> 点伤害，施加 <em>3</em> 层毒性；若敌人有防御，移除其 <em>5</em> 点防御",
+  },
+  bloodRobe: {
+    name: "血衣蛊", cost: 1, type: "blood", category: "defense", typeName: "血道护甲蛊",
+    glyph: "衣", art: "血", effect: "失去 <em>2</em> 点生命，获得 <em>12</em> 点防御，并获得 <em>1</em> 层血煞",
+  },
+  lifeLamp: {
+    name: "命灯蛊", cost: 1, type: "fate", category: "utility", typeName: "命势辅助蛊",
+    glyph: "灯", art: "命", effect: "获得 <em>1</em> 层命势；若命势已满，恢复 <em>4</em> 点生命",
+  },
+
+  // V0.9.9 寿道·子批3：朝暮专属进阶蛊（type:"lifespan" 取霜白暗金配色；焚寿/蚀岁/回光/桑田/续命）。
+  burnLife: {
+    name: "焚寿蛊", cost: 1, type: "lifespan", category: "attack", typeName: "寿道攻击",
+    glyph: "焚", art: "寿", lifespanCost: 2,
+    effect: "消耗 <em>2</em> 寿元，造成 <em>6</em> 点伤害；本场每焚去 1 点寿元额外 <em>+2</em>（含本次）",
+  },
+  erodeAge: {
+    name: "蚀岁蛊", cost: 1, type: "lifespan", category: "attack", typeName: "寿道攻击",
+    glyph: "蚀", art: "岁",
+    effect: "造成 <em>8</em> 点伤害，并夺回 <em>2</em> 点寿元（不超过上限）",
+  },
+  focalLife: {
+    name: "回光蛊", cost: 1, type: "lifespan", category: "utility", typeName: "寿道秘蛊",
+    glyph: "回", art: "光", lifespanCost: 3,
+    effect: "消耗 <em>3</em> 寿元，本回合攻击蛊伤害<em>翻倍</em>",
+  },
+  mulberryField: {
+    name: "桑田蛊", cost: 1, type: "lifespan", category: "utility", typeName: "寿道秘蛊",
+    glyph: "桑", art: "田", lifespanCost: 1,
+    effect: "消耗 <em>1</em> 寿元，使敌人<em>衰老 3</em>（攻击意图永久 -3，可叠加）",
+  },
+  prolongLife: {
+    name: "续命蛊", cost: 1, type: "lifespan", category: "utility", typeName: "寿道疗愈",
+    glyph: "续", art: "命",
+    effect: "恢复 <em>6</em> 点寿元（不超过上限）",
+  },
+
+  // 流派专属：无名逆命者围绕攻击/护甲/辅助交替形成“命势”循环。
+  fateThread: {
+    name: "命线蛊", cost: 1, type: "fate", category: "attack", typeName: "攻击蛊",
+    glyph: "线", art: "命", effect: "造成 <em>8</em> 点伤害；若命势不少于 <em>2</em> 层，额外造成 <em>6</em> 点伤害",
+  },
+  reversePath: {
+    name: "逆途蛊", cost: 0, type: "fate", category: "utility", typeName: "辅助蛊",
+    glyph: "逆", art: "途", effect: "获得 <em>3</em> 点防御，并获得 <em>1</em> 层命势",
+  },
+  fixedFate: {
+    name: "定数蛊", cost: 1, type: "fate", category: "defense", typeName: "护甲蛊",
+    glyph: "定", art: "数", effect: "获得 <em>9</em> 点防御；若本回合上一张牌不是护甲蛊，额外获得 <em>3</em> 点防御",
+  },
+
+  // 流派专属：绛妄以生命代价换取血煞和高爆发。
+  bloodSacrifice: {
+    name: "血祭蛊", cost: 0, type: "blood", category: "utility", typeName: "辅助蛊",
+    glyph: "祭", art: "血", effect: "失去 <em>3</em> 点生命，获得 <em>2</em> 层血煞，抽 <em>1</em> 张牌",
+  },
+  bloodThirst: {
+    name: "嗜血蛊", cost: 1, type: "blood", category: "attack", typeName: "攻击蛊",
+    glyph: "嗜", art: "饮", effect: "造成 <em>7 + 当前血煞</em> 点伤害；恢复 <em>3</em> 点生命",
+  },
+
+  // 流派专属：青蟒以毒性层数和重复施毒压制敌人。
+  greenMiasma: {
+    name: "青瘴蛊", cost: 1, type: "poison", category: "utility", typeName: "毒道辅助蛊",
+    glyph: "瘴", art: "毒", effect: "施加 <em>4</em> 层毒性",
+  },
+  insectSwarm: {
+    name: "虫群蛊", cost: 1, type: "poison", category: "attack", typeName: "毒道攻击蛊",
+    glyph: "虫", art: "群", effect: "造成 <em>4</em> 点伤害，并施加 <em>4</em> 层毒性",
+  },
+  moltingShell: {
+    name: "蜕壳蛊", cost: 1, type: "poison", category: "defense", typeName: "护甲蛊",
+    glyph: "蜕", art: "壳", effect: "获得 <em>8</em> 点防御；若敌人已中毒，抽 <em>1</em> 张牌",
+  },
+  poisonReturn: {
+    name: "返毒蛊", cost: 1, type: "poison", category: "attack", typeName: "毒道攻击蛊",
+    glyph: "返", art: "毒", effect: "造成 <em>6</em> 点伤害；若敌人中毒不少于 <em>8</em> 层，额外造成 <em>8</em> 点伤害",
+  },
+
+  // V0.6：异变炼蛊结果。异变卡不会进入普通奖励池，只会替换被炼化的卡牌实例。
+  bloodMoon: {
+    name: "血月蛊", cost: 1, type: "blood", category: "attack", typeName: "血道攻击蛊",
+    glyph: "月", art: "血", effect: "失去 <em>2</em> 点生命，造成 <em>12</em> 点伤害；若拥有血煞，额外造成当前血煞层数的伤害",
+  },
+  moltedArmor: {
+    name: "蜕甲蛊", cost: 1, type: "defense", category: "defense", typeName: "护甲蛊",
+    glyph: "蜕", art: "甲", effect: "获得 <em>9</em> 点防御；若本回合未受伤，抽 <em>1</em> 张牌",
+  },
+  rotMiasma: {
+    name: "腐瘴蛊", cost: 1, type: "poison", category: "utility", typeName: "毒道辅助蛊",
+    glyph: "腐", art: "瘴", effect: "施加 <em>6</em> 层毒性；若敌人已经中毒，额外触发一次蚀毒",
+  },
+  fateSever: {
+    name: "断命蛊", cost: 0, type: "fate", category: "utility", typeName: "辅助蛊",
+    glyph: "断", art: "命", effect: "获得 <em>1</em> 层命势，抽 <em>1</em> 张牌；失去 <em>1</em> 点寿元",
+  },
+  leechBlade: {
+    name: "血蛭刃", cost: 1, type: "blood", category: "attack", typeName: "血道攻击蛊",
+    glyph: "蛭", art: "刃", effect: "失去 <em>4</em> 点生命，造成 <em>15</em> 点伤害；恢复造成伤害的 20% 生命，至少恢复 <em>2</em> 点",
+  },
+  drunkFateWorm: {
+    name: "醉命虫", cost: 1, type: "fate", category: "utility", typeName: "辅助蛊",
+    glyph: "醉", art: "酒", effect: "下一张攻击蛊伤害翻倍；若本回合已获得命势，抽 <em>1</em> 张牌",
+  },
+  soulBurn: {
+    name: "魂燃蛊", cost: 0, type: "utility", category: "utility", typeName: "辅助蛊",
+    glyph: "魂", art: "燃", effect: "获得 <em>2</em> 点真元，失去 <em>3</em> 点生命；本回合下一张蛊牌消耗 -1，最低为 0",
+  },
+  mutantBlade: {
+    name: "异刃蛊", cost: 1, type: "attack", category: "attack", typeName: "异变攻击蛊",
+    glyph: "异", art: "刃", effect: "失去 <em>2</em> 点生命，造成 <em>14</em> 点伤害",
+  },
+  mutantArmor: {
+    name: "异甲蛊", cost: 1, type: "defense", category: "defense", typeName: "异变护甲蛊",
+    glyph: "异", art: "甲", effect: "获得 <em>14</em> 点防御；弃 1 张随机手牌",
+  },
+  mutantPoison: {
+    name: "异毒蛊", cost: 1, type: "poison", category: "utility", typeName: "异变毒道蛊",
+    glyph: "异", art: "毒", effect: "施加 <em>9</em> 层毒性；你失去 <em>2</em> 点生命",
+  },
+  mutantFate: {
+    name: "异命蛊", cost: 0, type: "utility", category: "utility", typeName: "异变辅助蛊",
+    glyph: "异", art: "命", effect: "获得 <em>2</em> 点真元并抽 <em>1</em> 张牌；失去 <em>1</em> 点寿元",
+  },
+};
+
+const CARD_EFFECT_TYPES = Object.freeze({
+  moonBlade: "blade",
+  fateThread: "blade",
+  armorBreaker: "blade",
+  mutantBlade: "blade",
+  soulCrack: "blade",
+  burnLife: "blade",
+  erodeAge: "blade",
+
+  bloodBlade: "blood",
+  bloodReversal: "blood",
+  bloodMoon: "blood",
+  leechBlade: "blood",
+  bloodThirst: "blood",
+  heartEater: "blood",
+  bloodTide: "blood",
+
+  greenMiasma: "poison",
+  insectSwarm: "poison",
+  poisonReturn: "poison",
+  rotMiasma: "poison",
+  mutantPoison: "poison",
+  armorMeltPoison: "poison",
+  swarmBite: "poison",
+
+  ironSkin: "armor",
+  fixedFate: "armor",
+  moltingShell: "armor",
+  mysticCarapace: "armor",
+  shellRemnant: "armor",
+  bloodRobe: "armor",
+  mutantArmor: "armor",
+  moltedArmor: "armor",
+
+  wineWorm: "yuan",
+  burningEssence: "yuan",
+  yuanReturn: "yuan",
+  essenceGathering: "yuan",
+  soulBurn: "yuan",
+  drunkFateWorm: "yuan",
+
+  reversePath: "fate",
+  lifeLamp: "fate",
+  fateSever: "fate",
+  meridianShift: "fate",
+  witheredBloom: "fate",
+  mutantFate: "fate",
+
+  guFeeding: "utility",
+  bloodSacrifice: "utility",
+  returnLife: "utility",
+  lifeFlame: "utility",
+  focalLife: "utility",
+  mulberryField: "utility",
+  prolongLife: "utility",
+});
+
+function inferCardEffectType(cardDefinition = {}) {
+  if (cardDefinition.type === "poison" || cardDefinition.typeName?.includes("毒道")) return "poison";
+  if (cardDefinition.category === "defense") return "armor";
+  if (cardDefinition.type === "blood" && cardDefinition.category === "attack") return "blood";
+  if (cardDefinition.type === "fate") return "fate";
+  if (cardDefinition.category === "attack") return "blade";
+  return "utility";
+}
+
+Object.entries(CARD_LIBRARY).forEach(([key, definition]) => {
+  definition.effectType = CARD_EFFECT_TYPES[key] || inferCardEffectType(definition);
+});
+
+const ADVANCED_CARD_KEYS = [
+  "heartEater", "bloodTide", "lifeFlame", "witheredBloom",
+  "essenceGathering", "mysticCarapace", "returnLife", "swarmBite", "meridianShift",
+];
+
+const V08_COMMON_CARD_KEYS = Object.freeze([
+  "armorBreaker", "yuanReturn", "shellRemnant", "guFeeding",
+  "soulCrack", "armorMeltPoison", "bloodRobe", "lifeLamp",
+]);
+
+const BLOOD_MAX = 10;
+const FATE_MOMENTUM_MAX = 3;
+
+const HERO_STARTER_DECKS = Object.freeze({
+  fate: [
+    ...Array(3).fill("moonBlade"),
+    ...Array(3).fill("ironSkin"),
+    "wineWorm", "burningEssence", "fateThread", "reversePath",
+  ],
+  blood: [
+    ...Array(2).fill("moonBlade"),
+    ...Array(2).fill("ironSkin"),
+    ...Array(2).fill("bloodBlade"),
+    "wineWorm", "bloodSacrifice", "bloodThirst", "bloodTide",
+  ],
+  poison: [
+    ...Array(2).fill("moonBlade"),
+    ...Array(2).fill("ironSkin"),
+    "wineWorm", "burningEssence", "greenMiasma", "insectSwarm", "moltingShell", "poisonReturn",
+  ],
+  longevity: [
+    ...Array(2).fill("moonBlade"),
+    ...Array(2).fill("ironSkin"),
+    "wineWorm", "lifeFlame", "lifeFlame", "witheredBloom", "soulCrack", "burningEssence",
+  ],
+});
+
+const HERO_EXCLUSIVE_CARD_KEYS = Object.freeze({
+  fate: ["fateThread", "reversePath", "fixedFate"],
+  blood: ["bloodSacrifice", "bloodThirst", "bloodReversal"],
+  poison: ["greenMiasma", "insectSwarm", "moltingShell", "poisonReturn"],
+  longevity: ["lifeFlame", "witheredBloom", "soulCrack", "burnLife", "erodeAge", "focalLife", "mulberryField", "prolongLife"], // V0.9.9 子批3：5 新寿道蛊只进朝暮专属奖励池，不污染他角色稀有池
+});
+
+const COMMON_REWARD_CARD_KEYS = Object.freeze([
+  "moonBlade", "ironSkin", "wineWorm", "bloodBlade", "burningEssence",
+  ...V08_COMMON_CARD_KEYS,
+  ...ADVANCED_CARD_KEYS,
+]);
+
+const STANDARD_REWARD_CARD_KEYS = Object.freeze([
+  "moonBlade", "ironSkin", "wineWorm", "bloodBlade", "burningEssence",
+  ...V08_COMMON_CARD_KEYS,
+]);
+
+const MATERIALS = Object.freeze({
+  bloodSand: {
+    name: "血砂", glyph: "砂", tone: "blood",
+    short: "偏向血道、爆发、生命代价。",
+    description: "适合攻击蛊和血道蛊；炉火更易催出爆发与反噬。",
+  },
+  insectMolt: {
+    name: "虫蜕", glyph: "蜕", tone: "jade",
+    short: "偏向防御、蜕壳、抽牌、生存。",
+    description: "适合护甲蛊和辅助蛊；能稳住炉火并织出护身虫纹。",
+  },
+  rotLiquid: {
+    name: "腐液", glyph: "腐", tone: "poison",
+    short: "偏向毒性、腐蚀、持续伤害。",
+    description: "适合毒道蛊；可放大毒性，也可能腐蚀施蛊者。",
+  },
+  fateSilk: {
+    name: "命丝", glyph: "丝", tone: "gold",
+    short: "偏向命势、真元、抽牌、连携。",
+    description: "适合命势流卡牌和辅助蛊；能把不同蛊术串成连携。",
+  },
+  remnantSoul: {
+    name: "残魂", glyph: "魂", tone: "soul",
+    short: "偏向高风险异变，可能强，也可能反噬。",
+    description: "适合所有卡，但不走匹配关系；异变率更高，反噬也更重。",
+  },
+});
+
+const MATERIAL_IDS = Object.freeze(Object.keys(MATERIALS));
+const MAX_RUN_MUTATIONS = REFINING_BALANCE.maxRunMutations;
+
+const SPECIFIC_MUTATIONS = Object.freeze({
+  "moonBlade:bloodSand": "bloodMoon",
+  "ironSkin:insectMolt": "moltedArmor",
+  "greenMiasma:rotLiquid": "rotMiasma",
+  "reversePath:fateSilk": "fateSever",
+  "bloodBlade:bloodSand": "leechBlade",
+  "wineWorm:fateSilk": "drunkFateWorm",
+  "burningEssence:remnantSoul": "soulBurn",
+});
+
+// V0.6：炼化配置集中维护。upgradeLevel 存在每张卡实例上，材料炼蛊会改写同一个卡牌实例。
+const CARD_UPGRADE_CONFIG = Object.freeze({
+  moonBlade: { rule: "基础伤害每级 +4" },
+  ironSkin: { rule: "基础防御每级 +4" },
+  wineWorm: { rule: "+1 抽 1 张牌；+2 消耗降为 0，仍抽 1 张牌" },
+  bloodBlade: { rule: "基础伤害每级 +4，保留 3 点生命反噬" },
+  burningEssence: { rule: "基础真元提升至 2，每级再 +1；附带抽 1 张牌" },
+  heartEater: { rule: "普通与血煞催发伤害每级 +4" },
+  bloodReversal: { rule: "基础伤害每级 +4，血煞倍率每级 +1" },
+  bloodTide: { rule: "基础伤害每级 +4，血煞倍率每级 +1" },
+  lifeFlame: { rule: "基础伤害每级 +4，寿元代价不降低" },
+  witheredBloom: { rule: "治疗量每级 +4，寿元代价不降低" },
+  essenceGathering: { rule: "+1 抽牌 +1；+2 真元 +1" },
+  mysticCarapace: { rule: "基础防御每级 +4" },
+  returnLife: { rule: "治疗量每级 +5，血煞代价不降低" },
+  swarmBite: { rule: "基础伤害每级 +4，此前出牌追加每级 +1" },
+  meridianShift: { rule: "每级额外抽 1 张牌，生命代价不降低" },
+  armorBreaker: { rule: "基础伤害每级 +4，破甲追加每级 +2" },
+  yuanReturn: { rule: "+1 后续辅助抽牌更稳；+2 真元额外 +1" },
+  shellRemnant: { rule: "基础防御每级 +4，受伤追加防御每级 +2" },
+  guFeeding: { rule: "每级额外抽 1 张牌，弃牌数不变" },
+  soulCrack: { rule: "基础伤害每级 +4，寿元代价不降低" },
+  burnLife: { rule: "基础伤害每级 +4；焚寿代价与每点加伤不变" },
+  erodeAge: { rule: "基础伤害每级 +4；夺回寿元不变" },
+  focalLife: { rule: "+2 时额外抽 1 张牌，寿元代价不降低" },
+  mulberryField: { rule: "每级衰老 +1，寿元代价不变" },
+  prolongLife: { rule: "每级回寿 +2" },
+  armorMeltPoison: { rule: "每级伤害 +2、施毒 +1、蚀甲 +2" },
+  bloodRobe: { rule: "基础防御每级 +4；+2 时额外获得 1 层血煞" },
+  lifeLamp: { rule: "每级治疗 +2；+2 时命势收益 +1" },
+  fateThread: { rule: "基础伤害每级 +4，命势额外伤害每级 +2" },
+  reversePath: { rule: "防御每级 +3；+2 时额外获得 1 层命势" },
+  fixedFate: { rule: "基础防御每级 +4，条件防御每级 +2" },
+  bloodSacrifice: { rule: "+1 抽牌 +1；+2 血煞 +1，生命反噬不降低" },
+  bloodThirst: { rule: "基础伤害每级 +4，治疗每级 +1；+2 血煞收益翻倍" },
+  greenMiasma: { rule: "每级施毒 +2 层" },
+  insectSwarm: { rule: "每级伤害 +2、施毒 +1 层" },
+  moltingShell: { rule: "每级防御 +4；+2 时中毒抽牌 +1" },
+  poisonReturn: { rule: "基础伤害与条件额外伤害每级 +3" },
+  bloodMoon: { rule: "异变血道攻击：+2 时基础伤害 +4，血煞额外伤害保留" },
+  moltedArmor: { rule: "异变护甲：+2 时基础防御 +4，未受伤抽牌保留" },
+  rotMiasma: { rule: "异变毒道：+2 时施毒 +2，额外蚀毒保留" },
+  fateSever: { rule: "异变辅助：+2 时额外获得 1 点真元，寿元代价保留" },
+  leechBlade: { rule: "异变血道攻击：+2 时基础伤害 +4，吸血保留" },
+  drunkFateWorm: { rule: "异变辅助：+2 时命势触发抽牌改为抽 2 张" },
+  soulBurn: { rule: "残魂异变辅助：+2 时真元 +1，生命代价保留" },
+  mutantBlade: { rule: "通用异变攻击：+2 时基础伤害 +4，生命代价保留" },
+  mutantArmor: { rule: "通用异变护甲：+2 时基础防御 +4，弃牌代价保留" },
+  mutantPoison: { rule: "通用异变毒道：+2 时施毒 +2，生命代价保留" },
+  mutantFate: { rule: "通用异变辅助：+2 时抽牌 +1，寿元代价保留" },
+});
+
+// 立绘路径只在这里维护，全部基于已核验并规范化后的真实文件名。
+const PORTRAIT_PATHS = Object.freeze({
+  heroes: {
+    fate: "assets/portraits/hero-fate-web.jpg",
+    blood: "assets/portraits/hero-blood-web.jpg",
+    poison: "assets/portraits/hero-poison-web.jpg",
+    longevity: [
+      // V0.9.9 子批3后修：原 .png 每张 2.2~2.5MB（941×1672）→ 重压成 720×1279 JPEG（~160-200KB），手机加载不再失败/占位
+      "assets/portraits/hero-longevity-1-web.jpg",
+      "assets/portraits/hero-longevity-2-web.jpg",
+      "assets/portraits/hero-longevity-3-web.jpg",
+      "assets/portraits/hero-longevity-4-web.jpg",
+    ],
+  },
+  enemies: {
+    shanxiao: "assets/portraits/enemy-shanxiao-web.jpg",
+    rottenShanxiao: "assets/portraits/enemy-shanxiao-web.jpg",
+    bloodwolf: "assets/portraits/enemy-bloodwolf-web.jpg",
+    redManeBloodwolf: "assets/portraits/enemy-bloodwolf-web.jpg",
+    bloodwolfElite: "assets/portraits/enemy-bloodwolf-web.jpg",
+    beeswarm: "assets/portraits/enemy-beeswarm-web.jpg",
+    wildBeeTide: "assets/portraits/enemy-beeswarm-web.jpg",
+    corpsepuppet: "assets/portraits/enemy-corpsepuppet-web.jpg",
+    corpsepuppetPhase2: "assets/portraits/enemy-corpsepuppet-phase2-web.jpg",
+    rotleafGu: "assets/portraits/rot-leaf-gu-insect.webp",
+    miasmaParasite: "assets/portraits/green-miasma-parasite.webp",
+    poisonVineCorpse: "assets/portraits/poison-vine-thrall.webp",
+    miasmaLanternEliteGu: "assets/portraits/miasma-lantern-keeper.webp",
+    miasmaMotherBoss: "assets/portraits/hundred-miasma-mother-gu.webp",
+    bloodLeechSwarm: "assets/portraits/red-marsh-leech-swarm.webp",
+    brokenMeridianGu: "assets/portraits/severed-meridian-cultist.webp",
+    bloodMudGolem: "assets/portraits/blood-mud-puppet.webp",
+    bloodRobePriestEliteGu: "assets/portraits/bloodrobe-gu-sacrificer.webp",
+    bloodRobeMotherBoss: "assets/portraits/bloodrobe-gu-mother.webp",
+    bonebellGu: "assets/portraits/bone-bell-patrol-gu.webp",
+    skeletonPuppetGu: "assets/portraits/rotten-armor-gu-soldier.webp",
+    boneArmorGuardGu: "assets/portraits/bone-armor-gu-guard.webp",
+    boneCommanderElite: "assets/portraits/bone-tower-commander.webp",
+    boneNestGuardianBoss: "assets/portraits/bone-nest-tomb-king.webp",
+    venomBeeGu: "assets/portraits/venom-bee-gu.webp",
+    beehiveBroodGu: "assets/portraits/beehive-brood-gu.webp",
+    chaosSwarmHordeGu: "assets/portraits/swarm-surge-gu.webp",
+    beehiveGuardElite: "assets/portraits/beehive-gu-guard.webp",
+    calamityQueenBoss: "assets/portraits/calamity-bee-queen.webp",
+  },
+  // V0.9.9.2 本命遗物立绘（遗物谱用）；原 ~2.5MB PNG 压成 640px JPEG(~65-115KB)，手机加载不失败
+  relics: {
+    jadeMarrow: "assets/portraits/relic-jade-marrow-web.jpg",
+    yuanCicada: "assets/portraits/relic-yuan-cicada-web.jpg",
+    boneCarapace: "assets/portraits/relic-molt-bone-web.jpg",
+    siSuiLun: "assets/portraits/relic-age-wheel-web.jpg",
+  },
+});
+
+// 开局后预加载战斗资源(只在首次开局触发一次)：敌人立绘小图 + 预热战斗/首领 BGM，
+// 避免开战那一刻才现拉、导致音乐慢半拍、立绘闪一下。纯加载时机优化，不改音频状态机与美术。
+let battleAssetsPreloaded = false;
+function preloadBattleAssets() {
+  if (battleAssetsPreloaded) return;
+  battleAssetsPreloaded = true;
+  try {
+    const seen = {};
+    Object.values(PORTRAIT_PATHS.enemies).forEach((src) => {
+      if (!src || seen[src]) return;
+      seen[src] = true;
+      const img = new Image();
+      img.decoding = "async";
+      img.src = src;
+    });
+  } catch (imgErr) { /* 立绘预加载失败忽略 */ }
+  try {
+    if (window.AudioManager && typeof window.AudioManager.warmScene === "function") {
+      window.AudioManager.warmScene("battle");
+      window.AudioManager.warmScene("boss");
+    }
+  } catch (audioErr) { /* BGM 预热失败忽略 */ }
+}
+
+const HEROES = {
+  fate: {
+    name: "无名逆命者", role: "命势流蛊修", glyph: "命", ...PLAYER_BALANCE.heroes.fate,
+    passiveName: "命势流转", passive: "成功打出与上一张不同类型的卡牌时获得 1 层命势；命势满 3 层后真元 +1 并抽 1 张牌。",
+    caption: "蛊影随身 · 天命不受",
+    quest: "命格断他是死局——他入塔，是要亲手掰断这两个字。", // V0.9.15 所求：入塔动机（选人卡与列传展示）
+  },
+  blood: {
+    name: "绛妄", role: "血道女蛊修", glyph: "血", ...PLAYER_BALANCE.heroes.blood,
+    passiveName: "血海饲蛊", passive: "血煞上限 10；血道攻击按牌面引用当前血煞获得额外伤害；每场战斗后按本场打出的血道牌数回血（每张 +1，上限 8）。",
+    caption: "以身饲虫 · 以命换力",
+    quest: "以血换力，只求换到无人再能从她手里夺走的东西。",
+  },
+  poison: {
+    name: "青蟒", role: "毒道少年蛊师", glyph: "毒", ...PLAYER_BALANCE.heroes.poison,
+    passiveName: "万毒归宗", passive: "每回合开始施加 1 层毒性；敌人已中毒时再次被毒道卡施毒，会触发 2 点蚀毒伤害。",
+    caption: "千虫藏袖 · 万毒随心",
+    quest: "曾被万毒噬身而不死——他要让毒认他为主，而非他认命。",
+  },
+  longevity: {
+    name: "朝暮", role: "寿道焚命蛊修", glyph: "寿", ...PLAYER_BALANCE.heroes.longevity,
+    passiveName: "焚寿燃命", passive: "寿元可作寿道蛊牌的燃料焚烧；当前寿元越低，蛊术伤害越高（满寿 +0／过半 +3／残寿 +6／垂暮 +10），立绘随寿元苍老。寿元归零即陨。",
+    caption: "朝如青丝 · 暮已成雪",
+    quest: "寿数将尽，与其守灯枯坐，不如烧成塔中最亮的一次。",
+  },
+};
+
+const ENEMY_LIBRARY = {
+  shanxiao: {
+    name: "山魈",
+    title: "塔中凶兽",
+    maxHp: 48,
+    kicker: "阴风穿塔，兽啸逼近",
+    intro: "山魈伏在阴影中，正窥伺你的破绽。",
+    caption: "山鬼成魈 · 饮血裂石",
+    actions: {
+      claw: { name: "爪击", icon: "爪", kind: "attack", damage: 7 },
+      rend: { name: "撕裂", icon: "裂", kind: "attack", damage: 11 },
+      charge: { name: "蓄势", icon: "势", kind: "charge", bonus: 5 },
+    },
+  },
+  rottenShanxiao: {
+    name: "腐皮山魈",
+    title: "腐毒凶兽",
+    maxHp: 54,
+    kicker: "腐皮剥落，腥毒渗阶",
+    intro: "腐皮山魈拖着烂尾伏在塔阶旁，爪缝里滴着青黑毒液。",
+    caption: "腐皮山魈 · 毒爪拖影",
+    actions: {
+      rotClaw: { name: "腐爪", icon: "腐", kind: "attack", damage: 6, playerPoison: 1 },
+      mudSlam: { name: "污泥重拍", icon: "泥", kind: "attack", damage: 9 },
+      rotBreath: { name: "腐息蓄毒", icon: "毒", kind: "charge", bonus: 4 },
+    },
+  },
+  bloodwolf: {
+    name: "异变血狼",
+    title: "血沼凶兽",
+    maxHp: 52,
+    kicker: "血雾贴地，狼嚎裂心",
+    intro: "异变血狼踏着猩红煞雾逼近，骨刺间仍挂着未干血迹。",
+    caption: "骨刺沐血 · 煞气为食",
+    actions: {
+      bloodClaw: { name: "血爪", icon: "爪", kind: "attack", damage: 8 },
+      hungerBite: { name: "饥噬", icon: "噬", kind: "attack", damage: 12 },
+      bloodHowl: { name: "煞血长嚎", icon: "嚎", kind: "charge", bonus: 5 },
+    },
+  },
+  redManeBloodwolf: {
+    name: "赤鬃血狼",
+    title: "赤鬃凶兽",
+    maxHp: 50,
+    kicker: "赤鬃燃血，狼影贴地",
+    intro: "赤鬃血狼绕着你低伏游走，半身染血后只会更凶。",
+    caption: "赤鬃血狼 · 伤重愈狂",
+    actions: {
+      redClaw: { name: "赤爪", icon: "爪", kind: "attack", damage: 8 },
+      throatBite: { name: "锁喉咬", icon: "咬", kind: "attack", damage: 11 },
+      maneHowl: { name: "赤鬃怒嚎", icon: "鬃", kind: "charge", bonus: 4 },
+    },
+    enrage: { threshold: 0.5, attackBonus: 3, name: "赤鬃狂怒" },
+  },
+  bloodwolfElite: {
+    name: "血纹狼王",
+    title: "命途精英",
+    maxHp: 76,
+    isElite: true,
+    kicker: "血纹伏地，狼王拦路",
+    intro: "血纹狼王从塔影中缓步踏出，背脊血纹如活虫般起伏。",
+    caption: "狼王血纹 · 追魂裂骨",
+    actions: {
+      bonePounce: { name: "裂骨扑杀", icon: "裂", kind: "attack", damage: 13 },
+      bloodMoonHowl: { name: "血月嚎叫", icon: "嚎", kind: "charge", bonus: 4, armor: 5, armorCap: 12 },
+      soulBite: { name: "追魂撕咬", icon: "咬", kind: "attack", damage: 8, lowHpExtra: 5 },
+    },
+    enrage: { threshold: 0.3, attackBonus: 3, name: "血纹狂化" },
+  },
+  beeswarm: {
+    name: "毒蜂蛊群",
+    title: "失控虫群",
+    maxHp: 44,
+    kicker: "毒翅蔽灯，群蜂如潮",
+    intro: "无数毒蜂纠缠成一张狰狞虫面，幽绿毒雾正从蜂群间滴落。",
+    caption: "万蜂同巢 · 毒翅遮天",
+    actions: {
+      venomNeedle: { name: "毒针攒射", icon: "针", kind: "attack", damage: 7 },
+      swarmRush: { name: "群蜂突袭", icon: "群", kind: "attack", damage: 4, hits: 2 },
+      wingBeat: { name: "振翅聚毒", icon: "振", kind: "charge", bonus: 4 },
+    },
+  },
+  wildBeeTide: {
+    name: "乱蜂蛊潮",
+    title: "暴乱虫群",
+    maxHp: 46,
+    kicker: "乱翅撞灯，蜂潮翻涌",
+    intro: "乱蜂蛊潮并非一群虫，而像一团被怨念搅碎的毒云。",
+    caption: "乱蜂蛊潮 · 双刺乱鸣",
+    actions: {
+      twinSting: { name: "乱刺连蜇", icon: "刺", kind: "attack", damage: 4, hits: 2 },
+      venomSpill: { name: "毒翅擦身", icon: "毒", kind: "attack", damage: 6, playerPoison: 1 },
+      swarmFold: { name: "蜂潮聚形", icon: "潮", kind: "charge", bonus: 3 },
+    },
+  },
+  corpsepuppet: {
+    name: "尸盘监守",
+    title: "塔顶尸盘监守",
+    maxHp: 108,
+    isBoss: true,
+    kicker: "尸盘转动，整座命途塔随之震颤",
+    intro: "尸盘监守从腐朽王座上起身，胸腔蛊火照亮了塔顶尸盘的累累白骨。",
+    caption: "尸盘镇塔 · 万蛊守门",
+    actions: {
+      corpseClaw: { name: "腐尸爪", icon: "尸", kind: "attack", damage: 10 },
+      guFireBreath: { name: "蛊火吐息", icon: "火", kind: "attack", damage: 7, playerPoison: 2 },
+      corpseCharge: { name: "尸盘蓄势", icon: "盘", kind: "charge", bonus: 7 },
+    },
+  },
+/* ===== V0.9.6 第二层敌人定义（沿用现有 ENEMY_LIBRARY 结构：actions{kind,damage/bonus,playerPoison,hits,armor,lowHpExtra}、enrage、isElite/isBoss、phase2 由战斗对象承载） ===== */
+/* ---- 瘴林路线（毒/持续伤害/削弱） ---- */
+  rotleafGu: {
+    name: "腐叶蛊虫", title: "瘴林杂蛊", maxHp: 58, poisonResist: 0.3,
+    kicker: "腐叶簌簌，毒涎滴阶",
+    intro: "腐叶蛊虫蜷在烂叶堆中，背壳渗着青黑黏液，一动便有毒雾散开。",
+    caption: "腐叶蛊虫 · 涎毒缠身",
+    actions: {
+      leafGnaw: { name: "腐叶啃噬", icon: "啃", kind: "attack", damage: 7, playerPoison: 2 },
+      sporeSpray: { name: "孢毒喷吐", icon: "孢", kind: "attack", damage: 4, playerPoison: 3 },
+      miasmaCoil: { name: "蓄瘴", icon: "瘴", kind: "charge", bonus: 5 },
+    },
+  },
+  miasmaParasite: {
+    name: "青瘴寄生", title: "附骨之瘴", maxHp: 60, poisonResist: 0.2, poisonConvert: { threshold: 6, give: 3, cap: 6 },
+    kicker: "青瘴附骨，越缠越深",
+    intro: "青瘴寄生半透的躯体里游着幽绿瘴气，专挑中毒者下口。",
+    caption: "青瘴寄生 · 噬毒愈凶",
+    actions: {
+      latchBite: { name: "附骨咬", icon: "咬", kind: "attack", damage: 8, playerPoison: 1 },
+      venomDrip: { name: "瘴息渗毒", icon: "渗", kind: "attack", damage: 5, playerPoison: 2, lowHpExtra: 4 },
+      curlGuard: { name: "缩壳蓄瘴", icon: "壳", kind: "charge", bonus: 4, armor: 6 },
+    },
+  },
+  poisonVineCorpse: {
+    name: "毒藤尸", title: "藤缠腐尸", maxHp: 64, poisonResist: 0.3, blockPurge: 3,
+    kicker: "毒藤穿尸，腐手拖泥",
+    intro: "毒藤尸被瘴藤贯穿提起，半腐的拳头裹着倒刺毒藤砸来。",
+    caption: "毒藤尸 · 藤击拖毒",
+    actions: {
+      vineSlam: { name: "毒藤重击", icon: "藤", kind: "attack", damage: 11, playerPoison: 1 },
+      thornLash: { name: "倒刺连抽", icon: "刺", kind: "attack", damage: 4, hits: 2, playerPoison: 1 },
+      rootBrace: { name: "扎根聚毒", icon: "根", kind: "charge", bonus: 6, armor: 6 },
+    },
+    enrage: { threshold: 0.4, attackBonus: 3, name: "藤毒暴走" },
+  },
+  miasmaLanternEliteGu: {
+    name: "瘴林执灯者", title: "瘴林精英", maxHp: 92, isElite: true, poisonConvert: { threshold: 4, give: 4, cap: 8, cooldown: 2 },
+    kicker: "鬼灯引瘴，林深无路",
+    intro: "瘴林执灯者提一盏青焰鬼灯缓步而来，灯过之处瘴气如潮翻涌。",
+    caption: "瘴林执灯者 · 灯引万瘴",
+    actions: {
+      lanternStrike: { name: "灯杖横扫", icon: "杖", kind: "attack", damage: 12 },
+      poisonTide: { name: "鬼灯引瘴", icon: "灯", kind: "attack", damage: 5, playerPoison: 4 },
+      greenFlameCharge: { name: "青焰蓄瘴", icon: "焰", kind: "charge", bonus: 5, armor: 5 },
+    },
+    enrage: { threshold: 0.35, attackBonus: 4, name: "鬼灯狂瘴" },
+  },
+  miasmaMotherBoss: {
+    name: "百瘴母蛊", title: "瘴林之主", maxHp: 124, isBoss: true, poisonResist: 0.3, poisonSwallow: { threshold: 12, heal: 6 },
+    kicker: "百瘴归巢，林木尽腐",
+    intro: "百瘴母蛊臃肿的腹囊里翻涌着上百种瘴毒，每一次蠕动都喷出新的毒雾。",
+    caption: "百瘴母蛊 · 万毒同巢",
+    actions: {
+      maternalLash: { name: "母蛊拍击", icon: "拍", kind: "attack", damage: 9, playerPoison: 2 },
+      hundredMiasma: { name: "百瘴喷涌", icon: "瘴", kind: "attack", damage: 5, playerPoison: 4 },
+      broodCharge: { name: "孕瘴蓄势", icon: "孕", kind: "charge", bonus: 7 },
+    },
+    /* phase2「瘴母苏醒」改写见 getCurrentEnemyAction 扩展 */
+  },
+/* ---- 血沼路线（血道/自损/吸血/反噬） ---- */
+  bloodLeechSwarm: {
+    name: "血蛭群", title: "血沼蛭潮", maxHp: 56,
+    kicker: "蛭群附身，吸血而肥",
+    intro: "血蛭群从沼泥里成片涌出，吸饱血的躯体油亮发红。",
+    caption: "血蛭群 · 附身吸血",
+    actions: {
+      leechBite: { name: "群蛭噬咬", icon: "蛭", kind: "attack", damage: 4, hits: 2, lifesteal: 4 },
+      bloodGorge: { name: "饱血一吸", icon: "吸", kind: "attack", damage: 8, lifesteal: 6 },
+      writhe: { name: "蠕动蓄势", icon: "蠕", kind: "charge", bonus: 5 },
+    },
+  },
+  brokenMeridianGu: {
+    name: "断脉蛊徒", title: "自戕血修", maxHp: 60,
+    kicker: "自断经脉，以血换力",
+    intro: "断脉蛊徒割开自己的腕脉，任血珠凝成赤刃，越是淌血出手越狠。",
+    caption: "断脉蛊徒 · 自损换攻",
+    actions: {
+      bloodBladeThrow: { name: "血刃掷击", icon: "刃", kind: "attack", damage: 13, selfBleed: 5 },
+      veinTap: { name: "引血加注", icon: "引", kind: "charge", bonus: 6, selfBleed: 4 },
+      crimsonSlash: { name: "赤血斩", icon: "斩", kind: "attack", damage: 8, lowHpExtra: 5, applyVulnerable: 1 },
+    },
+  },
+  bloodMudGolem: {
+    name: "血泥傀", title: "沼底血傀", maxHp: 66,
+    kicker: "血泥成傀，越打越凝",
+    intro: "血泥傀由凝结的血泥堆塑而成，受创的伤口会再吸沼血补回。",
+    caption: "血泥傀 · 血泥自补",
+    actions: {
+      mudPound: { name: "血泥猛砸", icon: "砸", kind: "attack", damage: 11 },
+      gather: { name: "凝泥固身", icon: "凝", kind: "charge", bonus: 5, armor: 8, armorCap: 16 },
+      bloodMend: { name: "吸沼回血", icon: "愈", kind: "attack", damage: 6, lifesteal: 6 },
+    },
+    enrage: { threshold: 0.4, attackBonus: 3, name: "血泥暴凝" },
+  },
+  bloodRobePriestEliteGu: {
+    name: "血衣祭蛊者", title: "血沼精英", maxHp: 96, isElite: true,
+    kicker: "血衣加身，以命饲蛊",
+    intro: "血衣祭蛊者披一件浸透鲜血的法袍，每一次挥洒都先割开自己。",
+    caption: "血衣祭蛊者 · 血祭压迫",
+    actions: {
+      sacrificeStrike: { name: "血祭挥击", icon: "祭", kind: "attack", damage: 13, selfBleed: 6, lowHpExtra: 6 },
+      sanguineWard: { name: "血衣护体", icon: "衣", kind: "charge", bonus: 5, armor: 6, armorCap: 18, lifesteal: 4 },
+      crimsonRain: { name: "血雨连击", icon: "雨", kind: "attack", damage: 5, hits: 2 },
+    },
+    enrage: { threshold: 0.35, attackBonus: 4, name: "血祭狂涌" },
+  },
+  bloodRobeMotherBoss: {
+    name: "血衣蛊母", title: "血沼之主", maxHp: 128, isBoss: true,
+    kicker: "血衣覆世，血债同偿",
+    intro: "血衣蛊母端坐于血池之上，周身血衣无风自动，越是搏杀她越亢奋。",
+    caption: "血衣蛊母 · 血债血偿",
+    actions: {
+      robeLash: { name: "血衣绞击", icon: "绞", kind: "attack", damage: 10, lifesteal: 5 },
+      bloodOffering: { name: "血祭重击", icon: "祭", kind: "attack", damage: 14, selfBleed: 6, lowHpExtra: 6 },
+      crimsonGather: { name: "聚血蓄势", icon: "聚", kind: "charge", bonus: 7, lifesteal: 4 },
+    },
+    /* phase2「血衣覆身」改写见 getCurrentEnemyAction 扩展 */
+  },
+/* ===== V0.9.8 第三层敌人定义（镜像 ENEMY_LIBRARY 结构：actions{kind,damage/bonus,hits,armor,playerPoison,lowHpExtra} + isElite/isBoss/enrage + 新机制 def 字段/action 标志：disorientBell/interruptThreshold/commanderMark/playerPoisonSting，def{boneArmorBonus/summonGuard/hasSwarmMechanic/swarmDamagePerLayer/hasCounterAttack/counterDamage/counterAttackThreshold}；phase2 由 getCurrentEnemyAction 改写） ===== */
+/* ---- 骨塔高陵路线（护甲/蓄力打断/召卫/执令） ---- */
+  bonebellGu: {
+    name: "骨铃巡蛊", title: "骨塔杂蛊", maxHp: 44,
+    def: { boneArmorStart: 6, boneArmorRegen: 3, boneArmorCap: 12 }, // V0.9.8.9 骨塔硬核：杂蛊也覆轻甲
+    kicker: "骨铃轻摇，乱人心神",
+    intro: "骨铃巡蛊背壳垂着一串森白骨铃，每一次摇动都在你耳中织出杂音。",
+    caption: "骨铃巡蛊 · 乱铃扰神",
+    actions: {
+      bellPeck: { name: "骨喙啄击", icon: "啄", kind: "attack", damage: 7 },
+      disorientRing: { name: "乱铃摇魂", icon: "铃", kind: "attack", damage: 4, disorientBell: 1 },
+      bellGather: { name: "聚铃蓄势", icon: "聚", kind: "charge", bonus: 5 },
+    },
+  },
+  skeletonPuppetGu: {
+    name: "朽甲蛊兵", title: "骨塔列卒", maxHp: 62, poisonResist: 0.3,
+    def: { boneArmorStart: 10, boneArmorRegen: 5, boneArmorCap: 20 }, // V0.9.8.9 骨塔硬核
+    kicker: "朽甲列阵，蓄力重砸",
+    intro: "朽甲蛊兵周身覆着朽烂旧甲，由残骨与蛊丝拼缀成形，举起骨锤时关节咔咔作响。",
+    caption: "朽甲蛊兵 · 蓄力重击",
+    actions: {
+      boneClub: { name: "骨锤横扫", icon: "锤", kind: "attack", damage: 9 },
+      braceBone: { name: "缩骨蓄甲", icon: "甲", kind: "charge", bonus: 4, armor: 8, armorCap: 28 }, // V0.9.12.1：上限=回甲上限20+一次蓄力余量，防无限滚甲
+      heavySlam: { name: "蓄力重砸", icon: "砸", kind: "charge", bonus: 9, interruptThreshold: 13 },
+    },
+  },
+  boneArmorGuardGu: {
+    name: "骨甲蛊卫", title: "骨塔甲士", maxHp: 60, poisonResist: 0.4,
+    kicker: "骨甲覆身，有甲愈凶",
+    intro: "骨甲蛊卫通体覆着层叠骨甲，护甲未破时出手格外沉重。",
+    caption: "骨甲蛊卫 · 甲坚击重",
+    def: { boneArmorBonus: 6, boneArmorStart: 16, boneArmorRegen: 6, boneArmorCap: 26 }, // V0.9.8.9 骨塔硬核：甲士=厚甲核心，有甲愈凶6
+    actions: {
+      guardStrike: { name: "甲拳重击", icon: "拳", kind: "attack", damage: 8 },
+      plateBrace: { name: "覆甲固身", icon: "覆", kind: "charge", bonus: 4, armor: 12, armorCap: 38 }, // V0.9.12.1：上限=回甲上限26+一次蓄力余量
+      armoredSweep: { name: "骨甲横扫", icon: "扫", kind: "attack", damage: 6, hits: 2 },
+    },
+    enrage: { threshold: 0.4, attackBonus: 3, name: "骨甲暴坚" },
+  },
+  boneCommanderElite: {
+    name: "骨塔执令者", title: "骨塔精英", maxHp: 92, isElite: true,
+    def: { boneArmorStart: 14, boneArmorRegen: 6, boneArmorCap: 24 }, // V0.9.8.9 骨塔硬核
+    kicker: "执令在手，号令尸群",
+    intro: "骨塔执令者举着一截发令骨杖，杖头骨纹一亮，便有重击随令而至。",
+    caption: "骨塔执令者 · 执令加身",
+    actions: {
+      commandStrike: { name: "号令斩击", icon: "斩", kind: "attack", damage: 12 },
+      issueCommand: { name: "执令印记", icon: "令", kind: "charge", bonus: 5, commanderMark: true },
+      boneVolleyElite: { name: "骨矢连射", icon: "矢", kind: "attack", damage: 6, hits: 2 },
+    },
+    enrage: { threshold: 0.35, attackBonus: 4, name: "厉令狂涌" },
+  },
+  boneNestGuardianBoss: {
+    name: "骨巢守墓王", title: "骨塔之主", maxHp: 140, isBoss: true, poisonResist: 0.3, poisonSwallow: { threshold: 14, heal: 6 },
+    kicker: "骨巢镇陵，守墓不退",
+    intro: "骨巢守墓王盘踞于万骨堆成的高陵之巅，召卫叠甲、蓄力重击，层层压来。",
+    caption: "骨巢守墓王 · 召卫镇陵",
+    def: { summonGuard: true, boneArmorStart: 16, boneArmorRegen: 4, boneArmorCap: 28 }, // V0.9.8.9 骨塔硬核：召卫+覆甲双甲源,上限28封顶
+    actions: {
+      tombCrush: { name: "镇陵重压", icon: "压", kind: "attack", damage: 11 },
+      boneVolley: { name: "骨矢齐射", icon: "矢", kind: "attack", damage: 6, hits: 2 },
+      sepulchreCharge: { name: "召卫蓄力", icon: "召", kind: "charge", bonus: 9, armor: 10, armorCap: 38, interruptThreshold: 14 }, // V0.9.12.1：上限=回甲上限28+一次蓄力余量
+    },
+    /* phase2「骨巢开裂」改写见 getCurrentEnemyAction 扩展 */
+  },
+/* ---- 蜂窟魔巢路线（毒刺/蜂群/抢攻/多段） ---- */
+  venomBeeGu: {
+    name: "毒蜂蛊", title: "蜂窟杂蛊", maxHp: 42,
+    kicker: "毒蜂乱舞，针针带毒",
+    intro: "毒蜂蛊振翅悬于半空，腹尾毒针滴着幽绿黏液，专挑空门连刺。",
+    caption: "毒蜂蛊 · 毒针连刺",
+    actions: {
+      venomJab: { name: "毒针连刺", icon: "刺", kind: "attack", damage: 4, hits: 2 },
+      poisonSting: { name: "渗毒蜇刺", icon: "蜇", kind: "attack", damage: 5, playerPoisonSting: 2, lowHpExtra: 3 },
+      hover: { name: "悬翅蓄势", icon: "悬", kind: "charge", bonus: 5 },
+    },
+  },
+  beehiveBroodGu: {
+    name: "蜂巢虫蛊", title: "蜂窟孵母", maxHp: 58,
+    kicker: "蜂巢孵潮，越拖越凶",
+    intro: "蜂巢虫蛊背负一座蠕动的小蜂巢，每过一刻便孵出新的蜂群扑面而来。",
+    caption: "蜂巢虫蛊 · 蜂群孵化",
+    def: { hasSwarmMechanic: true, swarmDamagePerLayer: 2 },
+    actions: {
+      broodBite: { name: "孵巢撕咬", icon: "咬", kind: "attack", damage: 7 },
+      swarmRelease: { name: "放蜂袭面", icon: "蜂", kind: "attack", damage: 5, playerPoison: 1 },
+      incubate: { name: "孵巢蓄势", icon: "孵", kind: "charge", bonus: 4, armor: 5 },
+    },
+    enrage: { threshold: 0.4, attackBonus: 3, name: "蜂巢暴孵" },
+  },
+  chaosSwarmHordeGu: {
+    name: "蜂潮蛊涌", title: "蜂窟潮群", maxHp: 56,
+    kicker: "蜂潮翻涌，密则反噬",
+    intro: "蜂潮蛊涌是无数毒蜂裹成的一团活潮，你出手越密，它越是乱翅抢攻。",
+    caption: "蜂潮蛊涌 · 密牌抢攻",
+    def: { hasCounterAttack: true, counterDamage: 8, counterAttackThreshold: 4 },
+    actions: {
+      swarmLash: { name: "乱蜂鞭挞", icon: "潮", kind: "attack", damage: 5, hits: 2 },
+      stingSwarm: { name: "群刺扑面", icon: "群", kind: "attack", damage: 7, playerPoison: 1 },
+      gatherSwarm: { name: "聚潮蓄势", icon: "聚", kind: "charge", bonus: 5 },
+    },
+    enrage: { threshold: 0.4, attackBonus: 3, name: "乱蜂狂潮" },
+  },
+  beehiveGuardElite: {
+    name: "蜂窟守卫", title: "蜂窟精英", maxHp: 90, isElite: true,
+    kicker: "守卫巡巢，触之即刺",
+    intro: "蜂窟守卫披着蜡甲巡弋于巢道，密集的招数会激它蜂刺反噬。",
+    caption: "蜂窟守卫 · 蜂刺反噬",
+    def: { hasCounterAttack: true, counterDamage: 8, counterAttackThreshold: 4 },
+    actions: {
+      guardSting: { name: "蜡甲蜇击", icon: "蜇", kind: "attack", damage: 11 },
+      waxBarrage: { name: "蜡针连射", icon: "针", kind: "attack", damage: 5, hits: 2, playerPoison: 1 },
+      waxBrace: { name: "蜡甲蓄势", icon: "蜡", kind: "charge", bonus: 5, armor: 6 },
+    },
+    enrage: { threshold: 0.35, attackBonus: 4, name: "蜂刺狂涌" },
+  },
+  calamityQueenBoss: {
+    name: "灾厄蜂后", title: "蜂窟之主", maxHp: 138, isBoss: true,
+    kicker: "蜂后临巢，万翅同振",
+    intro: "灾厄蜂后伏于魔巢核心，麾下蜂群无穷无尽，毒刺与多段齐落，半血后更掀蜂群暴动。",
+    caption: "灾厄蜂后 · 万蜂同振",
+    def: { hasSwarmMechanic: true, swarmDamagePerLayer: 2 },
+    actions: {
+      queenSting: { name: "蜂后毒刺", icon: "刺", kind: "attack", damage: 5, hits: 2, playerPoisonSting: 1 },
+      swarmBurst: { name: "蜂群迸射", icon: "迸", kind: "attack", damage: 6, playerPoison: 3 },
+      broodCharge: { name: "孕蜂蓄势", icon: "孕", kind: "charge", bonus: 7 },
+    },
+    /* phase2「蜂群暴动」改写见 getCurrentEnemyAction 扩展 */
+  },
+};
+
+const NORMAL_ENEMY_IDS = ["shanxiao", "bloodwolf", "beeswarm", "rottenShanxiao", "redManeBloodwolf", "wildBeeTide"];
+
+const MAP_NODE_DESCRIPTIONS = Object.freeze({
+  battle: "凶影伏阶，胜后取蛊。",
+  event: "异兆一闪，利害同来。",
+  shop: "残灯开门，蛊石交易。",
+  elite: "血煞盘踞，厚利藏险。",
+  defy: "舍常规之利，搏命挑绝敌；胜则厚赏，败则命殒。", // V0.9.8.6 逆命节点：高风险高回报
+  rest: "塔隙暂歇，只取一息。",
+  boss: "尸盘镇塔，破之通关。",
+});
+
+const REST_NODE_NAMES = Object.freeze(["残灯小憩", "断井调息", "腐林避风", "塔隙养蛊"]);
+
+const CHANCE_EVENTS = Object.freeze([
+  {
+    id: "dryWellMolt",
+    name: "枯井遗蜕",
+    story: "干裂井壁上挂着一层旧蜕，井底传来细密啃噬声。",
+    options: [
+      { label: "探井取蜕", detail: "失去 8 点生命，获得 1 张随机稀有蛊牌。", kind: "rareCard" },
+      { label: "只取残蜕", detail: "获得 1 个虫蜕。", kind: "material", materialId: "insectMolt" },
+      { label: "安全离开", detail: "不冒险，直接离开。", kind: "leave" },
+    ],
+  },
+  {
+    id: "brokenStele",
+    name: "残碑悟道",
+    story: "半截石碑刻着残缺蛊诀，碑缝中渗出微弱金光。",
+    options: [
+      { label: "强记杀诀", detail: "随机一张攻击蛊本局伤害 +3。", kind: "attackInsight" },
+      { label: "抽取命丝", detail: "获得 1 个命丝。", kind: "material", materialId: "fateSilk" },
+      { label: "调息片刻", detail: "恢复 10 点生命。", kind: "heal", amount: 10 },
+    ],
+  },
+  {
+    id: "restlessEgg",
+    name: "蛊卵异动",
+    story: "一枚无主蛊卵忽明忽暗，似乎在等新的血气孵化。",
+    options: [
+      { label: "以血温卵", detail: "获得 1 张随机蛊牌，但下一场战斗开始失去 4 点生命。", kind: "cardNextHurt" },
+      { label: "卖给游商", detail: "获得 12 蛊石。", kind: "stones", amount: 12 },
+      { label: "听残魂低语", detail: "失去 1 点寿元，获得 1 个残魂。", kind: "lifespanMaterial", materialId: "remnantSoul" },
+    ],
+  },
+  {
+    id: "bloodLantern",
+    name: "血灯夜祭",
+    story: "暗红灯火悬在塔梁下，灯芯像一条仍在抽动的血虫。",
+    options: [
+      { label: "献血点灯", detail: "失去 5 点生命，获得 1 个血砂和 1 个腐液。", kind: "bloodMaterials" },
+      { label: "焚去旧蛊", detail: "移除 1 张随机基础卡。", kind: "removeBasic" },
+      { label: "吞灯留煞", detail: "永久血煞上限 +1，但最大生命 -3。", kind: "bloodLimit" },
+    ],
+  },
+  {
+    id: "brokenBridgeCaravan",
+    name: "断桥商队",
+    story: "断桥边停着一支残破商队，货箱上爬满不知名的小蛊。",
+    options: [
+      { label: "以石换蛊", detail: "花费 10 蛊石，获得 1 张随机蛊牌。", kind: "buyRandomCard", cost: 10 },
+      { label: "护送过桥", detail: "恢复 8 点生命。", kind: "heal", amount: 8 },
+      { label: "抢夺残箱", detail: "获得 1 个随机材料；下一场战斗敌人攻击 +2。", kind: "stealMaterialEnemyBuff" },
+    ],
+  },
+  {
+    id: "bloodLotTemple",
+    name: "枯庙血签",
+    story: "枯庙里垂着三枚血签，签尾还在滴落温热血珠。",
+    options: [
+      { label: "抽血签", detail: "失去 4 点生命，获得 1 件普通遗物。", kind: "hurtRelic" },
+      { label: "献寿问材", detail: "失去 1 点寿元，获得 2 个随机材料。", kind: "lifespanTwoMaterials" },
+      { label: "不问神签", detail: "离开枯庙。", kind: "leave" },
+    ],
+  },
+  {
+    id: "guMasterRemains",
+    name: "蛊师遗骸",
+    story: "一具蛊师遗骸盘坐石阶，指骨仍按着一只未熄的小炉。",
+    options: [
+      { label: "焚去旧蛊", detail: "随机移除 1 张卡。", kind: "removeAnyCard" },
+      { label: "借炉炼蛊", detail: "随机 1 张卡炼化 +1，但有 20% 概率反噬。", kind: "randomUpgradeBacklash" },
+      { label: "取走蛊石", detail: "获得 8 蛊石。", kind: "stones", amount: 8 },
+    ],
+  },
+  {
+    id: "poisonPondReflection",
+    name: "毒潭照影",
+    story: "毒潭映出另一张脸，水面下有虫影把影子啃成碎片。",
+    options: [
+      { label: "收毒入匣", detail: "获得 1 张毒道卡。", kind: "poisonCard" },
+      { label: "饮下毒影", detail: "下一场战斗开局失去 3 点生命，获得 1 个腐液。", kind: "poisonBloodResidue" },
+      { label: "借潭调息", detail: "恢复 6 点生命。", kind: "heal", amount: 6 },
+    ],
+  },
+]);
+
+const HERO_CHANCE_EVENTS = Object.freeze({
+  fate: Object.freeze([
+    {
+      id: "fateBrokenThread",
+      heroId: "fate",
+      name: "断命旧线",
+      story: "塔壁垂下一缕灰白命线，线头缠着一枚早该熄灭的名签。签上没有姓名，只写着一个死字。",
+      options: [
+        { label: "割线入囊", detail: "失去 4 点生命，获得 1 个命丝和 1 张命势蛊。", kind: "heroFateThreadCard" },
+        { label: "顺线调息", detail: "恢复 8 点生命。", kind: "heal", amount: 8 },
+        { label: "不认旧命", detail: "不碰命线，直接离开。", kind: "leave" },
+      ],
+    },
+  ]),
+  blood: Object.freeze([
+    {
+      id: "bloodDebtShrine",
+      heroId: "blood",
+      name: "血债小祠",
+      story: "小祠里供着半截红绳，绳下压着旧契。绛妄一靠近，契上的血字便倒着爬回她掌心。",
+      options: [
+        { label: "咬回血契", detail: "失去 6 点生命，血煞上限 +1，并获得 1 个血砂。", kind: "heroBloodOathLimit" },
+        { label: "挑走灯灰", detail: "获得 1 个血砂和 1 个腐液。", kind: "bloodMaterials" },
+        { label: "踢翻小祠", detail: "不再认这笔血债，直接离开。", kind: "leave" },
+      ],
+    },
+  ]),
+  poison: Object.freeze([
+    {
+      id: "poisonSleeveWell",
+      heroId: "poison",
+      name: "袖底毒井",
+      story: "井水无波，却映出青蟒幼时被万毒噬身的影子。井底毒虫没有扑来，只伏低触须，像在等他认主。",
+      options: [
+        { label: "令毒认主", detail: "获得 1 张毒道卡和 1 个腐液；下一场战斗开局失去 2 点生命。", kind: "heroPoisonClaim" },
+        { label: "借井调息", detail: "恢复 6 点生命。", kind: "heal", amount: 6 },
+        { label: "封井而走", detail: "不取井毒，直接离开。", kind: "leave" },
+      ],
+    },
+  ]),
+  longevity: Object.freeze([
+    {
+      id: "longevityBorrowedLamp",
+      heroId: "longevity",
+      name: "借寿残灯",
+      story: "一盏残灯悬在无风处，灯芯像白发一样卷曲。朝暮听见灯里有人问：借一息寿，换一分亮，可敢？",
+      options: [
+        { label: "借灯炼蛊", detail: "失去 1 点寿元，随机一张可炼化的卡稳定炼化 +1。", kind: "heroLongevityLampRefine" },
+        { label: "收灯中魂", detail: "失去 1 点寿元，获得 1 个残魂。", kind: "lifespanMaterial", materialId: "remnantSoul" },
+        { label: "吹灯离开", detail: "不借寿火，直接离开。", kind: "leave" },
+      ],
+    },
+  ]),
+});
+
+/* ===================== V0.9.8 第三层主题机缘事件（加性，仅在 runState.layer3.active 时按 theme 分流；离开走默认 leave；随机牌只用真实 CARD_LIBRARY key） ===================== */
+const LAYER3_THEME_EVENTS = Object.freeze({
+  bone: [
+    {
+      id: "l3_boneBellShrine",
+      name: "断铃石龛",
+      story: "残破石龛中悬着一枚锈裂骨铃，铃舌处缠满早已风干的发丝，似有低频嗡鸣自骨缝渗出。",
+      options: [
+        { label: "敲响骨铃", detail: "获得 14 蛊石，但铃声惊动守陵之物——下一场战斗敌人攻击 +3。", kind: "boneBellChime" },
+        { label: "拾取铃下残片", detail: "获得 1 张随机防御蛊。", kind: "boneFragmentDefense" },
+        { label: "绕龛而过", detail: "不去招惹死骨，悄然离开。", kind: "leave" },
+      ],
+    },
+    {
+      id: "l3_boneStepScroll",
+      name: "骨阶残卷",
+      story: "骨砌石阶夹缝间塞着半卷人皮残卷，墨迹是干涸的暗褐色，记着一段失传的护身蛊诀。",
+      options: [
+        { label: "翻阅护身诀", detail: "领悟一式：获得 1 张随机防御蛊，或最大生命 +5（随机其一）。", kind: "boneScrollArmorOrHp" },
+        { label: "拓印残卷", detail: "失去 3 点生命拓下蛊纹，恢复 8 点生命作为悟道反哺。", kind: "boneScrollImprint" },
+        { label: "合上残卷", detail: "诀不全则反噬，弃之而行。", kind: "leave" },
+      ],
+    },
+  ],
+  beehive: [
+    {
+      id: "l3_waxBroodNest",
+      name: "蜂蜡虫巢",
+      story: "半融的蜂蜡巢挂在窟壁，蜡层下蠕动着未孵化的毒蛹，一股甜腻腐气令人头皮发麻。",
+      options: [
+        { label: "取蜡得石", detail: "获得 13 蛊石，但惊动毒蛹——下一场战斗开局失去 3 点生命。", kind: "waxStonesPoison" },
+        { label: "以烟熏散", detail: "焚草熏走蜂群，借暖息调养，恢复 10 点生命。", kind: "waxSmokeHeal" },
+        { label: "绕开虫巢", detail: "不碰这窝活蜡，绕道离开。", kind: "leave" },
+      ],
+    },
+    {
+      id: "l3_honeyRemnantGu",
+      name: "噬蜜残蛊",
+      story: "一只半死的噬蜜蛊蜷在蜡缝里，毒囊仍在微微鼓动，似在等一个肯收容它的宿主。",
+      options: [
+        { label: "收入蛊囊", detail: "获得 1 张随机毒道蛊。", kind: "honeyPoisonCard" },
+        { label: "焚毁残蛊", detail: "以火逼出蛊石：随机移除 1 张卡，或得 9 蛊石（随机其一）。", kind: "honeyBurnRemoveOrStones" },
+        { label: "置之不理", detail: "任它自生自灭，转身离开。", kind: "leave" },
+      ],
+    },
+  ],
+});
+
+
+/* ===== V0.9.18 塔中回声：叙事第二批（序章 / 司命人 NPC / 英雄结局 / Boss 对峙） ===== */
+
+// 开场序章：首次进入开始界面自动弹一次，可在设置里重看。文本与《命蛊残卷》正典严格同源
+// （卷一「蛊生于代价」原文：石缝里没有神声——V0.9.19 修正此前"黑石开口"与卷一矛盾的自创句）；看完自动解锁卷一。
+const PROLOGUE_PAGES = Object.freeze([
+  { title: "黑石", text: "传说最初之人跪在黑石前，割血三滴，断发一缕，又吹灭半盏寿灯。石缝里没有神声，只有细小虫鸣——那虫食血，衔发，伏在将熄的灯烟中成形。\n\n自此世人知晓：蛊不从天落，也不替人慈悲。凡欲改命，须先拿命中之物相喂。" },
+  { title: "命途塔", text: "后来，代价堆成了一座塔。塔里有人收血、有人收寿、有人收还没说出口的执念。\n\n它从不赐终局，只把登塔者送往更深的黑处，让他们听见下一道锁响。世人叫它命途塔。" },
+  { title: "入塔", text: "你也来了，带着一身还没还清的东西，站在塔门前。\n\n记住一句话：命途塔中，从来没有天命之人。" }
+]);
+
+// 司命人：塔中收代价的人，天命的代理，第一个会说话的活人。台词随英雄、是否重逢、跨局死亡次数变化。
+const SIMING = Object.freeze({
+  name: "司命人",
+  firstMeet: "一个青袍人负手立于残灯下，看不清脸。「我司此塔命数。你带进来的东西，迟早都要还。」",
+  reunion: "青袍人又在前路等你。「这么快又见面。塔很深，你才走了一小段。」",
+  afterDeath: (n) => `青袍人抬眼看你，眼神似曾相识。「又是你。你已在此折过 ${n} 回——命途塔记得每一个不肯认命的人。」`,
+  heroLine: Object.freeze({
+    fate: "「命格判你死。可你偏要来掰断那个字——有意思。」",
+    blood: "「你要夺回的东西，我这儿没有。但路还长，谁说得准。」",
+    poison: "「万毒噬身而不死……毒认了你半个主，另半个，还在看着。」",
+    longevity: "「灯将尽的人，反而烧得最亮。你想好要烧到哪一步了吗？」"
+  }),
+  options: Object.freeze([
+    { label: "以血奉司命", detail: "失去 6 点生命，获得 12 蛊石与 1 个随机材料。", kind: "simingBlood" },
+    { label: "以寿换蛊", detail: "失去 2 点寿元，获得 1 张随机稀有蛊牌。", kind: "simingLife" },
+    { label: "不予理会", detail: "「代价不急，来日方长。」——转身离开。", kind: "simingLeave" }
+  ])
+});
+
+// 四英雄通关结局尾声：呼应各自「所求」，在结算页通关时显示，形成入塔动机→结局的闭环。
+const HERO_ENDINGS = Object.freeze({
+  fate: "塔顶的风里，那个「死」字终于被你亲手掰断。命格无声，你成了自己命途上第一个不受天命的人。",
+  blood: "血债两清。你夺回的从来不是某样东西，而是「再没有人能从你手里夺走」这件事本身。",
+  poison: "万毒俯首。从此毒以你为主，你以毒为命——被噬过的人，终于把命运噬了回来。",
+  longevity: "最后一盏寿灯燃尽的刹那，你照亮了整座塔。朝如青丝，暮已成雪，而这一烧，值了。"
+});
+
+// Boss 战前对峙：进入 Boss 战时给一句压迫感文本（按敌人 id）。
+const BOSS_TAUNTS = Object.freeze({
+  corpsepuppet: "尸盘监守缓缓转头：「登塔者……又一个来还债的。」",
+  miasmaMotherBoss: "百瘴母蛊在雾中低鸣：「瘴林收过太多名字，不差你一个。」",
+  bloodRobeMotherBoss: "血衣蛊母抖开血袍：「旧账未清者，血债加倍偿还。」",
+  boneNestGuardianBoss: "骨巢守墓王抬起骨杖：「此处只安眠败者。你，也想留下么？」",
+  calamityQueenBoss: "灾厄蜂后万翅齐振：「还——把当年那一巢，都还来。」"
+});
+
+const RELICS = {
+  jadeMarrow: {
+    name: "寒玉髓", glyph: "玉", description: "最大生命 +8；每场战斗结束后恢复 6 点生命。",
+  },
+  yuanCicada: {
+    name: "纳元蝉", glyph: "蝉", description: "每回合基础真元由 3 提升至 4。",
+  },
+  boneCarapace: {
+    name: "蜕骨甲", glyph: "骨", description: "每个回合开始时自动获得 4 点防御。",
+  },
+  // V0.9.9 寿道·子批2c：饲岁轮——寿元上限 +12（起始寿元同涨），以战后焚寿换取下场首回合真元。
+  siSuiLun: {
+    name: "饲岁轮", glyph: "岁", description: "寿元上限 +12（起始寿元同涨）；每场战斗结束焚去 2 点寿元，下场首回合真元 +2。",
+  },
+};
+
+/* ===== V0.9.16 丹囊：战斗消耗品（囊中活蛊，用一次即失）。 =====
+ * 效果全部复用现有结算入口（healPlayer/gainBlood/applyEnemyPoison/gainFateMomentum/gainLifespan 等），
+ * 不新开结算相位；直伤类必须带 Boss 转阶段检查（V0.9.12.1 势爆符漏检的教训）。
+ * faction 偏发同遗物：掉落池 = 通用 + 当前英雄流派。 */
+const BATTLE_ITEMS = Object.freeze({
+  huihunDan: { name: "回魂丹蛊", glyph: "丹", faction: "common", description: "恢复 8 点生命。" },
+  huxinJia: { name: "护心甲蛊", glyph: "甲", faction: "common", description: "获得 8 点防御。" },
+  yinluChong: { name: "引路虫", glyph: "引", faction: "common", description: "抽 2 张牌。" },
+  ningyuanSha: { name: "凝元砂", glyph: "元", faction: "common", description: "本回合真元 +1。" },
+  ningshaPo: { name: "凝煞珀", glyph: "煞", faction: "blood", description: "血煞 +3。" },
+  chixueLu: { name: "炽血露", glyph: "炽", faction: "blood", description: "对敌人直接造成 6 点伤害（无视护甲）。" },
+  baoduNang: { name: "爆毒囊", glyph: "爆", faction: "poison", description: "敌人获得 4 层毒性。" },
+  qingzhangSan: { name: "清瘴散", glyph: "清", faction: "poison", description: "自身毒性 -4、毒刺 -2。" },
+  yinshiLing: { name: "引势铃", glyph: "铃", faction: "fate", description: "命势 +2。" },
+  dingpanZhu: { name: "定盘珠", glyph: "珠", faction: "fate", description: "下一张蛊牌费用 -1。" },
+  zhuyanLu: { name: "驻颜露", glyph: "驻", faction: "longevity", description: "回复 3 点寿元。" },
+  suijinXiang: { name: "岁烬香", glyph: "烬", faction: "longevity", description: "敌人衰老 +2（攻击伤害永久平减）。" },
+});
+const BATTLE_ITEM_IDS = Object.keys(BATTLE_ITEMS);
+const SATCHEL_CAP = PLAYER_BALANCE.satchel.baseCap;
+// V0.9.19 十重天·三重薄囊：丹囊上限 3→2。所有容量判断走此函数，勿直用 SATCHEL_CAP。
+function getSatchelCap() {
+  return (runState?.mode === "tian" && (runState.tianTier || 0) >= 3) ? PLAYER_BALANCE.satchel.tianThinPouchCap : SATCHEL_CAP;
+}
+
+// V0.9.9.2 Batch4：每枚带 faction（common 通用 / fate 命势 / blood 血道 / poison 毒道 / longevity 寿道）。
+// 专属遗物只对该流派英雄掉落（见 pickRandomAvailableRelicId），common 通用；faction 与 heroId 对齐。
+const ORDINARY_RELICS = Object.freeze({
+  tailCutCharm: {
+    name: "断尾符", glyph: "尾", tone: "jade", faction: "common",
+    description: "每场战斗第一次生命低于 30% 时，恢复 8 点生命。",
+  },
+  bloodJadeCup: {
+    name: "血玉盏", glyph: "盏", tone: "blood", faction: "blood",
+    description: "每当获得血煞时，恢复 1 点生命；每回合最多触发 2 次。",
+  },
+  greenPouchBug: {
+    name: "青囊虫", glyph: "囊", tone: "poison", faction: "poison",
+    description: "每场战斗开始时，随机一张毒道蛊消耗 -1，本场战斗有效。",
+  },
+  fateCoin: {
+    name: "命轨铜钱", glyph: "钱", tone: "gold", faction: "fate",
+    description: "命势圆满时，额外获得 1 点防御和 1 蛊石。",
+  },
+  shopContract: {
+    name: "蛊坊残契", glyph: "契", tone: "gold", faction: "common",
+    description: "蛊坊中第一次购买打 7 折，向下取整。",
+  },
+  furnaceAshSeal: {
+    name: "炉灰印", glyph: "灰", tone: "soul", faction: "common",
+    description: "每局第一次炼蛊反噬时，反噬代价减半。",
+  },
+  // V0.9.9.2 暴击系统首枚遗物（毒道·暴击流）
+  venomFang: {
+    name: "淬毒尖牙", glyph: "牙", tone: "poison", faction: "poison",
+    description: "攻击中毒的敌人时，34% 概率暴击（该次伤害 ×1.6）。",
+  },
+  // V0.9.9.2 Batch4 命势流派专属遗物（仅命势蛊修「无名逆命者」可掉落）
+  chainFate: {
+    name: "连势符", glyph: "连", tone: "gold", faction: "fate",
+    description: "连续打出同类型蛊也累积命势（不再要求交替出牌）。",
+  },
+  fateSurge: {
+    name: "势盈引", glyph: "盈", tone: "gold", faction: "fate",
+    description: "命势圆满时，额外抽 1 张牌。",
+  },
+  fateBurst: {
+    name: "势爆符", glyph: "爆", tone: "gold", faction: "fate",
+    description: "命势圆满时，对敌人直接造成 6 点伤害（无视护甲）。",
+  },
+  fateRemnant: {
+    name: "残势续燃", glyph: "续", tone: "gold", faction: "fate",
+    description: "战斗胜利后，保留半数命势带入下场首战。",
+  },
+  // V0.9.9.2 Batch4 血道流派专属遗物
+  bloodAbyss: {
+    name: "血溟囊", glyph: "溟", tone: "blood", faction: "blood",
+    description: "血煞上限翻倍；但每回合开始自损 2 点生命。",
+  },
+  bloodPrimer: {
+    name: "饲血符", glyph: "饲", tone: "blood", faction: "blood",
+    description: "每场战斗开始时，自带 5 层血煞。",
+  },
+  bloodRepay: {
+    name: "血偿契", glyph: "偿", tone: "blood", faction: "blood",
+    description: "受到伤害时，按损失生命的一半（向下取整）转为血煞。",
+  },
+  bloodEcho: {
+    name: "噬血回响", glyph: "响", tone: "blood", faction: "blood",
+    description: "打出血道攻击蛊时，额外按当前血煞的 30%（向下取整）回复生命。",
+  },
+  // V0.9.9.2 Batch4 毒道流派专属遗物（另有暴击遗物淬毒尖牙）
+  thickVenom: {
+    name: "浓毒瓶", glyph: "浓", tone: "poison", faction: "poison",
+    description: "每次施加毒性时，额外 +1 层。",
+  },
+  boneVenom: {
+    name: "蚀骨毒", glyph: "蚀", tone: "poison", faction: "poison",
+    description: "攻击中毒的敌人时，额外造成其当前毒层数的伤害。",
+  },
+  venomLead: {
+    name: "引毒幡", glyph: "引", tone: "poison", faction: "poison",
+    description: "每回合开始时，若敌人已中毒，其毒性 +2。",
+  },
+  // V0.9.9.2 Batch4 寿道流派专属遗物
+  burnDraw: {
+    name: "焚牌饲岁", glyph: "焚", tone: "soul", faction: "longevity",
+    description: "寿元每低一档，每回合开始额外抽 1 张牌。",
+  },
+  soulBurnMirror: {
+    name: "焚魂镜", glyph: "魂", tone: "soul", faction: "longevity",
+    description: "焚寿燃命的伤害加成翻倍。",
+  },
+  lifeKindle: {
+    name: "薪火符", glyph: "薪", tone: "soul", faction: "longevity",
+    description: "焚寿时，每焚 1 点寿元额外获得 1 点护甲。",
+  },
+  // V0.9.9.2 Batch4 通用遗物
+  desperatePact: {
+    name: "险中契", glyph: "险", tone: "gold", faction: "common",
+    description: "生命低于 50% 时，所有蛊术伤害 +25%。",
+  },
+  loneValor: {
+    name: "孤勇符", glyph: "勇", tone: "gold", faction: "common",
+    description: "手牌不多于 2 张时，攻击伤害 +30%。",
+  },
+  stoneInterest: {
+    name: "蛊石生息", glyph: "息", tone: "gold", faction: "common",
+    description: "每段战斗胜利后，额外获得 3 枚蛊石。",
+  },
+});
+
+const ORDINARY_RELIC_IDS = Object.freeze(Object.keys(ORDINARY_RELICS));
+
+const REFINEMENTS = {
+  yuanShell: { name: "养元蜕壳", glyph: "养", description: "立即恢复 18 点生命，但不超过最大生命。", effect: "heal" },
+  bloodFragment: { name: "血纹残片", glyph: "血", description: "所有血道攻击蛊伤害 +3。", effect: "bloodDamage" },
+  armorShell: { name: "玄甲蛊壳", glyph: "甲", description: "每场战斗开始时获得 5 点防御。", effect: "startArmor" },
+};
