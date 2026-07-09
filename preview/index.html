@@ -23,7 +23,7 @@
     // 失败安全兜底：非 web 平台给根节点打标，CSS 据此彻底藏香火三入口（不依赖任何 JS 执行完成）。
     if (window.NMG_PLATFORM !== "web") { try { document.documentElement.classList.add("nmg-noxianghuo"); } catch (e) {} }
   </script>
-  <link rel="stylesheet" href="style.v1025.css">
+  <link rel="stylesheet" href="style.v1028.css">
   <script src="audio.v0982.js" defer></script>
   <script src="gu_catalog.js?v=v1002" defer></script>
   <script src="telemetry.v0001.js" defer></script>
@@ -34,7 +34,7 @@
   <!-- V0.9.36 批次B-2：存档基础设施模块，须在 game.v 之前加载（含顶层迁移立即执行 + game 运行期写档走 safeWriteJson） -->
   <script src="nmg-save.v0001.js" defer></script>
   <!-- V0.9.36 批次B-3：万蛊录/图鉴模块（含 escGu 等工具），须在 game.v 之前加载 -->
-  <script src="nmg-codex.v0001.js" defer></script>
+  <script src="nmg-codex.v0002.js" defer></script>
   <!-- V0.9.36 批次B-4：蛊庐/归庐日课/香火弹窗模块，须在 game.v 之前加载 -->
   <script src="nmg-gulu.v0001.js" defer></script>
   <!-- V0.9.36 批次B-5a：炼蛊/蛊炉模块，须在 game.v 之前加载 -->
@@ -47,7 +47,7 @@
   <script src="nmg-tian.v0002.js" defer></script>
   <!-- V0.9.36 批次B-6c：叙事系统模块，须在 game.v 之前加载 -->
   <script src="nmg-story.v0001.js" defer></script>
-  <script src="game.v1068.js" defer></script>
+  <script src="game.v1069.js" defer></script>
   <script>
     /* V0.9.24 离线护符：注册 Service Worker——玩家成功进过一次游戏后，断网/连接被
      * 重置也能离线开玩（github.io 在部分网络下被间歇性重置）。version.json 由 SW
@@ -85,31 +85,6 @@
         }).catch(function () {});
       });
     }
-    (function () {
-      // V0.9.8.7：全屏按钮仅在「桌面·非触屏·宽屏」创建——手机/触屏/窄屏本已全屏，且该按钮浮于左下会压住手牌第一张，故不创建（窄屏再由 CSS @media 兜底隐藏）。桌面保留全屏功能。
-      if (!window.matchMedia) return;
-      if (window.matchMedia("(pointer: coarse)").matches) return;
-      if (window.matchMedia("(max-width: 820px)").matches) return;
-      var el = document.documentElement;
-      var req = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen;
-      if (!req) return;
-      var fsBtn = document.createElement("button");
-      fsBtn.type = "button";
-      fsBtn.textContent = "全屏";
-      fsBtn.className = "pwa-fs-button";
-      function inFs() { return document.fullscreenElement || document.webkitFullscreenElement; }
-      function sync() {
-        if (inFs()) { fsBtn.style.display = "none"; }
-        else { fsBtn.style.display = "inline-flex"; fsBtn.textContent = "全屏"; }
-      }
-      fsBtn.addEventListener("click", function () {
-        try { if (!inFs()) { req.call(el); } } catch (err) {}
-      });
-      document.addEventListener("fullscreenchange", sync);
-      document.addEventListener("webkitfullscreenchange", sync);
-      (document.body || document.documentElement).appendChild(fsBtn);
-      sync();
-    })();
   </script>
 </head>
 <body>
@@ -314,6 +289,9 @@
       <div id="towerProgress" class="tower-progress" aria-label="命途塔进度"></div>
       <div id="topGuStone" class="top-gu-stone" aria-label="当前蛊石">蛊石 <strong>20</strong></div>
       <button id="deckViewButton" class="deck-view-button" type="button" title="查看当前完整卡组">蛊囊</button>
+      <button id="battleFullscreenButton" class="battle-fullscreen-button hidden" type="button" aria-label="进入全屏战斗视图" title="进入全屏">
+        <span class="fullscreen-glyph" aria-hidden="true">⛶</span><span>全屏</span>
+      </button>
       <div id="topRelic" class="top-relic" aria-label="当前遗物">
         <span id="topRelicGlyph">玉</span>
         <p>本命遗物<strong id="topRelicName">寒玉髓</strong></p>
@@ -323,6 +301,7 @@
         <strong id="turnNumber">1</strong>
       </div>
     </header>
+    <div id="battleFullscreenHint" class="battle-fullscreen-hint hidden" role="status" aria-live="polite">建议全屏体验，蛊效和战斗反馈会更清楚。</div>
 
     <section class="combatant player-panel" aria-labelledby="playerTitle">
       <div class="panel-heading">
