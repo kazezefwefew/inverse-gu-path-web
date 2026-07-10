@@ -23,7 +23,7 @@
     // 失败安全兜底：非 web 平台给根节点打标，CSS 据此彻底藏香火三入口（不依赖任何 JS 执行完成）。
     if (window.NMG_PLATFORM !== "web") { try { document.documentElement.classList.add("nmg-noxianghuo"); } catch (e) {} }
   </script>
-  <link rel="stylesheet" href="style.v1032.css">
+  <link rel="stylesheet" href="style.v1034.css">
   <script src="audio.v0982.js" defer></script>
   <script src="gu_catalog.js?v=v1002" defer></script>
   <script src="telemetry.v0001.js" defer></script>
@@ -42,12 +42,12 @@
   <!-- V0.9.36 批次B-5b：遗物系统模块，须在 game.v 之前加载 -->
   <script src="nmg-relics.v0001.js" defer></script>
   <!-- V0.9.36 批次B-6a：本命蛊系统模块，须在 game.v 之前加载 -->
-  <script src="nmg-benming.v0002.js" defer></script>
+  <script src="nmg-benming.v0003.js" defer></script>
   <!-- V0.9.36 批次B-6b：十重天系统模块，须在 game.v 之前加载 -->
   <script src="nmg-tian.v0002.js" defer></script>
   <!-- V0.9.36 批次B-6c：叙事系统模块，须在 game.v 之前加载 -->
   <script src="nmg-story.v0001.js" defer></script>
-  <script src="game.v1073.js" defer></script>
+  <script src="game.v1074.js" defer></script>
   <script>
     /* V0.9.24 离线护符：注册 Service Worker——玩家成功进过一次游戏后，断网/连接被
      * 重置也能离线开玩（github.io 在部分网络下被间歇性重置）。version.json 由 SW
@@ -440,7 +440,7 @@
           <strong id="intentName">爪击</strong>
           <p id="intentDescription">将造成 7 点伤害</p>
         </div>
-        <button id="fateRewriteButton" class="fate-rewrite-button hidden" type="button" aria-label="消耗待圆满命势，改写当前敌人意图">
+        <button id="fateRewriteButton" class="fate-rewrite-button hidden" type="button" aria-label="命势已满时，改换敌人当前准备使用的技能">
           <strong>改签</strong>
           <small>结算圆满</small>
         </button>
