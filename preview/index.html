@@ -23,7 +23,7 @@
     // 失败安全兜底：非 web 平台给根节点打标，CSS 据此彻底藏香火三入口（不依赖任何 JS 执行完成）。
     if (window.NMG_PLATFORM !== "web") { try { document.documentElement.classList.add("nmg-noxianghuo"); } catch (e) {} }
   </script>
-  <link rel="stylesheet" href="style.v1040.css">
+  <link rel="stylesheet" href="style.v1041.css">
   <script src="audio.v0982.js" defer></script>
   <script src="gu_catalog.js?v=v1002" defer></script>
   <script src="telemetry.v0001.js" defer></script>
@@ -51,7 +51,7 @@
   <script src="nmg-chapter.v0004.js" defer></script>
   <!-- V0.9.37 批次E-2b1：万命母盘命债评分与纯规则内核，须在 game.v 之前加载 -->
   <script src="nmg-mupan.v0003.js" defer></script>
-  <script src="game.v1095.js" defer></script>
+  <script src="game.v1097.js" defer></script>
   <script>
     /* V0.9.24 离线护符：注册 Service Worker——玩家成功进过一次游戏后，断网/连接被
      * 重置也能离线开玩（github.io 在部分网络下被间歇性重置）。version.json 由 SW
@@ -491,6 +491,10 @@
   <section id="towerHeartScreen" class="tower-heart-screen hidden" aria-labelledby="towerHeartTitle">
     <div class="tower-heart-backdrop" aria-hidden="true"></div>
     <div class="tower-heart-vignette" aria-hidden="true"></div>
+    <!-- E-2c3.1 压迫感特效层：心跳红晕 / 余烬粒子 / 换场黑幕（均 transform/opacity，受战斗特效开关门控） -->
+    <div class="tower-heart-pulse" aria-hidden="true"></div>
+    <div id="towerHeartEmbers" class="tower-heart-embers" aria-hidden="true"></div>
+    <div id="towerHeartVeil" class="tower-heart-veil" aria-hidden="true"></div>
     <div class="tower-heart-panel">
       <p class="tower-heart-eyebrow" id="towerHeartEyebrow">命途塔 · 塔心</p>
       <h2 class="tower-heart-title" id="towerHeartTitle">断契之门</h2>
