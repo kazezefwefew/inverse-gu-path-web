@@ -23,14 +23,14 @@
     // 失败安全兜底：非 web 平台给根节点打标，CSS 据此彻底藏香火三入口（不依赖任何 JS 执行完成）。
     if (window.NMG_PLATFORM !== "web") { try { document.documentElement.classList.add("nmg-noxianghuo"); } catch (e) {} }
   </script>
-  <link rel="stylesheet" href="style.v1035.css">
+  <link rel="stylesheet" href="style.v1038.css">
   <script src="audio.v0982.js" defer></script>
   <script src="gu_catalog.js?v=v1002" defer></script>
   <script src="telemetry.v0001.js" defer></script>
   <!-- V0.9.36 批次C-0：数值中枢基线模块，必须在 nmg-data 与 game.v 之前加载 -->
-  <script src="nmg-balance.v0002.js" defer></script>
+  <script src="nmg-balance.v0003.js" defer></script>
   <!-- V0.9.36 批次B-1：静态数据模块，必须在 game.v 之前加载（含顶层 effectType 装配 + game 后段构造期读它） -->
-  <script src="nmg-data.v0002.js" defer></script>
+  <script src="nmg-data.v0004.js" defer></script>
   <!-- V0.9.36 批次B-2：存档基础设施模块，须在 game.v 之前加载（含顶层迁移立即执行 + game 运行期写档走 safeWriteJson） -->
   <script src="nmg-save.v0001.js" defer></script>
   <!-- V0.9.36 批次B-3：万蛊录/图鉴模块（含 escGu 等工具），须在 game.v 之前加载 -->
@@ -38,18 +38,20 @@
   <!-- V0.9.36 批次B-4：蛊庐/归庐日课/香火弹窗模块，须在 game.v 之前加载 -->
   <script src="nmg-gulu.v0002.js" defer></script>
   <!-- V0.9.36 批次B-5a：炼蛊/蛊炉模块，须在 game.v 之前加载 -->
-  <script src="nmg-refining.v0003.js" defer></script>
+  <script src="nmg-refining.v0004.js" defer></script>
   <!-- V0.9.36 批次B-5b：遗物系统模块，须在 game.v 之前加载 -->
   <script src="nmg-relics.v0001.js" defer></script>
   <!-- V0.9.36 批次B-6a：本命蛊系统模块，须在 game.v 之前加载 -->
   <script src="nmg-benming.v0003.js" defer></script>
   <!-- V0.9.36 批次B-6b：十重天系统模块，须在 game.v 之前加载 -->
-  <script src="nmg-tian.v0002.js" defer></script>
+  <script src="nmg-tian.v0003.js" defer></script>
   <!-- V0.9.36 批次B-6c：叙事系统模块，须在 game.v 之前加载 -->
   <script src="nmg-story.v0001.js" defer></script>
   <!-- V0.9.37 批次E-1a：命途塔章节路线数据骨架，须在 game.v 之前加载 -->
-  <script src="nmg-chapter.v0003.js" defer></script>
-  <script src="game.v1081.js" defer></script>
+  <script src="nmg-chapter.v0004.js" defer></script>
+  <!-- V0.9.37 批次E-2b1：万命母盘命债评分与纯规则内核，须在 game.v 之前加载 -->
+  <script src="nmg-mupan.v0003.js" defer></script>
+  <script src="game.v1091.js" defer></script>
   <script>
     /* V0.9.24 离线护符：注册 Service Worker——玩家成功进过一次游戏后，断网/连接被
      * 重置也能离线开玩（github.io 在部分网络下被间歇性重置）。version.json 由 SW
@@ -447,6 +449,7 @@
           <small>结算圆满</small>
         </button>
         <div id="fateRewriteChoice" class="fate-rewrite-choice hidden" role="group" aria-label="选择采用新意图或保留原意图"></div>
+        <div id="mupanSealPanel" class="mupan-seal-panel hidden" aria-live="polite"></div>
       </div>
       <div id="enemyPower" class="enemy-power hidden">蓄势：下次攻击 +5</div>
       <div id="enemyStatusList" class="enemy-status-list" aria-live="polite"></div>
@@ -602,6 +605,17 @@
     </div>
   </div>
 
+  <div id="mupanLedgerOverlay" class="mupan-ledger-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="mupanLedgerTitle">
+    <div class="mupan-ledger-card">
+      <p class="deck-eyebrow">命途塔心 · 开发挑战</p>
+      <h2 id="mupanLedgerTitle">万命母盘正在翻阅此行命债</h2>
+      <p id="mupanLedgerLead" class="mupan-ledger-lead"></p>
+      <div id="mupanLedgerDebts" class="mupan-ledger-debts"></div>
+      <p class="mupan-ledger-rule">命签出现后，在倒计时内完成签上条件；也可支付真元，封存一张手牌至本战结束来断签。</p>
+      <button id="mupanLedgerStartButton" type="button">合上账页 · 应战</button>
+    </div>
+  </div>
+
   <!-- V0.9.25 删卡选牌独立弹窗（P0-2）：原先内嵌在蛊坊长列表末尾，点了按钮看不见列表、确认条还溢出面板。
        现升格全屏弹窗，蛊坊删卡与休整整理蛊匣共用（内部 id 全部沿用，逻辑零改）。 -->
   <div id="removePickerOverlay" class="remove-picker-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="removePickerTitle">
@@ -621,6 +635,11 @@
           </div>
         </div>
         <button id="shopCancelRemoveButton" class="reward-skip" type="button">返回蛊坊</button>
+      </div>
+      <div id="mupanSealPickerPanel" class="mupan-seal-picker-panel hidden">
+        <p id="mupanSealPickerHint">支付真元，选择一张手牌封存至本战结束。</p>
+        <div id="mupanSealChoices" class="shop-remove-choices"></div>
+        <button id="mupanSealCancelButton" class="reward-skip" type="button">返回战斗</button>
       </div>
     </div>
   </div>
