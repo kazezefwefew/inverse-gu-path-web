@@ -51,7 +51,7 @@
   <script src="nmg-chapter.v0005.js" defer></script>
   <!-- V0.9.37 批次E-2b1：万命母盘命债评分与纯规则内核，须在 game.v 之前加载 -->
   <script src="nmg-mupan.v0003.js" defer></script>
-  <script src="game.v1109.js" defer></script>
+  <script src="game.v1110.js" defer></script>
   <script>
     /* V0.9.24 离线护符：注册 Service Worker——玩家成功进过一次游戏后，断网/连接被
      * 重置也能离线开玩（github.io 在部分网络下被间歇性重置）。version.json 由 SW
@@ -63,7 +63,9 @@
        * 否则首访补录的清单会被静默截断 */
       try { if (performance.setResourceTimingBufferSize) performance.setResourceTimingBufferSize(600); } catch (e) {}
       window.addEventListener("load", function () {
-        navigator.serviceWorker.register("./sw.js").catch(function () {});
+        navigator.serviceWorker.register("./sw.js", { updateViaCache: "none" })
+          .then(function (reg) { return reg.update(); })
+          .catch(function () {});
         /* 首访补录：SW 首次安装时本页资源已加载完（不经 SW，不会自动进缓存）。
          * 把已加载的同源资源清单发给 SW 补录，让"第一次访问"之后就具备离线能力。
          * 分三轮增量发（Set 去重），兜住 boot-loader 之后的懒加载，不重复劳动。 */

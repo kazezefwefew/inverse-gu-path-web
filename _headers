@@ -1,4 +1,10 @@
-# Cloudflare Pages 更新基础设施。Preview 先行验收；正式根规则在正式热修发布时再加入。
+# Cloudflare Pages 更新基础设施。Service Worker 与版本清单必须跳过四小时边缘/浏览器缓存。
+/sw.js
+  Cache-Control: no-cache, no-store, must-revalidate
+
+/version.json
+  Cache-Control: no-cache, no-store, must-revalidate
+
 /preview/sw.js
   Cache-Control: no-cache, no-store, must-revalidate
 
