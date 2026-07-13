@@ -13,8 +13,8 @@
   <meta name="description" content="原创暗黑东方奇幻卡牌肉鸽原型《逆命蛊途》">
   <title>逆命蛊途 · 命途塔试炼</title>
   <script>
-    window.__NMG_BUILD__ = "v0.9.37";
-    window.NMG_GAME_VERSION = "V0.9.37 衔命虫双路线";
+    window.__NMG_BUILD__ = "v0.9.38";
+    window.NMG_GAME_VERSION = "V0.9.38 塔心终局";
     window.NMG_TELEMETRY_ENDPOINT = "https://nmg-analytics.nmg-analytics-kaan.workers.dev/ingest";
     // V0.9.36 平台标志：web=网页版（香火可见）。小游戏包设 "minigame" 仅做【运行时】隐藏香火入口。
     // ⚠ 打包小游戏发行包时【还须在构建期物理剥离】：删除下方 #xianghuoOverlay 整段 + 设置页香火按钮，
@@ -23,7 +23,7 @@
     // 失败安全兜底：非 web 平台给根节点打标，CSS 据此彻底藏香火三入口（不依赖任何 JS 执行完成）。
     if (window.NMG_PLATFORM !== "web") { try { document.documentElement.classList.add("nmg-noxianghuo"); } catch (e) {} }
   </script>
-  <link rel="stylesheet" href="style.v1051.css">
+  <link rel="stylesheet" href="style.v1052.css">
   <script src="audio.v0983.js" defer></script>
   <script src="gu_catalog.js?v=v1002" defer></script>
   <script src="telemetry.v0001.js" defer></script>
@@ -34,9 +34,9 @@
   <!-- V0.9.36 批次B-2：存档基础设施模块，须在 game.v 之前加载（含顶层迁移立即执行 + game 运行期写档走 safeWriteJson） -->
   <script src="nmg-save.v0001.js" defer></script>
   <!-- V0.9.36 批次B-3：万蛊录/图鉴模块（含 escGu 等工具），须在 game.v 之前加载 -->
-  <script src="nmg-codex.v0003.js" defer></script>
+  <script src="nmg-codex.v0005.js" defer></script>
   <!-- V0.9.36 批次B-4：蛊庐/归庐日课/香火弹窗模块，须在 game.v 之前加载 -->
-  <script src="nmg-gulu.v0002.js" defer></script>
+  <script src="nmg-gulu.v0004.js" defer></script>
   <!-- V0.9.36 批次B-5a：炼蛊/蛊炉模块，须在 game.v 之前加载 -->
   <script src="nmg-refining.v0004.js" defer></script>
   <!-- V0.9.36 批次B-5b：遗物系统模块，须在 game.v 之前加载 -->
@@ -51,7 +51,7 @@
   <script src="nmg-chapter.v0005.js" defer></script>
   <!-- V0.9.37 批次E-2b1：万命母盘命债评分与纯规则内核，须在 game.v 之前加载 -->
   <script src="nmg-mupan.v0003.js" defer></script>
-  <script src="game.v1108.js" defer></script>
+  <script src="game.v1109.js" defer></script>
   <script>
     /* V0.9.24 离线护符：注册 Service Worker——玩家成功进过一次游戏后，断网/连接被
      * 重置也能离线开玩（github.io 在部分网络下被间歇性重置）。version.json 由 SW
@@ -132,7 +132,7 @@
       <span class="start-moon"></span>
     </div>
     <div class="start-content">
-      <p class="start-kicker">原创暗黑东方卡牌肉鸽 · V0.9.37 衔命虫双路线</p>
+      <p class="start-kicker">原创暗黑东方卡牌肉鸽 · V0.9.38 塔心终局</p>
       <p class="start-agehint">适龄提示 · 建议 <span data-age-num>16</span> 周岁以上 · 纯单机、不含实物交易</p>
       <div class="start-logo" aria-hidden="true"><span>蛊</span></div>
       <h1 id="startTitle">逆命蛊途</h1>
@@ -145,12 +145,23 @@
       <div class="start-guide-actions" aria-label="新手与测试设置">
         <button id="tutorialOpenButton" class="start-guide-button" type="button">初入命途</button>
         <button id="updateLogButton" class="start-guide-button update-log-button" type="button">更新公告</button>
-        <button id="wanGuLuButton" class="start-guide-button wangulu-button" type="button">万蛊录</button>
         <button id="trialSettingsButton" class="start-guide-button trial-settings-button" type="button">试炼设置</button>
         <button id="settingsOpenButton" class="start-guide-button settings-guide-button" type="button">设置</button>
         <button id="balanceOpenButton" class="start-guide-button balance-guide-button" type="button">平衡检查</button>
         <button id="recordingModeToggle" class="start-guide-button recording-mode-button" type="button" aria-pressed="false">录屏模式：关</button>
         <button id="tutorialResetButton" class="start-reset-button" type="button">重置新手提示</button>
+      </div>
+      <div class="start-collection-hub" aria-label="局外收藏与养成">
+        <button id="wanGuLuButton" class="collection-hub-entry wangulu-entry" type="button">
+          <span class="collection-hub-glyph" aria-hidden="true">录</span>
+          <span><strong>万蛊录</strong><small>世界知识 · 蛊虫 · 敌怪 · 残卷</small></span>
+          <em id="collectionBadge" class="collection-hub-badge hidden"></em>
+        </button>
+        <button id="guluOpenButton" class="collection-hub-entry gulu-enter-button" type="button">
+          <span class="collection-hub-glyph" aria-hidden="true">庐</span>
+          <span><strong>归返蛊庐</strong><small>个人养成 · 孵卵 · 藏册 · 蛊斗</small></span>
+          <em id="guluBadge" class="collection-hub-badge hidden"></em>
+        </button>
       </div>
       <p id="trialModeHint" class="trial-mode-hint hidden"></p>
 
@@ -179,11 +190,6 @@
         <button id="startBattleButton" class="start-button" type="button">
           <span>踏入命途塔</span>
           <small>层层深入，直面尸盘监守</small>
-        </button>
-        <!-- V0.9.23 蛊庐第二主入口：一个进塔、一个回家 -->
-        <button id="guluOpenButton" class="start-button gulu-enter-button" type="button">
-          <span>归返蛊庐</span>
-          <small>养蛊 · 孵卵 · 蛊斗喂养</small>
         </button>
       </div>
       <p id="runProgress" class="run-progress hidden"></p>
@@ -778,7 +784,7 @@
       <button id="settingsCloseButton" class="deck-close-button" type="button" aria-label="关闭设置">×</button>
       <p class="deck-eyebrow">试玩包设置</p>
       <h2 id="settingsTitle">设置</h2>
-        <p id="settingsVersion" class="settings-version">当前版本：V0.9.37 衔命虫双路线</p>
+        <p id="settingsVersion" class="settings-version">当前版本：V0.9.38 塔心终局</p>
       <div class="settings-list">
         <button id="settingsMusicToggle" type="button">音乐：开</button>
         <label class="settings-volume" for="settingsVolume">
