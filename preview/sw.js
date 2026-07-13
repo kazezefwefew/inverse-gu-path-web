@@ -150,6 +150,20 @@ function handleNavigate(event, req) {
   const netPromise = fetchFreshIndexHtml(req.url); // 保留 ?_upd/?dev 查询串
   event.waitUntil(netPromise.then((html) => cacheIndexAtomic(html)).catch(() => {}));
   return (async () => {
+    const forcedUpdate = (() => {
+      try { return new URL(req.url).searchParams.has("_upd"); } catch (e) { return false; }
+    })();
+    if (forcedUpdate) {
+      // 玩家已明确点击更新：慢网也必须等到新 index，不能在 5 秒后再次交回旧缓存。
+      // 只有真实断网/请求失败时才回退旧壳，旧页会继续显示带逃生口的更新闸。
+      try {
+        return htmlResponse(await netPromise);
+      } catch (e) {
+        const cached = await (await caches.open(CACHE_NAME)).match(INDEX_KEY);
+        if (cached) return cached;
+        throw e;
+      }
+    }
     const winner = await Promise.race([
       netPromise.then((html) => htmlResponse(html)).catch(() => null),
       new Promise((res) => setTimeout(() => res("timeout"), NAV_TIMEOUT_MS)),

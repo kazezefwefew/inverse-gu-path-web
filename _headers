@@ -1,0 +1,6 @@
+# Cloudflare Pages 更新基础设施。Preview 先行验收；正式根规则在正式热修发布时再加入。
+/preview/sw.js
+  Cache-Control: no-cache, no-store, must-revalidate
+
+/preview/version.json
+  Cache-Control: no-cache, no-store, must-revalidate
