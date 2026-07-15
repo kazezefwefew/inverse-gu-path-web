@@ -23,7 +23,7 @@
     // 失败安全兜底：非 web 平台给根节点打标，CSS 据此彻底藏香火三入口（不依赖任何 JS 执行完成）。
     if (window.NMG_PLATFORM !== "web") { try { document.documentElement.classList.add("nmg-noxianghuo"); } catch (e) {} }
   </script>
-  <link rel="stylesheet" href="style.v1057.css">
+  <link rel="stylesheet" href="style.v1067.css">
   <script src="audio.v0983.js" defer></script>
   <script src="gu_catalog.js?v=v1002" defer></script>
   <script src="telemetry.v0001.js" defer></script>
@@ -51,7 +51,7 @@
   <script src="nmg-chapter.v0005.js" defer></script>
   <!-- V0.9.37 批次E-2b1：万命母盘命债评分与纯规则内核，须在 game.v 之前加载 -->
   <script src="nmg-mupan.v0003.js" defer></script>
-  <script src="game.v1117.js" defer></script>
+  <script src="game.v1129.js" defer></script>
   <script>
     /* V0.9.24 离线护符：注册 Service Worker——玩家成功进过一次游戏后，断网/连接被
      * 重置也能离线开玩（github.io 在部分网络下被间歇性重置）。version.json 由 SW
@@ -134,24 +134,18 @@
       <span class="start-moon"></span>
     </div>
     <div class="start-content">
+      <div id="homeHubView" class="home-hub-view">
       <p class="start-kicker">原创暗黑东方卡牌肉鸽 · V0.9.38 塔心终局</p>
       <p class="start-agehint">适龄提示 · 建议 <span data-age-num>16</span> 周岁以上 · 纯单机、不含实物交易</p>
       <div class="start-logo" aria-hidden="true"><span>蛊</span></div>
       <h1 id="startTitle">逆命蛊途</h1>
       <p class="start-subtitle">以蛊为刃，以命为薪。命途塔中，从来没有天命之人。</p>
-      <!-- V0.9.8.7 自动续局：有未完成存档时由 JS 显示 -->
-      <button id="resumeRunButton" class="resume-run-button hidden" type="button">
-        <span class="resume-run-main">继续上一局</span>
-        <small class="resume-run-sub" id="resumeRunSummary"></small>
-      </button>
-      <div class="start-guide-actions" aria-label="新手与测试设置">
-        <button id="tutorialOpenButton" class="start-guide-button" type="button">初入命途</button>
-        <button id="updateLogButton" class="start-guide-button update-log-button" type="button">更新公告</button>
-        <button id="trialSettingsButton" class="start-guide-button trial-settings-button" type="button">试炼设置</button>
-        <button id="settingsOpenButton" class="start-guide-button settings-guide-button" type="button">设置</button>
-        <button id="balanceOpenButton" class="start-guide-button balance-guide-button" type="button">平衡检查</button>
-        <button id="recordingModeToggle" class="start-guide-button recording-mode-button" type="button" aria-pressed="false">录屏模式：关</button>
-        <button id="tutorialResetButton" class="start-reset-button" type="button">重置新手提示</button>
+      <div class="home-run-actions" aria-label="命途入口">
+        <button id="resumeRunButton" class="resume-run-button hidden" type="button">
+          <span class="resume-run-main">继续上一局</span>
+          <small class="resume-run-sub" id="resumeRunSummary"></small>
+        </button>
+        <button id="newRunButton" class="new-run-button" type="button"><strong>新启命途</strong><small>进入开局整备</small></button>
       </div>
       <div class="start-collection-hub" aria-label="局外收藏与养成">
         <button id="wanGuLuButton" class="collection-hub-entry wangulu-entry" type="button">
@@ -165,6 +159,28 @@
           <em id="guluBadge" class="collection-hub-badge hidden"></em>
         </button>
       </div>
+      <div class="home-utility-bar" aria-label="首页工具">
+        <button id="settingsOpenButton" class="home-icon-button" type="button" aria-label="设置" title="设置">⚙</button>
+        <button id="moreMenuButton" class="home-icon-button" type="button" aria-expanded="false" aria-controls="moreMenuPanel" aria-label="更多">⋯</button>
+        <div id="moreMenuPanel" class="more-menu-panel hidden">
+          <button id="updateLogButton" type="button">更新公告</button>
+          <button id="tutorialResetButton" type="button">重置新手提示</button>
+        </div>
+      </div>
+      <p class="start-feedback-note">网页试玩版：当前为开发测试版本，数据与内容仍会调整。</p>
+      </div>
+
+      <div id="prepScreenView" class="prep-screen-view hidden" aria-label="开局整备">
+      <header class="prep-screen-header">
+        <button id="prepBackButton" type="button" aria-label="返回首页">←</button>
+        <div><small>命途塔 · 入塔前</small><strong>开局整备</strong></div>
+        <div class="prep-utility-actions">
+          <button id="tutorialOpenButton" type="button">入塔指引</button>
+          <button id="trialSettingsButton" type="button">试炼设置</button>
+          <button id="balanceOpenButton" class="dev-only" type="button">平衡检查</button>
+          <button id="recordingModeToggle" class="dev-only" type="button" aria-pressed="false">录屏模式：关</button>
+        </div>
+      </header>
       <p id="trialModeHint" class="trial-mode-hint hidden"></p>
 
       <div id="startPrepShell" class="start-prep-shell" data-prep-step="hero">
@@ -208,7 +224,7 @@
         </div>
       </div>
       <p id="runProgress" class="run-progress hidden"></p>
-      <p class="start-feedback-note">网页试玩版：当前为开发测试版本，数据与内容仍会调整。</p>
+      </div>
     </div>
   </section>
 
@@ -284,8 +300,8 @@
     <div class="map-card">
       <div class="map-heading">
         <div>
-          <p class="map-eyebrow">命途图 / 分岔塔路</p>
-          <h2 id="mapTitle">命途塔路</h2>
+          <p class="map-eyebrow">命线图 / 当前分岔</p>
+          <h2 id="mapTitle">命线图</h2>
           <p id="mapDescription">塔路会在每局生成不同岔口。选择一处节点后，同段其他命途会被封锁。</p>
         </div>
         <div class="map-actions">
@@ -295,9 +311,15 @@
       </div>
       <div id="mapProgress" class="map-progress" aria-label="命途图进度"></div>
       <div id="mapStatus" class="map-status" aria-live="polite"></div>
-      <div id="mapRoute" class="map-route" aria-live="polite"></div>
+      <div id="mapRoute" class="map-route fate-line-map" aria-live="polite"></div>
       <div id="mapNotice" class="map-notice hidden" aria-live="polite"></div>
-      <p id="mapHint" class="map-hint">选择当前发亮的命途节点继续。</p>
+      <div id="mapSelectionPanel" class="map-selection-panel">
+        <div><small id="mapSelectionKind">当前分岔</small><strong id="mapSelectionName">尚未择路</strong></div>
+        <p id="mapSelectionRisk">选择一个命途节点查看风险。</p>
+        <p id="mapSelectionReward">收益将在此显示。</p>
+        <button id="mapNodeConfirmButton" type="button" disabled>踏入</button>
+      </div>
+      <p id="mapHint" class="map-hint">先择命线，再踏入节点。</p>
       <div id="mapTransition" class="map-transition hidden" aria-live="assertive">
         <strong id="mapTransitionText">命途流转</strong>
       </div>
@@ -444,6 +466,25 @@
       <div id="combatRelicStrip" class="combat-relic-strip" aria-live="polite"></div>
     </section>
 
+    <section id="battleIntentRegion" class="battle-intent-region" aria-label="敌方意图">
+      <div id="intentBox" class="intent-box" aria-live="polite">
+        <div id="intentIcon" class="intent-icon">爪</div>
+        <div class="intent-copy">
+          <span>敌人意图</span>
+          <strong id="intentName">爪击</strong>
+          <p id="intentDescription">将造成 7 点伤害</p>
+        </div>
+        <p id="intentSummary" class="intent-summary" aria-live="polite">爪击｜7伤害</p>
+        <button id="intentCollapseButton" class="intent-collapse-button" type="button" aria-expanded="true" aria-label="收起敌方意图">⌃</button>
+        <button id="fateRewriteButton" class="fate-rewrite-button hidden" type="button" aria-label="命势已满时，改换敌人当前准备使用的技能">
+          <strong>改签</strong>
+          <small>结算圆满</small>
+        </button>
+        <div id="fateRewriteChoice" class="fate-rewrite-choice hidden" role="group" aria-label="选择采用新意图或保留原意图"></div>
+        <div id="mupanSealPanel" class="mupan-seal-panel hidden" aria-live="polite"></div>
+      </div>
+    </section>
+
     <section class="arena-panel" aria-labelledby="battleInfoTitle">
       <div id="battleBackgroundSlot" class="battle-background-slot" data-battle-scene="tower" aria-hidden="true"></div>
       <div class="tower-sigil" aria-hidden="true">
@@ -460,17 +501,6 @@
         <h2 id="battleInfoTitle">此战，唯有一方能离开</h2>
         <p id="battleMessage" class="battle-message" aria-live="polite">山魈伏在阴影中，正窥伺你的破绽。</p>
       </div>
-      <div id="satchelStrip" class="satchel-strip hidden" aria-label="丹囊（点击使用消耗品）"></div>
-      <div class="pile-status" aria-label="牌堆状态">
-        <div><span>牌堆</span><strong id="drawCount">5</strong></div>
-        <i aria-hidden="true"></i>
-        <div><span>弃牌</span><strong id="discardCount">0</strong></div>
-      </div>
-      <button id="endTurnButton" class="end-turn-button" type="button">
-        <span>结束回合</span>
-        <small id="endTurnHint">敌人将执行意图</small>
-      </button>
-      <p class="end-turn-tip">真元耗尽后可结束回合</p>
     </section>
 
     <section class="combatant enemy-panel" aria-labelledby="enemyTitle">
@@ -485,20 +515,6 @@
           <strong><span id="enemyHp">48</span> / <span id="enemyMaxHp">48</span></strong>
         </div>
         <div class="bar"><div id="enemyHpBar" class="bar-fill enemy-hp-fill"></div></div>
-      </div>
-      <div id="intentBox" class="intent-box" aria-live="polite">
-        <div id="intentIcon" class="intent-icon">爪</div>
-        <div class="intent-copy">
-          <span>敌人意图</span>
-          <strong id="intentName">爪击</strong>
-          <p id="intentDescription">将造成 7 点伤害</p>
-        </div>
-        <button id="fateRewriteButton" class="fate-rewrite-button hidden" type="button" aria-label="命势已满时，改换敌人当前准备使用的技能">
-          <strong>改签</strong>
-          <small>结算圆满</small>
-        </button>
-        <div id="fateRewriteChoice" class="fate-rewrite-choice hidden" role="group" aria-label="选择采用新意图或保留原意图"></div>
-        <div id="mupanSealPanel" class="mupan-seal-panel hidden" aria-live="polite"></div>
       </div>
       <div id="enemyPower" class="enemy-power hidden">蓄势：下次攻击 +5</div>
       <div id="enemyStatusList" class="enemy-status-list" aria-live="polite"></div>
@@ -521,6 +537,26 @@
       <ol id="journeyLog" class="battle-log journey-log hidden" aria-live="polite" aria-relevant="additions"></ol>
     </aside>
 
+    <section id="battleActionBar" class="battle-action-bar" aria-label="战斗操作">
+      <div class="battle-action-utilities">
+        <div id="satchelStrip" class="satchel-strip hidden" aria-label="丹囊（点击使用消耗品）"></div>
+        <div class="pile-status" aria-label="牌堆状态">
+          <div><span>牌堆</span><strong id="drawCount">5</strong></div>
+          <i aria-hidden="true"></i>
+          <div><span>弃牌</span><strong id="discardCount">0</strong></div>
+        </div>
+      </div>
+      <div id="selectedCardActions" class="selected-card-actions hidden" aria-live="polite">
+        <span id="selectedCardName">尚未选牌</span>
+        <button id="selectedCardDetailButton" type="button">详情</button>
+        <button id="selectedCardPlayButton" type="button">催动</button>
+      </div>
+      <button id="endTurnButton" class="end-turn-button" type="button">
+        <span>结束回合</span>
+        <small id="endTurnHint">敌人将执行意图</small>
+      </button>
+    </section>
+
     <section class="hand-panel" aria-labelledby="handTitle">
       <div class="hand-heading">
         <div>
@@ -528,11 +564,6 @@
           <h2 id="handTitle">手牌</h2>
         </div>
         <p><kbd>点按</kbd>选择 · <kbd>长按</kbd>详情</p>
-      </div>
-      <div id="selectedCardActions" class="selected-card-actions hidden" aria-live="polite">
-        <span id="selectedCardName">尚未选牌</span>
-        <button id="selectedCardDetailButton" type="button">详情</button>
-        <button id="selectedCardPlayButton" type="button">催动</button>
       </div>
       <button id="handCollapseToggle" class="hand-collapse-toggle" type="button" aria-label="收起或展开手牌" onclick="document.body.classList.toggle('hand-collapsed')">手牌</button>
       <div id="hand" class="hand" aria-live="polite"></div>
@@ -746,19 +777,35 @@
   </div>
 
   <div id="deckOverlay" class="deck-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="deckTitle">
-    <div class="deck-card">
+    <div class="deck-card deck-workbench">
       <button id="deckCloseButton" class="deck-close-button" type="button" aria-label="关闭蛊囊">×</button>
       <p class="deck-eyebrow">蛊囊 / 卡组查看</p>
       <h2 id="deckTitle">当前蛊匣</h2>
       <button id="deckLoreButton" class="deck-lore-button" type="button">命蛊残卷</button>
-      <button id="deckStatsButton" class="deck-stats-button" type="button">本局统计</button>
-      <div class="ux-scroll-body">
-        <div id="deckSummary" class="deck-summary"></div>
-        <div id="deckStats" class="deck-stats"></div>
-        <div id="deckMaterials" class="deck-materials"></div>
-        <div id="deckRelics" class="deck-relics"></div>
-        <div id="deckMarks" class="deck-marks"></div>
-        <div id="deckList" class="deck-list"></div>
+      <nav id="deckTabs" class="deck-tabs" role="tablist" aria-label="蛊囊分类">
+        <button class="is-active" type="button" role="tab" aria-selected="true" data-deck-tab="cards">蛊牌</button>
+        <button type="button" role="tab" aria-selected="false" data-deck-tab="materials">材料</button>
+        <button type="button" role="tab" aria-selected="false" data-deck-tab="relics">遗物</button>
+        <button type="button" role="tab" aria-selected="false" data-deck-tab="marks">命途印记</button>
+        <button id="deckStatsButton" type="button" role="tab" aria-selected="false" data-deck-tab="stats">本局统计</button>
+      </nav>
+      <div class="deck-workspace">
+        <section class="deck-tab-panel is-active" data-deck-panel="cards">
+          <div id="deckSummary" class="deck-summary"></div>
+          <div class="deck-card-browser">
+            <div id="deckList" class="deck-list deck-page-grid"></div>
+            <aside id="deckCardDetail" class="deck-card-detail" aria-live="polite"></aside>
+          </div>
+          <div class="deck-pager">
+            <button id="deckPrevPage" type="button">上一页</button>
+            <span id="deckPageLabel">1 / 1</span>
+            <button id="deckNextPage" type="button">下一页</button>
+          </div>
+        </section>
+        <section class="deck-tab-panel" data-deck-panel="materials"><div id="deckMaterials" class="deck-materials ux-scroll-body"></div></section>
+        <section class="deck-tab-panel" data-deck-panel="relics"><div id="deckRelics" class="deck-relics ux-scroll-body"></div></section>
+        <section class="deck-tab-panel" data-deck-panel="marks"><div id="deckMarks" class="deck-marks ux-scroll-body"></div></section>
+        <section class="deck-tab-panel" data-deck-panel="stats"><div id="deckStats" class="deck-stats ux-scroll-body"></div></section>
       </div>
     </div>
   </div>
@@ -834,7 +881,7 @@
           <input id="settingsVolume" type="range" min="0" max="1" step="0.05" value="0.45">
         </label>
         <button id="settingsEffectToggle" type="button">战斗特效：开</button>
-        <button id="settingsRecordingToggle" type="button">录屏模式：关</button>
+        <button id="settingsRecordingToggle" class="dev-only" type="button">录屏模式：关</button>
         <button id="settingsLoreAnimationToggle" type="button">跳过残卷动画：关</button>
         <div class="settings-session-actions" aria-label="试炼操作">
           <button id="settingsHomeButton" type="button">返回首页</button>
