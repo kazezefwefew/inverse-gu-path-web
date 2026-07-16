@@ -23,7 +23,7 @@
     // 失败安全兜底：非 web 平台给根节点打标，CSS 据此彻底藏香火三入口（不依赖任何 JS 执行完成）。
     if (window.NMG_PLATFORM !== "web") { try { document.documentElement.classList.add("nmg-noxianghuo"); } catch (e) {} }
   </script>
-  <link rel="stylesheet" href="style.v1078.css">
+  <link rel="stylesheet" href="style.v1079.css">
   <script src="audio.v0983.js" defer></script>
   <script src="gu_catalog.js?v=v1002" defer></script>
   <script src="telemetry.v0001.js" defer></script>
@@ -373,6 +373,7 @@
       <button id="battleFullscreenButton" class="battle-fullscreen-button hidden" type="button" aria-label="进入全屏战斗视图" title="进入全屏">
         <span class="fullscreen-glyph" aria-hidden="true">⛶</span><span>全屏</span>
       </button>
+      <button id="handCollapseToggle" class="hand-collapse-toggle" type="button" aria-label="收起手牌" aria-expanded="true">手牌</button>
       <div id="topRelic" class="top-relic" aria-label="当前遗物">
         <span id="topRelicGlyph">玉</span>
         <p>本命遗物<strong id="topRelicName">寒玉髓</strong></p>
@@ -557,8 +558,6 @@
         <small id="endTurnHint">敌人将执行意图</small>
       </button>
     </section>
-
-    <button id="handCollapseToggle" class="hand-collapse-toggle" type="button" aria-label="收起手牌" aria-expanded="true">手牌</button>
 
     <section class="hand-panel" aria-labelledby="handTitle">
       <div class="hand-heading">
