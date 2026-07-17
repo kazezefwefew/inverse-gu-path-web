@@ -23,7 +23,7 @@
     // 失败安全兜底：非 web 平台给根节点打标，CSS 据此彻底藏香火三入口（不依赖任何 JS 执行完成）。
     if (window.NMG_PLATFORM !== "web") { try { document.documentElement.classList.add("nmg-noxianghuo"); } catch (e) {} }
   </script>
-  <link rel="stylesheet" href="style.v1079.css">
+  <link rel="stylesheet" href="style.v1081.css">
   <script src="audio.v0983.js" defer></script>
   <script src="gu_catalog.js?v=v1002" defer></script>
   <script src="telemetry.v0001.js" defer></script>
@@ -51,7 +51,7 @@
   <script src="nmg-chapter.v0005.js" defer></script>
   <!-- V0.9.37 批次E-2b1：万命母盘命债评分与纯规则内核，须在 game.v 之前加载 -->
   <script src="nmg-mupan.v0003.js" defer></script>
-  <script src="game.v1133.js" defer></script>
+  <script src="game.v1136.js" defer></script>
   <script>
     /* V0.9.24 离线护符：注册 Service Worker——玩家成功进过一次游戏后，断网/连接被
      * 重置也能离线开玩（github.io 在部分网络下被间歇性重置）。version.json 由 SW
@@ -129,9 +129,23 @@
 
   <section id="startScreen" class="start-screen" aria-labelledby="startTitle">
     <div class="start-backdrop" aria-hidden="true">
-      <span class="mountain mountain-one"></span>
-      <span class="mountain mountain-two"></span>
-      <span class="start-moon"></span>
+      <!-- V0.9.38 血月塔影：分层动态标题画（16:9 覆盖框，层内动画全部 transform/opacity，老内核安全） -->
+      <div class="title-scene" id="titleScene">
+        <div class="ts-zoom">
+          <img class="ts-layer" src="assets/scenes/title-base.webp" alt="">
+          <img class="ts-layer ts-moontex" src="assets/scenes/title-moontex.webp" alt="">
+          <div class="ts-fly-back" id="titleFlyBack"></div>
+          <img class="ts-layer" src="assets/scenes/title-tower.webp" alt="">
+          <img class="ts-layer ts-fate" src="assets/scenes/title-fateglow.webp" alt="">
+          <img class="ts-layer ts-windows" src="assets/scenes/title-windows.webp" alt="">
+          <img class="ts-layer ts-door" src="assets/scenes/title-doorglow.webp" alt="">
+          <div class="ts-fly-front" id="titleFlyFront"></div>
+        </div>
+        <div class="ts-halo"></div>
+        <img class="ts-layer ts-foga" src="assets/scenes/title-foga.webp" alt="">
+        <img class="ts-layer ts-fogb" src="assets/scenes/title-fogb.webp" alt="">
+        <div class="ts-embers" id="titleEmbers"></div>
+      </div>
     </div>
     <div class="start-content">
       <div id="homeHubView" class="home-hub-view">
