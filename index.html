@@ -23,7 +23,8 @@
     // 失败安全兜底：非 web 平台给根节点打标，CSS 据此彻底藏香火三入口（不依赖任何 JS 执行完成）。
     if (window.NMG_PLATFORM !== "web") { try { document.documentElement.classList.add("nmg-noxianghuo"); } catch (e) {} }
   </script>
-  <link rel="stylesheet" href="style.v1085.css">
+  <link rel="preload" href="assets/fonts/wenkai-screen.v1.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="style.v1088.css">
   <script src="audio.v0983.js" defer></script>
   <script src="gu_catalog.js?v=v1002" defer></script>
   <script src="telemetry.v0001.js" defer></script>
@@ -36,7 +37,7 @@
   <!-- V0.9.36 批次B-3：万蛊录/图鉴模块（含 escGu 等工具），须在 game.v 之前加载 -->
   <script src="nmg-codex.v0006.js" defer></script>
   <!-- V0.9.36 批次B-4：蛊庐/归庐日课/香火弹窗模块，须在 game.v 之前加载 -->
-  <script src="nmg-gulu.v0006.js" defer></script>
+  <script src="nmg-gulu.v0007.js" defer></script>
   <!-- V0.9.36 批次B-5a：炼蛊/蛊炉模块，须在 game.v 之前加载 -->
   <script src="nmg-refining.v0004.js" defer></script>
   <!-- V0.9.36 批次B-5b：遗物系统模块，须在 game.v 之前加载 -->
@@ -51,7 +52,7 @@
   <script src="nmg-chapter.v0005.js" defer></script>
   <!-- V0.9.37 批次E-2b1：万命母盘命债评分与纯规则内核，须在 game.v 之前加载 -->
   <script src="nmg-mupan.v0003.js" defer></script>
-  <script src="game.v1137.js" defer></script>
+  <script src="game.v1139.js" defer></script>
   <script>
     /* V0.9.24 离线护符：注册 Service Worker——玩家成功进过一次游戏后，断网/连接被
      * 重置也能离线开玩（github.io 在部分网络下被间歇性重置）。version.json 由 SW
@@ -174,8 +175,8 @@
         </button>
       </div>
       <div class="home-utility-bar" aria-label="首页工具">
-        <button id="settingsOpenButton" class="home-icon-button" type="button" aria-label="设置" title="设置">⚙</button>
-        <button id="moreMenuButton" class="home-icon-button" type="button" aria-expanded="false" aria-controls="moreMenuPanel" aria-label="更多">⋯</button>
+        <button id="settingsOpenButton" class="home-icon-button" type="button" aria-label="设置" title="设置">设</button>
+        <button id="moreMenuButton" class="home-icon-button" type="button" aria-expanded="false" aria-controls="moreMenuPanel" aria-label="更多">更</button>
         <div id="moreMenuPanel" class="more-menu-panel hidden" role="dialog" aria-modal="false" aria-labelledby="moreMenuTitle">
           <p id="moreMenuTitle" class="more-menu-title">更多操作</p>
           <button id="updateLogButton" type="button">更新公告</button>
@@ -359,7 +360,7 @@
     <strong class="mobile-audio-title">音律设置</strong>
     <button id="mobileAudioClose" class="mobile-audio-close" type="button" aria-label="收起音频设置">×</button>
     <button id="musicToggle" class="music-toggle" type="button" aria-pressed="false" title="开启或关闭背景音乐">
-      <span aria-hidden="true">♫</span>
+      <span aria-hidden="true">乐</span>
       <strong id="musicStatus">音乐：开</strong>
     </button>
     <label class="music-volume" for="musicVolume" title="调整背景音乐音量">
@@ -385,7 +386,7 @@
       <div id="topGuStone" class="top-gu-stone" aria-label="当前蛊石">蛊石 <strong>20</strong></div>
       <button id="deckViewButton" class="deck-view-button" type="button" title="查看当前完整卡组">蛊囊</button>
       <button id="battleFullscreenButton" class="battle-fullscreen-button hidden" type="button" aria-label="进入全屏战斗视图" title="进入全屏">
-        <span class="fullscreen-glyph" aria-hidden="true">⛶</span><span>全屏</span>
+        <span class="fullscreen-glyph" aria-hidden="true">屏</span><span>全屏</span>
       </button>
       <button id="handCollapseToggle" class="hand-collapse-toggle" type="button" aria-label="收起手牌" aria-expanded="true">手牌</button>
       <div id="topRelic" class="top-relic" aria-label="当前遗物">
