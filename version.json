@@ -1,5 +1,5 @@
 {
-  "build": "v0.9.38",
-  "version": "V0.9.38 塔心终局",
+  "build": "v0.9.39",
+  "version": "V0.9.39 蜕鳞双路",
   "note": "游戏内更新闸读取本文件；部署时必须让 build 与当前 index.html 的 __NMG_BUILD__ 保持一致。"
 }
