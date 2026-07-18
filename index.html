@@ -24,7 +24,7 @@
     if (window.NMG_PLATFORM !== "web") { try { document.documentElement.classList.add("nmg-noxianghuo"); } catch (e) {} }
   </script>
   <link rel="preload" href="assets/fonts/wenkai-screen.v1.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="style.v1088.css">
+  <link rel="stylesheet" href="style.v1090.css">
   <script src="audio.v0983.js" defer></script>
   <script src="gu_catalog.js?v=v1002" defer></script>
   <script src="telemetry.v0001.js" defer></script>
@@ -37,7 +37,7 @@
   <!-- V0.9.36 批次B-3：万蛊录/图鉴模块（含 escGu 等工具），须在 game.v 之前加载 -->
   <script src="nmg-codex.v0006.js" defer></script>
   <!-- V0.9.36 批次B-4：蛊庐/归庐日课/香火弹窗模块，须在 game.v 之前加载 -->
-  <script src="nmg-gulu.v0007.js" defer></script>
+  <script src="nmg-gulu.v0009.js" defer></script>
   <!-- V0.9.36 批次B-5a：炼蛊/蛊炉模块，须在 game.v 之前加载 -->
   <script src="nmg-refining.v0004.js" defer></script>
   <!-- V0.9.36 批次B-5b：遗物系统模块，须在 game.v 之前加载 -->
@@ -52,7 +52,7 @@
   <script src="nmg-chapter.v0005.js" defer></script>
   <!-- V0.9.37 批次E-2b1：万命母盘命债评分与纯规则内核，须在 game.v 之前加载 -->
   <script src="nmg-mupan.v0003.js" defer></script>
-  <script src="game.v1139.js" defer></script>
+  <script src="game.v1140.js" defer></script>
   <script>
     /* V0.9.24 离线护符：注册 Service Worker——玩家成功进过一次游戏后，断网/连接被
      * 重置也能离线开玩（github.io 在部分网络下被间歇性重置）。version.json 由 SW
@@ -885,6 +885,18 @@
       <p class="deck-eyebrow">塔外居所 · 万虫入瓮</p>
       <h2 id="guluTitle">蛊庐</h2>
       <div id="guluBody" class="gulu-body ux-scroll-body"></div>
+      <div id="guluActionConfirm" class="gulu-action-confirm hidden" role="dialog" aria-modal="true" aria-labelledby="guluActionConfirmTitle" aria-describedby="guluActionConfirmText">
+        <div class="gulu-action-confirm-card">
+          <button id="guluActionConfirmClose" class="gulu-action-confirm-close" type="button" aria-label="关闭确认">×</button>
+          <p class="deck-eyebrow">不可逆操作 · 请再次确认</p>
+          <h3 id="guluActionConfirmTitle">遣蛊归野</h3>
+          <div class="gulu-action-confirm-body"><p id="guluActionConfirmText"></p></div>
+          <div class="gulu-action-confirm-actions">
+            <button id="guluActionConfirmCancel" type="button" autofocus>暂且留下</button>
+            <button id="guluActionConfirmOk" class="is-danger" type="button">确认遣归</button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
