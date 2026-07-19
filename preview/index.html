@@ -13,8 +13,8 @@
   <meta name="description" content="原创暗黑东方奇幻卡牌肉鸽原型《逆命蛊途》">
   <title>逆命蛊途 · 命途塔试炼</title>
   <script>
-    window.__NMG_BUILD__ = "v0.9.39.1";
-    window.NMG_GAME_VERSION = "V0.9.39.1 视口修复";
+    window.__NMG_BUILD__ = "v0.9.40";
+    window.NMG_GAME_VERSION = "V0.9.40 命途契市";
     window.NMG_TELEMETRY_ENDPOINT = "https://nmg-analytics.nmg-analytics-kaan.workers.dev/ingest";
     // V0.9.36 平台标志：web=网页版（香火可见）。小游戏包设 "minigame" 仅做【运行时】隐藏香火入口。
     // ⚠ 打包小游戏发行包时【还须在构建期物理剥离】：删除下方 #xianghuoOverlay 整段 + 设置页香火按钮，
@@ -24,7 +24,7 @@
     if (window.NMG_PLATFORM !== "web") { try { document.documentElement.classList.add("nmg-noxianghuo"); } catch (e) {} }
   </script>
   <link rel="preload" href="assets/fonts/wenkai-screen.v1.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="style.v1099.css">
+  <link rel="stylesheet" href="style.v1100.css">
   <script src="audio.v0983.js" defer></script>
   <script src="gu_catalog.js?v=v1002" defer></script>
   <script src="telemetry.v0001.js" defer></script>
@@ -35,15 +35,17 @@
   <!-- V0.9.36 批次B-2：存档基础设施模块，须在 game.v 之前加载（含顶层迁移立即执行 + game 运行期写档走 safeWriteJson） -->
   <script src="nmg-save.v0001.js" defer></script>
   <!-- V0.9.36 批次B-3：万蛊录/图鉴模块（含 escGu 等工具），须在 game.v 之前加载 -->
-  <script src="nmg-codex.v0006.js" defer></script>
+  <script src="nmg-codex.v0008.js" defer></script>
   <!-- V0.9.36 批次B-4：蛊庐/归庐日课/香火弹窗模块，须在 game.v 之前加载 -->
   <script src="nmg-gulu.v0009.js" defer></script>
   <!-- V0.9.36 批次B-5a：炼蛊/蛊炉模块，须在 game.v 之前加载 -->
   <script src="nmg-refining.v0004.js" defer></script>
   <!-- V0.9.36 批次B-5b：遗物系统模块，须在 game.v 之前加载 -->
-  <script src="nmg-relics.v0001.js" defer></script>
+  <script src="nmg-relics.v0002.js" defer></script>
   <!-- V0.9.36 批次B-6a：本命蛊系统模块，须在 game.v 之前加载 -->
   <script src="nmg-benming.v0006.js" defer></script>
+  <!-- V0.9.40 批次QS-1a：命途契市模块，须在 game.v 之前加载 -->
+  <script src="nmg-contracts.v0003.js" defer></script>
   <!-- V0.9.36 批次B-6b：十重天系统模块，须在 game.v 之前加载 -->
   <script src="nmg-tian.v0003.js" defer></script>
   <!-- V0.9.36 批次B-6c：叙事系统模块，须在 game.v 之前加载 -->
@@ -52,7 +54,7 @@
   <script src="nmg-chapter.v0005.js" defer></script>
   <!-- V0.9.37 批次E-2b1：万命母盘命债评分与纯规则内核，须在 game.v 之前加载 -->
   <script src="nmg-mupan.v0003.js" defer></script>
-  <script src="game.v1148.js" defer></script>
+  <script src="game.v1153.js" defer></script>
   <script>
     /* V0.9.24 离线护符：注册 Service Worker——玩家成功进过一次游戏后，断网/连接被
      * 重置也能离线开玩（github.io 在部分网络下被间歇性重置）。version.json 由 SW
@@ -150,7 +152,7 @@
     </div>
     <div class="start-content">
       <div id="homeHubView" class="home-hub-view">
-      <p class="start-kicker">原创暗黑东方卡牌肉鸽 · V0.9.39.1 视口修复</p>
+      <p class="start-kicker">原创暗黑东方卡牌肉鸽 · V0.9.40 命途契市</p>
       <p class="start-agehint">适龄提示 · 建议 <span data-age-num>16</span> 周岁以上 · 纯单机、不含实物交易</p>
       <div class="start-logo" aria-hidden="true"><span>蛊</span></div>
       <h1 id="startTitle">逆命蛊途</h1>
@@ -228,6 +230,11 @@
           <section class="prep-step-panel" data-prep-panel="mode" aria-label="选择挑战模式">
             <div class="prep-panel-heading"><strong>挑战模式</strong><span>锁定后随本局写入，不影响旧存档。</span></div>
             <div id="modeChoices" class="mode-choices" aria-label="选择挑战模式"></div>
+            <!-- V0.9.40 QS-1a 命途契市：首次有效结算后解锁；未解锁时整块隐藏（零噪音） -->
+            <div id="contractSection" class="prep-contract-block hidden">
+              <div class="prep-panel-heading"><strong id="contractTitle">命途契</strong><span id="contractHint">司命人的暗契：改一条规则，标一份代价。可以不签。</span></div>
+              <div id="contractChoices" class="contract-choices" aria-label="选择命途契"></div>
+            </div>
           </section>
         </div>
 
@@ -902,7 +909,7 @@
       <button id="settingsCloseButton" class="deck-close-button" type="button" aria-label="关闭设置">×</button>
       <p class="deck-eyebrow">试玩包设置</p>
       <h2 id="settingsTitle">设置</h2>
-        <p id="settingsVersion" class="settings-version">当前版本：V0.9.39.1 视口修复</p>
+        <p id="settingsVersion" class="settings-version">当前版本：V0.9.40 命途契市</p>
       <div class="settings-list">
         <button id="settingsMusicToggle" type="button">音乐：开</button>
         <label class="settings-volume" for="settingsVolume">

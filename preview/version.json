@@ -1,5 +1,5 @@
 {
-  "build": "v0.9.39.1",
-  "version": "V0.9.39.1 视口修复",
+  "build": "v0.9.40",
+  "version": "V0.9.40 命途契市",
   "note": "游戏内更新闸读取本文件；部署时必须让 build 与当前 index.html 的 __NMG_BUILD__ 保持一致。"
 }
