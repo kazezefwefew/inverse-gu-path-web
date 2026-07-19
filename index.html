@@ -24,7 +24,7 @@
     if (window.NMG_PLATFORM !== "web") { try { document.documentElement.classList.add("nmg-noxianghuo"); } catch (e) {} }
   </script>
   <link rel="preload" href="assets/fonts/wenkai-screen.v1.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="style.v1090.css">
+  <link rel="stylesheet" href="style.v1096.css">
   <script src="audio.v0983.js" defer></script>
   <script src="gu_catalog.js?v=v1002" defer></script>
   <script src="telemetry.v0001.js" defer></script>
@@ -52,7 +52,7 @@
   <script src="nmg-chapter.v0005.js" defer></script>
   <!-- V0.9.37 批次E-2b1：万命母盘命债评分与纯规则内核，须在 game.v 之前加载 -->
   <script src="nmg-mupan.v0003.js" defer></script>
-  <script src="game.v1140.js" defer></script>
+  <script src="game.v1141.js" defer></script>
   <script>
     /* V0.9.24 离线护符：注册 Service Worker——玩家成功进过一次游戏后，断网/连接被
      * 重置也能离线开玩（github.io 在部分网络下被间歇性重置）。version.json 由 SW
@@ -385,9 +385,6 @@
       <div id="towerProgress" class="tower-progress" aria-label="命途塔进度"></div>
       <div id="topGuStone" class="top-gu-stone" aria-label="当前蛊石">蛊石 <strong>20</strong></div>
       <button id="deckViewButton" class="deck-view-button" type="button" title="查看当前完整卡组">蛊囊</button>
-      <button id="battleFullscreenButton" class="battle-fullscreen-button hidden" type="button" aria-label="进入全屏战斗视图" title="进入全屏">
-        <span class="fullscreen-glyph" aria-hidden="true">屏</span><span>全屏</span>
-      </button>
       <button id="handCollapseToggle" class="hand-collapse-toggle" type="button" aria-label="收起手牌" aria-expanded="true">手牌</button>
       <div id="topRelic" class="top-relic" aria-label="当前遗物">
         <span id="topRelicGlyph">玉</span>
@@ -398,8 +395,6 @@
         <strong id="turnNumber">1</strong>
       </div>
     </header>
-    <div id="battleFullscreenHint" class="battle-fullscreen-hint hidden" role="status" aria-live="polite">建议全屏体验，蛊效和战斗反馈会更清楚。</div>
-
     <section class="combatant player-panel" aria-labelledby="playerTitle">
       <div class="panel-heading">
         <span id="playerSideLabel" class="side-label">蛊修</span>
