@@ -24,7 +24,7 @@
     if (window.NMG_PLATFORM !== "web") { try { document.documentElement.classList.add("nmg-noxianghuo"); } catch (e) {} }
   </script>
   <link rel="preload" href="assets/fonts/wenkai-screen.v1.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="style.v1096.css">
+  <link rel="stylesheet" href="style.v1099.css">
   <script src="audio.v0983.js" defer></script>
   <script src="gu_catalog.js?v=v1002" defer></script>
   <script src="telemetry.v0001.js" defer></script>
@@ -52,7 +52,7 @@
   <script src="nmg-chapter.v0005.js" defer></script>
   <!-- V0.9.37 批次E-2b1：万命母盘命债评分与纯规则内核，须在 game.v 之前加载 -->
   <script src="nmg-mupan.v0003.js" defer></script>
-  <script src="game.v1141.js" defer></script>
+  <script src="game.v1144.js" defer></script>
   <script>
     /* V0.9.24 离线护符：注册 Service Worker——玩家成功进过一次游戏后，断网/连接被
      * 重置也能离线开玩（github.io 在部分网络下被间歇性重置）。version.json 由 SW
@@ -176,9 +176,11 @@
       </div>
       <div class="home-utility-bar" aria-label="首页工具">
         <button id="settingsOpenButton" class="home-icon-button" type="button" aria-label="设置" title="设置">设</button>
+        <button id="homeBackupButton" class="home-icon-button" type="button" aria-label="备份存档" title="备份存档（复制并下载存档码）">备</button>
         <button id="moreMenuButton" class="home-icon-button" type="button" aria-expanded="false" aria-controls="moreMenuPanel" aria-label="更多">更</button>
         <div id="moreMenuPanel" class="more-menu-panel hidden" role="dialog" aria-modal="false" aria-labelledby="moreMenuTitle">
           <p id="moreMenuTitle" class="more-menu-title">更多操作</p>
+          <button id="tutorialDrillButton" type="button">教学演武 · 练一场</button>
           <button id="updateLogButton" type="button">更新公告</button>
           <button id="tutorialResetButton" type="button">重置新手提示</button>
         </div>
@@ -908,6 +910,7 @@
           <input id="settingsVolume" type="range" min="0" max="1" step="0.05" value="0.45">
         </label>
         <button id="settingsEffectToggle" type="button">战斗特效：开</button>
+        <button id="settingsPerfToggle" type="button">性能模式：自动</button>
         <button id="settingsRecordingToggle" class="dev-only" type="button">录屏模式：关</button>
         <button id="settingsLoreAnimationToggle" type="button">跳过残卷动画：关</button>
         <div class="settings-session-actions" aria-label="试炼操作">
@@ -984,6 +987,7 @@
       <div class="tutorial-actions">
         <button id="tutorialPrevButton" type="button">上一页</button>
         <button id="tutorialNextButton" type="button">下一页</button>
+        <button id="tutorialDrillFromTutorial" class="tutorial-drill-button" type="button">下场练一手</button>
         <button id="tutorialSkipButton" class="tutorial-skip-button" type="button">跳过</button>
       </div>
     </div>
