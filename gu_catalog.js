@@ -148,6 +148,92 @@ window.GU_CATALOG = [
     gameplayEffect: "造成 6 点伤害；若敌人中毒不少于 8 层，额外造成 8 点伤害。", image: "assets/codex/gu/return-poison-gu.webp",
   },
 
+  /* ===== 烬鳞专属蛊与第二阶段通用蛊 ===== */
+  {
+    id: "gu_scale_hiding", category: "gu", cardKey: "scaleHiding",
+    name: "藏鳞蛊", alias: "潜鳞", rarity: "灵蛊", faction: "龙道", type: "防御", stage: "灵蛊·鳞形",
+    descriptionShort: "藏鳞入体，护身并积蓄龙鳞。", descriptionLore: "蛊伏脊骨之间，遇险才张开暗鳞。鳞不在甲厚，而在将龙性藏进每一次忍耐。",
+    habitat: "赤岩龙脉。", feeding: "铁砂与热血。", temperament: "沉静护主。", evolution: "可随龙化蜕为逆鳞。", synergy: "积蓄龙鳞并保护龙化前的空档。", counteredBy: "惧持续蚀甲。",
+    dropsFrom: "烬鳞专属蛊池。", unlockCondition: "选择烬鳞后可获得。", gameplayEffect: "获得 8 点防御，并获得 1 枚龙鳞。", image: "assets/codex/gu/scale-hiding-gu.webp",
+  },
+  {
+    id: "gu_reverse_scale", category: "gu", cardKey: "reverseScale",
+    name: "逆鳞蛊", alias: "触怒之鳞", rarity: "异蛊", faction: "龙道", type: "攻击", stage: "异蛊·逆鳞",
+    descriptionShort: "以伤换势，撕开龙化前的杀机。", descriptionLore: "龙有逆鳞，触之则怒。此蛊先噬主血，再借怒意撞入敌身。",
+    habitat: "龙骨裂隙。", feeding: "主血与怒火。", temperament: "暴烈难驯。", evolution: "龙化时锋芒尽显。", synergy: "快速积蓄龙鳞。", counteredBy: "主血不足时无法久用。",
+    dropsFrom: "烬鳞专属蛊池。", unlockCondition: "选择烬鳞后可获得。", gameplayEffect: "失去 2 点生命，造成 9 点伤害，并获得 2 枚龙鳞。", image: "assets/codex/gu/reverse-scale-gu.webp",
+  },
+  {
+    id: "gu_chi_breath", category: "gu", cardKey: "chiBreath",
+    name: "螭息蛊", alias: "焚息", rarity: "异蛊", faction: "龙道", type: "攻击", stage: "异蛊·息形",
+    descriptionShort: "吐出螭龙灼息，龙化时威力暴涨。", descriptionLore: "蛊腹藏一口未熄龙息，平日如炭，化龙则如赤潮。",
+    habitat: "火窟龙涎池。", feeding: "硫火与真元。", temperament: "炽烈。", evolution: "可炼成真龙息。", synergy: "龙化期间获得额外伤害。", counteredBy: "真元不足时难以连发。",
+    dropsFrom: "烬鳞专属蛊池。", unlockCondition: "选择烬鳞后可获得。", gameplayEffect: "造成 14 点伤害；龙化期间额外造成 8 点伤害。", image: "assets/codex/gu/chi-breath-gu.webp",
+  },
+  {
+    id: "gu_bone_molt", category: "gu", cardKey: "boneMolt",
+    name: "蜕骨蛊", alias: "换骨", rarity: "灵蛊", faction: "龙道", type: "辅助", stage: "灵蛊·蜕形",
+    descriptionShort: "消耗未化龙鳞，蜕骨换来手牌与防御。", descriptionLore: "旧骨一寸寸退出皮囊，新骨便在痛里长成。",
+    habitat: "龙蜕墓穴。", feeding: "骨粉与龙鳞。", temperament: "忍痛而生。", evolution: "可蜕出龙骨之躯。", synergy: "将多余龙鳞转化为资源。", counteredBy: "龙化后无法使用。",
+    dropsFrom: "烬鳞专属蛊池。", unlockCondition: "选择烬鳞后可获得。", gameplayEffect: "消耗 2 枚未化形龙鳞，抽 2 张牌并获得 6 点防御。", image: "assets/codex/gu/bone-molt-gu.webp",
+  },
+  {
+    id: "gu_cloud_horn", category: "gu", cardKey: "cloudHorn",
+    name: "行云角蛊", alias: "云角", rarity: "异蛊", faction: "龙道", type: "辅助", stage: "异蛊·角形",
+    descriptionShort: "引云聚鳞，并延长龙化之势。", descriptionLore: "角起则云随，蛊鸣一声，散落龙气皆来归附。",
+    habitat: "高崖云眼。", feeding: "雷云与晨雾。", temperament: "高傲。", evolution: "角成可召真龙云海。", synergy: "积鳞或延长龙化。", counteredBy: "每次龙化只能延长一次。",
+    dropsFrom: "烬鳞专属蛊池。", unlockCondition: "选择烬鳞后可获得。", gameplayEffect: "获得 1 枚龙鳞；龙化期间改为延长 1 回合。", image: "assets/codex/gu/cloud-horn-gu.webp",
+  },
+  {
+    id: "gu_return_breath", category: "gu", cardKey: "returnBreath",
+    name: "回息蛊", alias: "调息虫", rarity: "凡蛊", faction: "通用", type: "辅助", stage: "成蛊·息形",
+    descriptionShort: "调匀气脉，迅速补充手牌。", descriptionLore: "蛊鸣如一呼一吸，能把散乱蛊意重新拢回掌中。",
+    habitat: "温泉石隙。", feeding: "清露。", temperament: "温顺。", evolution: "可炼为长息蛊。", synergy: "适合任何需要过牌的蛊囊。", counteredBy: "牌堆将尽时收益降低。",
+    dropsFrom: "普通奖励与百蛊市。", unlockCondition: "获得此蛊即录入。", gameplayEffect: "抽 2 张牌。", image: "assets/codex/gu/return-breath-gu.webp",
+  },
+  {
+    id: "gu_hidden_meridian", category: "gu", cardKey: "hiddenMeridian",
+    name: "伏脉蛊", alias: "潜脉", rarity: "灵蛊", faction: "通用", type: "防御", stage: "灵蛊·脉形",
+    descriptionShort: "当前护身，并为下一回合埋下防御。", descriptionLore: "一半蛊力浮于皮表，另一半沉入经脉，待下一息再显。",
+    habitat: "地脉暗河。", feeding: "温玉粉。", temperament: "迟稳。", evolution: "可化重脉蛊。", synergy: "适合预判重击。", counteredBy: "战斗即将结束时延迟收益落空。",
+    dropsFrom: "普通奖励与百蛊市。", unlockCondition: "获得此蛊即录入。", gameplayEffect: "获得 5 点防御；下回合开始时再获得 5 点防御。", image: "assets/codex/gu/hidden-meridian-gu.webp",
+  },
+  {
+    id: "gu_thunder_guide", category: "gu", cardKey: "thunderGuide",
+    name: "引雷蛊", alias: "牵霆", rarity: "灵蛊", faction: "通用", type: "攻击", stage: "灵蛊·雷形",
+    descriptionShort: "承接前一张牌的余势，引雷追加伤害。", descriptionLore: "蛊不自产雷，只把尚未散尽的蛊术余响牵成一道霆光。",
+    habitat: "雷击枯木。", feeding: "磁砂。", temperament: "躁动。", evolution: "可化连霆蛊。", synergy: "不宜作为回合第一张牌。", counteredBy: "断连时威力平平。",
+    dropsFrom: "普通奖励与百蛊市。", unlockCondition: "获得此蛊即录入。", gameplayEffect: "造成 8 点伤害；本回合此前打出过牌时额外造成 4 点伤害。", image: "assets/codex/gu/thunder-guide-gu.webp",
+  },
+  {
+    id: "gu_aperture_guard", category: "gu", cardKey: "apertureGuard",
+    name: "守窍蛊", alias: "镇窍", rarity: "凡蛊", faction: "通用", type: "防御", stage: "成蛊·窍形",
+    descriptionShort: "封守空窍，提供扎实防御。", descriptionLore: "蛊蜷于窍门，如一枚沉重门闩，将侵入之力拒在体外。",
+    habitat: "古修洞府。", feeding: "石髓。", temperament: "稳重。", evolution: "可化玄关蛊。", synergy: "稳定补足任何蛊囊的防守。", counteredBy: "惧蚀甲。",
+    dropsFrom: "普通奖励与百蛊市。", unlockCondition: "获得此蛊即录入。", gameplayEffect: "获得 10 点防御。", image: "assets/codex/gu/aperture-guard-gu.webp",
+  },
+  {
+    id: "gu_ember_remnant", category: "gu", cardKey: "emberRemnant",
+    name: "余烬蛊", alias: "拾烬", rarity: "异蛊", faction: "通用", type: "辅助", stage: "异蛊·烬形",
+    descriptionShort: "烧去一张旧牌，换取新牌与防御。", descriptionLore: "它在废弃蛊意里拣火，烧掉无用之物，再把余温覆到主人身上。",
+    habitat: "熄灭丹炉。", feeding: "残符灰。", temperament: "喜新厌旧。", evolution: "可化劫灰蛊。", synergy: "清理不合时宜的手牌。", counteredBy: "手牌稀少时风险较高。",
+    dropsFrom: "普通奖励与百蛊市。", unlockCondition: "获得此蛊即录入。", gameplayEffect: "抽 2 张牌，随机弃 1 张；若成功弃牌，获得 5 点防御。", image: "assets/codex/gu/ember-remnant-gu.webp",
+  },
+  {
+    id: "gu_shadow_bind", category: "gu", cardKey: "shadowBind",
+    name: "缚影蛊", alias: "锁影", rarity: "灵蛊", faction: "通用", type: "攻防", stage: "灵蛊·影形",
+    descriptionShort: "钉住敌影，同时护住自身。", descriptionLore: "蛊丝穿影而过，敌身一滞，余丝便回绕主人腕间成盾。",
+    habitat: "无灯旧巷。", feeding: "灯影。", temperament: "阴静。", evolution: "可化封魂影蛊。", synergy: "攻守兼备，适合薄弱回合。", counteredBy: "伤害与防御都不偏极致。",
+    dropsFrom: "普通奖励与百蛊市。", unlockCondition: "获得此蛊即录入。", gameplayEffect: "造成 5 点伤害并获得 5 点防御。", image: "assets/codex/gu/shadow-bind-gu.webp",
+  },
+  {
+    id: "gu_borrow_life", category: "gu", cardKey: "borrowLife",
+    name: "借命蛊", alias: "赊命", rarity: "异蛊", faction: "通用", type: "辅助", stage: "异蛊·命形",
+    descriptionShort: "赊去一点活命，换来真元与手牌。", descriptionLore: "它从不白给力量，只把代价写在下一口血里。账未清，人先醒。",
+    habitat: "赌命祭坛。", feeding: "血契纸。", temperament: "精明冷酷。", evolution: "可化索命蛊。", synergy: "零耗补充资源。", counteredBy: "生命过低时不可使用。",
+    dropsFrom: "普通奖励与百蛊市。", unlockCondition: "获得此蛊即录入。", gameplayEffect: "失去 2 点生命，获得 1 点真元并抽 1 张牌；不会令你死亡。", image: "assets/codex/gu/borrow-life-gu.webp",
+  },
+
   /* ===== 生态蛊(gu 文件夹有立绘、游戏内暂未实装为战斗蛊牌) ===== */
   {
     id: "eco_bonebell", category: "eco", cardKey: "",
@@ -858,5 +944,15 @@ window.GU_CATALOG = [
     dropsFrom: "命途塔· 初始可选蛊修（寿道大版本新增）。", unlockCondition: "登场即录入。",
     gameplayEffect: "焚寿燃命：寿元可作寿道蛊牌燃料；当前寿元越低，蛊术伤害越高（满寿 +0／过半 +3／残寿 +6／垂暮 +10），立绘随寿元苍老。寿元归零即陨。",
     image: "assets/portraits/hero-longevity-1-web.jpg",
+  },
+  {
+    id: "hero_dragon", category: "hero", glyph: "龙",
+    name: "烬鳞", alias: "人身藏龙 · 满鳞化形", rarity: "蛊修", faction: "龙道", type: "龙道化形", stage: "蛊修·烬龙",
+    heroHp: "60", heroEnergy: "3", heroLifespan: "24",
+    descriptionShort: "积蓄龙鳞，在关键回合化龙爆发的攻防蛊修。",
+    descriptionLore: "龙道残篇：烬鳞并非天生真龙。他把残龙骨一节节嵌入己身，以五蛊镇住暴烈龙性。每得一鳞，人味便淡一分；六鳞俱全时，骨节轰鸣、赤云压顶，人身终于容不下那条蛰伏已久的龙。化形只有短短数息，却足以让整座命途塔听见龙吟。",
+    dropsFrom: "命途塔·初始可选蛊修。", unlockCondition: "登场即录入。",
+    gameplayEffect: "藏鳞化龙：龙鳞满 6 枚后可主动龙化 2 回合；龙化期间攻击、防御与真元获得增幅。",
+    image: "assets/portraits/hero-dragon-web.webp", transformedImage: "assets/portraits/hero-dragon-transformed-web.webp",
   },
 ];
