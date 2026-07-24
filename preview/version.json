@@ -1,5 +1,5 @@
 {
-  "build": "v0.9.46",
-  "version": "V0.9.46 残卷急修",
+  "build": "v0.9.47",
+  "version": "V0.9.47 龙化顺手",
   "note": "游戏内更新闸读取本文件；部署时必须让 build 与当前 index.html 的 __NMG_BUILD__ 保持一致。"
 }
