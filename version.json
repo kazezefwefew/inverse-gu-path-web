@@ -1,5 +1,5 @@
 {
-  "build": "v0.9.66",
-  "version": "V0.9.66 蛊斗鸣锋",
+  "build": "v0.9.84",
+  "version": "V0.9.84 千阶新蛊",
   "note": "游戏内更新闸读取本文件；部署时必须让 build 与当前 index.html 的 __NMG_BUILD__ 保持一致。"
 }
