@@ -13,8 +13,8 @@
   <meta name="description" content="原创暗黑东方奇幻卡牌肉鸽原型《逆命蛊途》">
   <title>逆命蛊途 · 命途塔试炼</title>
   <script>
-    window.__NMG_BUILD__ = "v0.9.66";
-    window.NMG_GAME_VERSION = "V0.9.66 蛊斗鸣锋";
+    window.__NMG_BUILD__ = "v0.9.84";
+    window.NMG_GAME_VERSION = "V0.9.84 千阶新蛊";
     window.NMG_TELEMETRY_ENDPOINT = "https://nmg-analytics.nmg-analytics-kaan.workers.dev/ingest";
     // V0.9.36 平台标志：web=网页版（香火可见）。小游戏包设 "minigame" 仅做【运行时】隐藏香火入口。
     // ⚠ 打包小游戏发行包时【还须在构建期物理剥离】：删除下方 #xianghuoOverlay 整段 + 设置页香火按钮，
@@ -25,53 +25,62 @@
   </script>
   <link rel="preload" href="assets/fonts/wenkai-screen.v1.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/icons/gu-coin.svg" as="image" type="image/svg+xml">
-  <link rel="stylesheet" href="style.v1265.css">
-  <script src="audio.v0994.js" defer></script>
+  <link rel="icon" href="assets/icons/gu-coin.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.v1339.css">
+  <script src="audio.v0997.js" defer></script>
   <script src="nmg-voices.v0005.js" defer></script>
-  <script src="gu_catalog.js?v=v1005" defer></script>
-  <script src="telemetry.v0001.js" defer></script>
+  <script src="gu_catalog.js?v=v1008" defer></script>
+  <script src="telemetry.v0002.js" defer></script>
   <!-- V0.9.36 批次C-0：数值中枢基线模块，必须在 nmg-data 与 game.v 之前加载 -->
-  <script src="nmg-balance.v0018.js" defer></script>
+  <script src="nmg-balance.v0029.js" defer></script>
+  <!-- V0.9.71：PVE 因果纵深纯规则模块，必须在 nmg-data 与 game.v 之前加载 -->
+  <script src="nmg-pve-mechanics.v0017.js" defer></script>
   <!-- V0.9.36 批次B-1：静态数据模块，必须在 game.v 之前加载（含顶层 effectType 装配 + game 后段构造期读它） -->
-  <script src="nmg-data.v0030.js" defer></script>
+  <script src="nmg-data.v0050.js" defer></script>
   <!-- V0.9.36 批次B-2：存档基础设施模块，须在 game.v 之前加载（含顶层迁移立即执行 + game 运行期写档走 safeWriteJson） -->
   <script src="nmg-save.v0005.js" defer></script>
   <!-- TapTap H5 云存档：依赖 nmg-save 的校验/恢复接口，普通网页环境自动停用 -->
   <script src="nmg-cloud-save.v0005.js" defer></script>
   <!-- V0.9.36 批次B-3：万蛊录/图鉴模块（含 escGu 等工具），须在 game.v 之前加载 -->
-  <script src="nmg-codex.v0024.js" defer></script>
+  <script src="nmg-codex.v0032.js" defer></script>
   <!-- V0.9.36 批次B-4：蛊庐/归庐日课/香火弹窗模块，须在 game.v 之前加载 -->
-  <script src="nmg-gulu.v0103.js" defer></script>
+  <script src="nmg-gulu.v0159.js" defer></script>
+  <!-- V0.9.71：PVE 因果回响、敌方课题、挑战推荐与无尽奖励进度；不新增联网状态。 -->
+  <script src="nmg-retention.v0003.js" defer></script>
   <!-- V0.9.36 批次B-5a：炼蛊/蛊炉模块，须在 game.v 之前加载 -->
-  <script src="nmg-refining.v0016.js" defer></script>
+  <script src="nmg-refining.v0021.js" defer></script>
   <!-- V0.9.36 批次B-5b：遗物系统模块，须在 game.v 之前加载 -->
-  <script src="nmg-relics.v0008.js" defer></script>
+  <script src="nmg-relics.v0010.js" defer></script>
   <!-- V0.9.36 批次B-6a：本命蛊系统模块，须在 game.v 之前加载 -->
-  <script src="nmg-benming.v0018.js" defer></script>
+  <script src="nmg-benming.v0019.js" defer></script>
+  <!-- V0.9.67：称号收藏、佩戴与九转旧档补发，依赖本命蛊阶段读取 -->
+  <script src="nmg-titles.v0006.js" defer></script>
   <!-- V0.9.40 批次QS-1a：命途契市模块，须在 game.v 之前加载 -->
   <script src="nmg-contracts.v0005.js" defer></script>
   <script src="nmg-outgame-receipts.v0005.js" defer></script>
   <!-- V0.9.36 批次B-6b：十重天系统模块，须在 game.v 之前加载 -->
-  <script src="nmg-tian.v0005.js" defer></script>
+  <script src="nmg-tian.v0008.js" defer></script>
   <!-- V0.9.36 批次B-6c：叙事系统模块，须在 game.v 之前加载 -->
-  <script src="nmg-story.v0003.js" defer></script>
+  <script src="nmg-story.v0004.js" defer></script>
   <!-- V0.9.37 批次E-1a：命途塔章节路线数据骨架，须在 game.v 之前加载 -->
   <script src="nmg-chapter.v0007.js" defer></script>
-  <script src="nmg-endless.v0002.js" defer></script>
+  <script src="nmg-endless.v0011.js" defer></script>
   <script src="nmg-leaderboard.v0002.js" defer></script>
   <!-- V0.9.65 蛊斗争锋：随机公平对战 + 无奖励邀请切磋。普通网页环境全链路隐藏。 -->
   <script src="nmg-taptap-login.v0004.js" defer></script>
   <script src="nmg-multiplayer.v0006.js" defer></script>
-  <script src="nmg-online-battle.v0006.js" defer></script>
-  <script src="nmg-card-cast.v0001.js" defer></script>
-  <script src="nmg-online-lobby.v0020.js" defer></script>
+  <script src="nmg-online-battle.v0012.js" defer></script>
+  <script src="nmg-duel-bot.v0002.js" defer></script>
+  <script src="nmg-duel-rank.v0003.js" defer></script>
+  <script src="nmg-card-cast.v0004.js" defer></script>
+  <script src="nmg-online-lobby.v0029.js" defer></script>
   <!-- V0.9.37 批次E-2b1：万命母盘命债评分与纯规则内核，须在 game.v 之前加载 -->
-  <script src="nmg-mupan.v0005.js" defer></script>
+  <script src="nmg-mupan.v0006.js" defer></script>
   <!-- AD-1 TapTap 激励视频广告（v0.9.48 复活）：官方 MCP check_ads_status 确认本应用广告状态=已生效、
        横屏激励视频位 1054323 有效（此前误用 Dirichlet 的 1059636 才不填充）。仅 TapTap 容器(注入 tap 全局)生效，
        网页/其他环境经 nmg-ads 能力门控自动降级、结算「看广告翻倍」按钮不渲染。须在 game.v 之前加载。 -->
-  <script src="nmg-ads.v0007.js" defer></script>
-  <script src="game.v1341.js" defer></script>
+  <script src="nmg-ads.v0012.js" defer></script>
+  <script src="game.v1451.js" defer></script>
   <script>
     /* V0.9.24 离线护符：注册 Service Worker——玩家成功进过一次游戏后，断网/连接被
      * 重置也能离线开玩（github.io 在部分网络下被间歇性重置）。version.json 由 SW
@@ -145,7 +154,7 @@
     </div>
   </div>
   <button id="mobileLogButton" class="mobile-log-button hidden" type="button" aria-expanded="false">铭刻</button>
-  <button id="mobileAudioToggle" class="mobile-audio-toggle hidden" type="button" aria-expanded="false" aria-label="打开音频设置">音</button>
+  <button id="mobileAudioToggle" class="mobile-audio-toggle hidden" type="button" aria-expanded="false" aria-label="打开声音设置"><span aria-hidden="true">声音</span></button>
 
   <section id="startScreen" class="start-screen" aria-labelledby="startTitle">
     <div class="start-backdrop" aria-hidden="true">
@@ -161,6 +170,7 @@
           <img class="ts-layer ts-door" src="assets/scenes/title-doorglow.webp" alt="">
           <div class="ts-fly-front" id="titleFlyFront"></div>
         </div>
+        <img class="ts-layer ts-poster" src="assets/scenes/start-poster-v0983.webp" alt="">
         <div class="ts-halo"></div>
         <img class="ts-layer ts-foga" src="assets/scenes/title-foga.webp" alt="">
         <img class="ts-layer ts-fogb" src="assets/scenes/title-fogb.webp" alt="">
@@ -169,18 +179,28 @@
     </div>
     <div class="start-content">
       <div id="homeHubView" class="home-hub-view">
-      <p class="start-kicker">原创暗黑东方卡牌肉鸽 · V0.9.66 蛊斗鸣锋</p>
+      <p class="start-kicker">原创暗黑东方卡牌肉鸽 · V0.9.84 千阶新蛊</p>
       <p class="start-agehint">适龄提示 · 建议 <span data-age-num>16</span> 周岁以上 · 单人命途、双人蛊斗、不含实物交易</p>
       <div class="start-logo" aria-hidden="true"><span>蛊</span></div>
       <h1 id="startTitle">逆命蛊途</h1>
       <p class="start-subtitle">以蛊为刃，以命为薪。命途塔中，从来没有天命之人。</p>
+      <button id="homeTitleIdentity" class="home-title-identity hidden" type="button" title="前往万蛊录更换称号">
+        <span>蛊修名号</span><strong id="homeEquippedTitle">未佩戴</strong><small>万蛊录中可更换</small>
+      </button>
       <div class="home-run-actions" aria-label="命途入口">
-        <button id="resumeRunButton" class="resume-run-button hidden" type="button">
-          <span class="resume-run-main">继续上一局</span>
+        <button id="recommendedRunButton" class="new-run-button recommended-run-button" type="button"><strong>推荐方案·立即入塔</strong><small>命修 · 寒玉髓 · 月刃与铁皮 · 普通</small></button>
+        <button id="newRunButton" class="custom-prep-button home-primary-action" type="button"><strong>自选整备</strong><small>自选蛊修、起始蛊、遗物与模式</small></button>
+        <button id="resumeRunButton" class="resume-run-button home-resume-action hidden" type="button">
+          <span class="resume-run-main">继续上次命途</span>
           <small class="resume-run-sub" id="resumeRunSummary"></small>
         </button>
-        <button id="newRunButton" class="new-run-button" type="button"><strong>新启命途</strong><small>进入开局整备</small></button>
       </div>
+      <p id="homeSaveStatus" class="home-save-status" aria-live="polite"><span aria-hidden="true">存</span><strong>本地自动存档</strong><small id="homeSaveStatusText">开局后自动保存；中途离开可从首页继续。</small></p>
+      <button id="homeDailyLuckButton" class="home-daily-luck hidden" type="button">
+        <span class="home-daily-luck-seal" aria-hidden="true">吉</span>
+        <span><small>每日一签 · 随机福缘</small><strong id="homeDailyLuckLabel">今日福缘待揭</strong><em id="homeDailyLuckHint">奖励每日随机，不会出现蛊虫或蛊牌</em></span>
+        <b aria-hidden="true">揭签</b>
+      </button>
       <div class="start-collection-hub" aria-label="局外收藏与养成">
         <button id="wanGuLuButton" class="collection-hub-entry wangulu-entry" type="button" title="万蛊录：种类图鉴 · 只记收录 · 不存个体">
           <span class="collection-hub-glyph" aria-hidden="true">录</span>
@@ -202,8 +222,8 @@
         </button>
         <button id="onlineLobbyEntry" class="collection-hub-entry online-lobby-entry hidden" type="button" title="蛊斗场：TapTap 真人公平对战">
           <span class="collection-hub-glyph" aria-hidden="true">斗</span>
-          <span><strong>蛊斗场</strong><small>随机对战 · 邀请切磋</small></span>
-          <em class="online-lobby-beta">双人</em>
+          <span><strong>蛊斗场</strong><small>排位得重赏 · 真人或守擂傀儡</small></span>
+          <em class="online-lobby-beta">有赏</em>
         </button>
         <!-- 登天榜始终在主页第一层占位；未解锁时禁用并直说条件，避免玩家误以为功能不存在。 -->
         <button id="leaderboardOpenButton" class="collection-hub-entry leaderboard-enter-button is-locked" type="button" disabled title="登天榜未解锁：通关任意路线后开放">
@@ -211,17 +231,20 @@
           <span><strong id="leaderboardEntryTitle">登天榜 · 未解锁</strong><small id="leaderboardEntryHint">未解锁 · 通关任意路线</small></span>
         </button>
       </div>
+      <button id="parkOpenButton" class="park-home-entry" type="button" title="万蛊游园：每日免费轻活动 · 宗门园景营造 · 不增加战力">
+        <span aria-hidden="true">园</span><strong>万蛊游园</strong><small>今日开园 · 每日免费游乐</small>
+      </button>
       <div class="home-utility-bar" aria-label="首页工具">
-        <button id="settingsOpenButton" class="home-icon-button" type="button" aria-label="设置" title="设置"><svg class="icon-gear" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 8.6a3.4 3.4 0 1 0 0 6.8 3.4 3.4 0 0 0 0-6.8z" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M19.3 14.2a1.4 1.4 0 0 0 .3 1.55l.05.05a1.7 1.7 0 1 1-2.4 2.4l-.05-.05a1.4 1.4 0 0 0-1.55-.3 1.4 1.4 0 0 0-.85 1.29V19a1.7 1.7 0 0 1-3.4 0v-.07a1.4 1.4 0 0 0-.92-1.29 1.4 1.4 0 0 0-1.55.3l-.05.05a1.7 1.7 0 1 1-2.4-2.4l.05-.05a1.4 1.4 0 0 0 .3-1.55 1.4 1.4 0 0 0-1.29-.85H5a1.7 1.7 0 0 1 0-3.4h.07a1.4 1.4 0 0 0 1.29-.92 1.4 1.4 0 0 0-.3-1.55l-.05-.05a1.7 1.7 0 1 1 2.4-2.4l.05.05a1.4 1.4 0 0 0 1.55.3H10a1.4 1.4 0 0 0 .85-1.29V5a1.7 1.7 0 0 1 3.4 0v.07a1.4 1.4 0 0 0 .85 1.29 1.4 1.4 0 0 0 1.55-.3l.05-.05a1.7 1.7 0 1 1 2.4 2.4l-.05.05a1.4 1.4 0 0 0-.3 1.55V10a1.4 1.4 0 0 0 1.29.85H19a1.7 1.7 0 0 1 0 3.4h-.07a1.4 1.4 0 0 0-1.29.85z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-        <button id="tutorialDrillButton" class="home-guide-button" type="button" aria-label="打开新手引导" title="新手引导 · 可随时重看或进入教学战"><span aria-hidden="true">引</span>新手引导</button>
-        <button id="moreMenuButton" class="home-icon-button" type="button" aria-expanded="false" aria-controls="moreMenuPanel" aria-label="更多">更</button>
+        <button id="settingsOpenButton" class="home-icon-button" type="button" aria-label="设置" title="设置"><svg class="icon-gear" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 8.6a3.4 3.4 0 1 0 0 6.8 3.4 3.4 0 0 0 0-6.8z" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M19.3 14.2a1.4 1.4 0 0 0 .3 1.55l.05.05a1.7 1.7 0 1 1-2.4 2.4l-.05-.05a1.4 1.4 0 0 0-1.55-.3 1.4 1.4 0 0 0-.85 1.29V19a1.7 1.7 0 0 1-3.4 0v-.07a1.4 1.4 0 0 0-.92-1.29 1.4 1.4 0 0 0-1.55.3l-.05.05a1.7 1.7 0 1 1-2.4-2.4l.05-.05a1.4 1.4 0 0 0 .3-1.55 1.4 1.4 0 0 0-1.29-.85H5a1.7 1.7 0 0 1 0-3.4h.07a1.4 1.4 0 0 0 1.29-.92 1.4 1.4 0 0 0-.3-1.55l-.05-.05a1.7 1.7 0 1 1 2.4-2.4l.05.05a1.4 1.4 0 0 0 1.55.3H10a1.4 1.4 0 0 0 .85-1.29V5a1.7 1.7 0 0 1 3.4 0v.07a1.4 1.4 0 0 0 .85 1.29 1.4 1.4 0 0 0 1.55-.3l.05-.05a1.7 1.7 0 1 1 2.4 2.4l-.05.05a1.4 1.4 0 0 0-.3 1.55V10a1.4 1.4 0 0 0 1.29.85H19a1.7 1.7 0 0 1 0 3.4h-.07a1.4 1.4 0 0 0-1.29.85z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><b class="home-tool-label">设置</b></button>
+        <button id="tutorialDrillButton" class="home-guide-button" type="button" aria-label="打开新手引导" title="新手引导 · 可随时重看或进入教学战"><span aria-hidden="true">引</span><b class="home-tool-label">引导</b></button>
+        <button id="moreMenuButton" class="home-icon-button" type="button" aria-expanded="false" aria-controls="moreMenuPanel" aria-label="更多"><span aria-hidden="true">更</span><b class="home-tool-label">更多</b></button>
         <div id="moreMenuPanel" class="more-menu-panel hidden" role="dialog" aria-modal="false" aria-labelledby="moreMenuTitle">
           <p id="moreMenuTitle" class="more-menu-title">更多操作</p>
           <button id="updateLogButton" type="button">更新公告</button>
           <button id="tutorialResetButton" type="button">重看新手指引</button>
         </div>
       </div>
-      <p class="start-feedback-note">网页试玩版：当前为开发测试版本，数据与内容仍会调整。</p>
+      <p class="start-feedback-note">正式版本：内容将持续更新与优化。</p>
       </div>
 
       <div id="prepScreenView" class="prep-screen-view hidden" aria-label="开局整备">
@@ -243,10 +266,10 @@
           <button class="prep-step-tab" type="button" role="tab" aria-selected="false" data-prep-step="relic"><b>三</b><span>遗物</span></button>
           <button class="prep-step-tab" type="button" role="tab" aria-selected="false" data-prep-step="mode"><b>四</b><span>试炼</span></button>
         </div>
-
         <div class="prep-step-viewport">
           <section class="prep-step-panel is-active" data-prep-panel="hero" aria-label="选择入塔蛊修">
             <div class="prep-panel-heading"><strong>选择入塔蛊修</strong><span>六命同列，点按选择；详情另阅。</span></div>
+            <details class="outgame-disclosure prep-panel-guide"><summary>四步怎么选</summary><p>依次选蛊修、两只通用蛊、一件本命遗物和试炼模式。底栏会汇总当前整备，最后再入塔。</p></details>
             <div id="heroChoices" class="hero-choices" aria-label="选择一名入塔蛊修"></div>
             <div id="benmingPathSection" class="benming-path-section hidden" aria-labelledby="benmingPathTitle">
               <div class="prep-panel-heading"><strong id="benmingPathTitle">本命蛊 · 选择本局路线</strong><span id="benmingPathHint">三转已成。两条路线互斥，每局重新选择。</span></div>
@@ -373,6 +396,8 @@
         </div>
       </div>
       <div id="mapProgress" class="map-progress" aria-label="命途图进度"></div>
+      <p id="endlessRewardGap" class="endless-reward-gap hidden" aria-live="polite"></p>
+      <div id="eventEchoMapStrip" class="event-echo-map-strip hidden" aria-live="polite"></div>
       <div id="mapStatus" class="map-status" aria-live="polite"></div>
       <div id="mapRoute" class="map-route fate-line-map" aria-live="polite"></div>
       <div id="mapNotice" class="map-notice hidden" aria-live="polite"></div>
@@ -384,7 +409,7 @@
       </div>
       <button id="mapBlessAdButton" class="run-rewarded-btn map-bless-btn hidden" type="button">
         <strong>看广告 · 战前加持：+8 护甲 / +1 攻击</strong>
-        <small>主动观看，完整看完才发放</small>
+        <small>主动观看，完整看完才发放；提前关闭不消耗资格。</small>
       </button>
       <p id="mapHint" class="map-hint">先择命线，再踏入节点。</p>
       <div id="mapTransition" class="map-transition hidden" aria-live="assertive">
@@ -400,7 +425,8 @@
     <button id="battleCoachClose" type="button" aria-label="关闭战斗提示">×</button>
     <strong>入塔提示</strong>
     <ul>
-      <li>每回合真元会恢复，点击卡牌即可使用。</li>
+      <li>手牌收起时，点屏幕底部金色“展开手牌”按钮；再点牌选中。</li>
+      <li>点“详情”看完整效果，确认后点“催动”使用。</li>
       <li>防御会抵挡伤害，但回合结束后清零。</li>
       <li>敌人意图会提前显示，注意防守或抢攻。</li>
     </ul>
@@ -446,6 +472,8 @@
         <strong id="turnNumber">1</strong>
       </div>
     </header>
+    <aside id="retryFocusBanner" class="retry-focus-banner hidden" aria-live="polite"></aside>
+    <div id="battleBackgroundSlot" class="battle-background-slot" data-battle-scene="tower" aria-hidden="true"></div>
     <section class="combatant player-panel" aria-labelledby="playerTitle">
       <div class="panel-heading">
         <span id="playerSideLabel" class="side-label">蛊修</span>
@@ -553,13 +581,7 @@
       </div>
     </section>
 
-    <section class="arena-panel" aria-labelledby="battleInfoTitle">
-      <div id="battleBackgroundSlot" class="battle-background-slot" data-battle-scene="tower" aria-hidden="true"></div>
-      <div class="tower-sigil" aria-hidden="true">
-        <span class="sigil-ring ring-outer"></span>
-        <span class="sigil-ring ring-inner"></span>
-        <span class="sigil-character">逆</span>
-      </div>
+    <section id="battleArenaPanel" class="arena-panel" aria-labelledby="battleInfoTitle">
       <div id="castDisplay" class="cast-display" aria-hidden="true">
         <span id="castGlyph">蛊</span>
         <strong id="castName">蛊术催动</strong>
@@ -567,6 +589,7 @@
       <div class="battle-copy">
         <p id="arenaKicker" class="arena-kicker">阴风穿塔，兽啸逼近</p>
         <h2 id="battleInfoTitle">此战，唯有一方能离开</h2>
+        <div id="eventEchoBattleBanner" class="event-echo-battle-banner hidden" aria-live="polite"></div>
         <p id="battleMessage" class="battle-message" aria-live="polite">山魈伏在阴影中，正窥伺你的破绽。</p>
       </div>
     </section>
@@ -616,7 +639,10 @@
         </div>
       </div>
       <div id="selectedCardActions" class="selected-card-actions hidden" aria-live="polite">
-        <span id="selectedCardName">尚未选牌</span>
+        <span class="selected-card-summary">
+          <strong id="selectedCardName">尚未选牌</strong>
+          <small id="selectedCardEffect">点牌后查看核心效果</small>
+        </span>
         <button id="selectedCardDetailButton" type="button">详情</button>
         <button id="selectedCardPlayButton" type="button">催动</button>
       </div>
@@ -624,6 +650,10 @@
         <button id="boneChimeButton" class="bone-chime-button hidden" type="button" aria-label="骨鸣达到三点后发动叩铃">
           <span>叩铃</span>
           <small>骨鸣未足</small>
+        </button>
+        <button id="dragonTransformButton" class="dragon-transform-button hidden" type="button" aria-label="化龙">
+          <span>化龙</span>
+          <small>龙鳞 0/7</small>
         </button>
         <button id="endTurnButton" class="end-turn-button" type="button">
           <span>结束回合</span>
@@ -695,6 +725,7 @@
       <p id="resultEyebrow">命途逆转</p>
       <h2 id="resultTitle">夺得传承</h2>
       <p id="resultDescription">山魈伏诛，命途塔的古老传承向你敞开。</p>
+      <div id="eventEchoReceipt" class="event-echo-receipt hidden" aria-live="polite"></div>
       <div class="result-stats">
         <span>历经 <strong id="resultTurns">1</strong> 回合</span>
         <span>剩余生命 <strong id="resultHp">50</strong></span>
@@ -709,6 +740,10 @@
           <span><i>核</i><b id="bossRewardCores">1</b><small>蛊母残核</small></span>
         </div>
         <p>蛊母残核须活着带出塔，方可在蛊庐孵化道脉精品蛊卵。</p>
+        <button id="bossMaterialSalvageButton" class="run-rewarded-btn hidden" type="button">
+          <strong>看广告 · 段末搜获</strong>
+          <small>本 Boss 一次 · 三选一获得基础炼材 ×2</small>
+        </button>
       </section>
       <div class="result-mini-actions">
         <button id="resultDeckButton" class="deck-mini-button" type="button">查看蛊囊</button>
@@ -720,6 +755,10 @@
           <h3>炼蛊收获</h3>
         </div>
         <div id="cardRewardChoices" class="card-reward-choices"></div>
+        <button id="firstWinQuickClaimButton" class="first-win-quick-claim hidden" type="button">
+          <strong>一键收纳推荐</strong>
+          <small>仍从本次正式候选中选择蛊牌与炉灰</small>
+        </button>
         <!-- V0.9.31 两段式：选中先高亮不落袋，确认才入组、可重选，防误触 -->
         <div id="cardRewardConfirm" class="reward-confirm hidden">
           <p id="cardRewardConfirmText" class="reward-confirm-text"></p>
@@ -729,7 +768,7 @@
           </div>
         </div>
         <!-- 普通战奖励重抽：仅普通战(≥2杀/未选)且广告可用时由 JS 显示；可反复重抽，网页无 tap 恒隐藏 -->
-        <button id="rewardRerollButton" class="run-rewarded-btn reward-reroll-btn hidden" type="button"><strong>看广告 · 重抽三枚蛊卵</strong><small>主动观看，完整看完才发放</small></button>
+        <button id="rewardRerollButton" class="run-rewarded-btn reward-reroll-btn hidden" type="button"><strong>看广告 · 重抽三枚蛊卵</strong><small>主动观看，完整看完才发放；提前关闭不消耗资格。</small></button>
         <button id="skipRewardButton" class="reward-skip" type="button">舍弃收获</button>
       </div>
       <div id="materialRewardPanel" class="material-reward-panel hidden">
@@ -747,6 +786,17 @@
         </div>
         <button id="skipMaterialButton" class="reward-skip" type="button">不取材料</button>
       </div>
+      <section id="rewardedMaterialChoicePanel" class="rewarded-material-choice hidden" aria-live="polite">
+        <small id="rewardedMaterialChoiceEyebrow">广告加持</small>
+        <h3 id="rewardedMaterialChoiceTitle">战后寻材</h3>
+        <p id="rewardedMaterialChoiceHint">选择一份基础炼材。</p>
+        <button id="rewardedBattleSalvageButton" type="button" class="run-rewarded-btn hidden" data-rewarded-battle-salvage>
+          <strong>看广告 · 战后寻材</strong>
+          <small>每两胜一次 · 三选一获得基础炼材 ×1</small>
+        </button>
+        <div id="rewardedMaterialChoiceList" class="rewarded-material-choice-list"></div>
+        <button id="rewardedMaterialChoiceLater" class="reward-skip" type="button">稍后再选</button>
+      </section>
       <div id="refinePanel" class="refine-panel hidden">
         <div class="refine-heading">
           <span>三蛊同炉，仅可取一</span>
@@ -832,7 +882,7 @@
           <h3>逆命 · 续一次</h3>
         </div>
         <p class="revive-offer-desc">回复 30% 最大生命，保留当前敌人、牌堆与场面。</p>
-        <p class="rewarded-ad-note">主动观看，完整看完才发放。</p>
+        <p class="rewarded-ad-note">主动观看，完整看完才发放；提前关闭不消耗资格。</p>
         <div class="revive-offer-actions">
           <button id="reviveWatchAdButton" class="run-rewarded-btn revive-watch-btn" type="button"><strong>看广告 · 续命：回复 30% 生命</strong></button>
           <button id="reviveDeclineButton" class="reward-skip" type="button">结束本局</button>
@@ -941,9 +991,9 @@
   <div id="balanceOverlay" class="balance-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="balanceTitle">
     <div class="balance-card">
       <button id="balanceCloseButton" class="deck-close-button" type="button" aria-label="关闭平衡检查">×</button>
-      <p class="deck-eyebrow">开发测试 / 配置摘要</p>
+      <p class="deck-eyebrow">开发工具 / 配置摘要</p>
       <h2 id="balanceTitle">平衡检查</h2>
-      <p class="balance-intro">仅用于内测核对数值入口；录屏模式开启后自动隐藏。</p>
+      <p class="balance-intro">仅用于开发者核对数值；录屏模式开启后自动隐藏。</p>
       <div id="balanceSummary" class="balance-summary"></div>
       <div class="balance-actions">
         <button id="balanceCopyButton" type="button">复制平衡摘要</button>
@@ -954,13 +1004,13 @@
   <div id="trialSettingsOverlay" class="trial-settings-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="trialSettingsTitle">
     <div class="trial-settings-card">
       <button id="trialSettingsCloseButton" class="deck-close-button" type="button" aria-label="关闭试炼设置">×</button>
-      <p class="deck-eyebrow">试玩模式 / 路线种子</p>
+      <p class="deck-eyebrow">命途模式 / 路线种子</p>
       <h2 id="trialSettingsTitle">试炼设置</h2>
-      <p class="settings-intro">选择下一局的试玩用途。切换后不影响已经开始的一局。</p>
+      <p class="settings-intro">选择下一局的命途规则。切换后不影响已经开始的一局。</p>
       <div id="trialModeChoices" class="trial-mode-choices" role="list"></div>
       <label class="seed-setting-row" for="trialSeedInput">
         <span>命途种子</span>
-        <input id="trialSeedInput" type="text" maxlength="7" placeholder="平衡测试可填，如 MT-7F3A">
+        <input id="trialSeedInput" type="text" maxlength="7" placeholder="种子复现可填，如 MT-7F3A">
       </label>
       <div class="settings-actions">
         <button id="trialSeedClearButton" type="button">下局随机种子</button>
@@ -1001,6 +1051,43 @@
     </div>
   </div>
 
+  <!-- 万蛊游园·珍稀蛊获取：只展示已经原子写入的结果，不参与奖励结算。 -->
+  <div id="parkRareAcquireOverlay" class="park-rare-acquire-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="parkRareAcquireName" aria-describedby="parkRareAcquireReason parkRareAcquireDestination">
+    <i class="park-rare-acquire-mist" aria-hidden="true"></i>
+    <i class="park-rare-acquire-rays" aria-hidden="true"></i>
+    <div class="park-rare-acquire-card">
+      <p class="park-rare-acquire-eyebrow">万蛊游园 · 奇茧灵光</p>
+      <span id="parkRareAcquireState" class="park-rare-acquire-state">新得珍稀蛊</span>
+      <div class="park-rare-acquire-art" aria-hidden="true">
+        <i></i><b id="parkRareAcquireArt"><img id="parkRareAcquireArtImage" alt="" decoding="async"><em>蛊</em></b><span id="parkRareAcquireSeal">奇</span>
+      </div>
+      <h2 id="parkRareAcquireName">珍稀蛊显形</h2>
+      <p id="parkRareAcquireReason" class="park-rare-acquire-reason">独有构筑机制</p>
+      <p id="parkRareAcquireDestination" class="park-rare-acquire-destination">已收入蛊庐</p>
+      <div class="park-rare-acquire-actions">
+        <button id="parkRareAcquireAccept" type="button">收入蛊庐</button>
+        <button id="parkRareAcquireDetail" type="button">查看详情</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="guEvolutionOverlay" class="gu-evolution-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="guEvolutionTitle" aria-describedby="guEvolutionHint">
+    <div class="gu-evolution-card">
+      <header>
+        <div><p class="deck-eyebrow">个体蛊 · 里程碑蜕变</p><h2 id="guEvolutionTitle">三转·择定行性</h2></div>
+        <button id="guEvolutionClose" type="button" aria-label="关闭蜕变选择">×</button>
+      </header>
+      <div class="gu-evolution-scroll">
+        <p id="guEvolutionHint" class="gu-evolution-hint"></p>
+        <div id="guEvolutionChoices" class="gu-evolution-choices" role="radiogroup" aria-label="蜕变选项"></div>
+      </div>
+      <footer>
+        <button id="guEvolutionCancel" type="button">暂不决定</button>
+        <button id="guEvolutionConfirm" type="button" disabled>确认选择</button>
+      </footer>
+    </div>
+  </div>
+
   <!-- 九转鼎升转大仪式：只展示 forgeUp 已结算的结果快照，不参与资产结算。 -->
   <div id="guluForgeResultOverlay" class="gulu-forge-result-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="guluForgeResultTitle" aria-describedby="guluForgeResultGu guluForgeResultTurns">
     <i class="gulu-forge-result-glow" aria-hidden="true"></i>
@@ -1017,6 +1104,10 @@
           <div><dt>失败积累</dt><dd id="guluForgeResultPity">0% → 0%</dd></div>
         </dl>
       </div>
+      <button id="guluForgeRewardedReclaim" type="button" class="gulu-rewarded-btn hidden">
+        <strong>看广告 · 炉败拾灰</strong>
+        <small>返还本炉实际消耗的一份基础材料 · 每日最多 2 次</small>
+      </button>
       <p class="gulu-forge-result-hint">点击 · Enter · Space · Escape</p>
       <button id="guluForgeResultAccept" type="button">跳过动势</button>
     </div>
@@ -1069,29 +1160,53 @@
       <h2 id="onlineLobbyTitle">蛊斗场</h2>
       <div id="onlineLobbySetup">
         <section class="online-lobby-page is-active" data-online-page="identity">
-          <div class="online-page-heading"><span>第一步</span><h3>亮明身份</h3><p>登录 TapTap 后，对手将看到你的真实昵称与头像。</p></div>
+          <div class="online-page-heading"><span>第一步</span><h3>亮明身份</h3><p>先登录；对手会看到你的 TapTap 昵称与头像。</p></div>
           <div class="online-lobby-profile online-identity-card">
             <div id="onlineProfileAvatar" class="online-profile-avatar" aria-hidden="true">命</div>
-            <div><strong id="onlineProfileName">尚未登录</strong><small id="onlineProfileHint">先完成 TapTap 登录</small></div>
+            <div><strong id="onlineProfileName">尚未登录</strong><em id="onlineProfileTitle" class="online-profile-title hidden"></em><small id="onlineProfileHint">先完成 TapTap 登录</small></div>
             <button id="onlineProfileButton" class="hidden" type="button">授权头像昵称</button>
           </div>
+          <section id="onlineRankCard" class="online-rank-card" aria-label="蛊斗赛季段位" aria-live="polite">
+            <img id="onlineRankIcon" class="online-rank-icon" data-tone="ash" src="assets/ui/duel-ranks/dormant.webp" alt="蛰蛊段位徽章">
+            <div class="online-rank-copy">
+              <small id="onlineRankSeason">本月赛季</small>
+              <strong id="onlineRankName">蛰蛊</strong>
+              <span><b id="onlineRankPoints">0</b> 荣誉 · <em id="onlineRankDaily">今日 0/8 场</em></span>
+            </div>
+          </section>
+          <details class="outgame-disclosure online-rank-details"><summary>七阶段位与奖励明细</summary>
+            <div class="online-rank-ladder" aria-label="七阶段位">
+              <span data-tone="ash"><img src="assets/ui/duel-ranks/dormant.webp" alt="蛰蛊"><small>蛰蛊</small></span><span data-tone="bronze"><img src="assets/ui/duel-ranks/cocoon.webp" alt="破茧"><small>破茧</small></span><span data-tone="jade"><img src="assets/ui/duel-ranks/spirit.webp" alt="灵蜕"><small>灵蜕</small></span><span data-tone="indigo"><img src="assets/ui/duel-ranks/mystic.webp" alt="玄脉"><small>玄脉</small></span><span data-tone="gold"><img src="assets/ui/duel-ranks/heaven.webp" alt="天命"><small>天命</small></span><span data-tone="crimson"><img src="assets/ui/duel-ranks/imperial.webp" alt="皇极"><small>皇极</small></span><span data-tone="violet"><img src="assets/ui/duel-ranks/ancestral.webp" alt="祖庭"><small>祖庭</small></span>
+              <i class="online-rank-progress"><b id="onlineRankProgress"></b></i>
+            </div>
+            <section class="online-rank-rewards" aria-label="蛊斗排位奖励">
+              <div><strong>蛊斗有赏</strong><small>真人荣誉与奖励最高；守擂傀儡胜场荣誉减半，每日最多 3 场计分，败北不扣荣誉。</small></div>
+              <span><b>今日</b><em id="onlineRankDailyReward">首场与首胜待领取</em></span>
+              <span><b>本周</b><em id="onlineRankWeeklyReward">排位 0/5 场</em></span>
+              <span><b>晋段</b><em id="onlineRankNextChest">破茧宝匣 · 蛊钱 60</em></span>
+              <span><b>赛季</b><em id="onlineRankSeasonReward">当前预计 · 蛊钱 50</em></span>
+            </section>
+          </details>
           <div class="online-page-primary"><button id="onlineLoginButton" type="button">TapTap 登录</button><button id="onlineConnectButton" type="button" disabled>连接蛊斗场</button></div>
         </section>
 
         <section class="online-lobby-page" data-online-page="modes">
-          <div class="online-page-heading"><span>选择方式</span><h3>入场斗蛊</h3><p>随机匹配胜者：蛊钱 100 + 随机生态异材 ×1；邀请房无奖励。</p></div>
+          <div class="online-page-heading"><span>选择方式</span><h3>入场斗蛊</h3><p>选排位拿荣誉，或开邀请房与好友切磋。</p></div>
           <div class="online-mode-grid">
-            <button id="onlineMatchButton" class="online-mode-card" type="button" disabled><b>随机匹配</b><small>胜者：蛊钱 100 + 随机生态异材 ×1</small></button>
+              <button id="onlineMatchButton" class="online-mode-card" type="button" disabled><b>排位匹配 · 有赏</b><small>点击后立即选择真人或守擂傀儡</small></button>
             <button id="onlineCreateButton" class="online-mode-card" type="button" disabled><b>创建邀请房</b><small>好友切磋 · 可连续再战 · 无奖励</small><span id="onlineInviteGroupGuide" class="online-invite-group-guide">加入 QQ 群 1007671044，可自定义约人单挑</span></button>
             <button id="onlineInviteOpenButton" class="online-mode-card" type="button" disabled><b>加入邀请房</b><small>输入好友发来的双段蛊印</small></button>
           </div>
+          <details class="outgame-disclosure online-mode-rules"><summary>公平匹配 · 赛季荣誉 · 七阶段位</summary><p>排位使用双方同一局十二蛊池，各选六种；随机匹配计入赛季荣誉；邀请房只切磋、不计分且无奖励。真人荣誉与奖励最高；守擂傀儡胜场荣誉减半，每日最多 3 场计分。</p></details>
         </section>
 
         <section class="online-lobby-page" data-online-page="matching">
           <div id="onlineMatchSpinner" class="online-match-spinner" aria-hidden="true"><i></i><span>蛊</span></div>
           <h3>正在寻觅同途者</h3>
           <p id="onlineMatchElapsed">已等待 0 秒</p>
-          <div class="online-match-facts"><span><small>当前匹配池</small><strong id="onlineMatchPool">正在探查</strong></span><span><small>预计等待</small><strong id="onlineMatchEstimate">约 10–45 秒</strong></span></div>
+          <div class="online-match-facts"><span><small>平台可见候场</small><strong id="onlineMatchPool">正在探查</strong></span><span><small>预计等待</small><strong id="onlineMatchEstimate">约 10–45 秒</strong></span></div>
+          <div class="online-match-choice"><button id="onlineKeepHumanButton" type="button">继续等真人</button><button id="onlineBotMatchButton" type="button">挑战守擂傀儡</button></div>
+          <small class="online-bot-disclosure">守擂傀儡明确标注，不计入在线人数；傀儡胜场荣誉减半，每日最多 3 场计分。</small>
           <button id="onlineMatchCancel" type="button">取消匹配</button>
         </section>
 
@@ -1107,6 +1222,7 @@
           <div id="onlineHeroChoices" class="online-hero-choices" aria-label="选择公平蛊修">
             <button type="button" data-online-hero="fate" class="is-selected"><b>命</b><small>借势增伤</small></button><button type="button" data-online-hero="blood"><b>血</b><small>自损蓄怒</small></button><button type="button" data-online-hero="poison"><b>毒</b><small>瘴印叠毒</small></button><button type="button" data-online-hero="longevity"><b>寿</b><small>回生护体</small></button><button type="button" data-online-hero="dragon"><b>龙</b><small>鳞势增伤</small></button><button type="button" data-online-hero="bone"><b>骨</b><small>格挡回元</small></button>
           </div>
+          <div id="onlineHeroGuPreview" class="online-hero-gu-preview" aria-live="polite"></div>
           <div class="online-loadout-heading"><strong>本局十二蛊池 · 选六</strong><span id="onlineCommonCount">匹配后生成</span></div>
           <div id="onlineCommonChoices" class="online-common-choices" aria-label="从本局蛊池选择六种通用蛊"><p>进入房间后生成本局共用蛊池。</p></div>
           <aside id="onlineCommonInspect" class="online-common-inspect" aria-live="polite"><div><b id="onlineCommonInspectName">先查看一只蛊虫</b><small id="onlineCommonInspectCost">第一次点击查看完整功效</small><p id="onlineCommonInspectText">第二次点击同一只蛊虫，才会加入或移出本局六蛊阵容。</p></div><em id="onlineCommonInspectHint">圆形立绘用于快速辨认</em></aside>
@@ -1122,6 +1238,7 @@
             <div class="online-battle-meta">
               <span>第 <strong id="onlineBattleRound">1</strong> 回合</span>
               <span id="onlineBattleTurn">等待战斗状态</span>
+              <span id="onlineBotIntent" class="online-bot-intent hidden">傀儡正在观局</span>
             </div>
             <div class="online-duel-seal" aria-hidden="true"><i></i><span>斗</span></div>
             <ol id="onlineBattleEvents" class="online-battle-events" aria-live="polite"></ol>
@@ -1131,7 +1248,7 @@
         <aside id="onlineCardInspect" class="online-card-inspect hidden"><div><b>选择一只蛊虫</b><small>轻触手牌查看完整技能</small><p></p></div><button id="onlineCardConfirm" type="button">催动</button></aside>
         <div id="onlineBattleActions" class="online-battle-actions">
           <div id="onlineBattleHand" class="online-duel-hand"></div>
-          <div class="online-duel-command"><button id="onlineEmoteToggle" type="button" aria-expanded="false">表情</button><button id="onlineBattleEndTurn" class="online-duel-end" type="button">结束回合</button></div>
+          <div class="online-duel-command"><div id="onlineBattleAbilities" class="online-battle-abilities"><button id="onlineDragonTransform" class="hidden" type="button">七鳞龙化</button><button id="onlineBoneSoul" class="hidden" type="button">骨鸣·镇魂</button><button id="onlineBoneFate" class="hidden" type="button">骨鸣·断命</button></div><button id="onlineBattleDrawButton" class="online-duel-draw hidden" type="button">余元引蛊 · 1 真元</button><button id="onlineEmoteToggle" type="button" aria-expanded="false">表情</button><button id="onlineBattleEndTurn" class="online-duel-end" type="button">结束回合</button></div>
         </div>
         <div id="onlineEmoteMenu" class="online-emote-menu hidden" aria-label="蛊斗表情">
           <button data-duel-emote="greet" title="问候"><img src="assets/icons/duel-emotes/greet.svg" alt="问候"></button><button data-duel-emote="praise" title="称赞"><img src="assets/icons/duel-emotes/praise.svg" alt="称赞"></button><button data-duel-emote="think" title="思考"><img src="assets/icons/duel-emotes/think.svg" alt="思考"></button><button data-duel-emote="surprise" title="惊讶"><img src="assets/icons/duel-emotes/surprise.svg" alt="惊讶"></button><button data-duel-emote="sigh" title="叹息"><img src="assets/icons/duel-emotes/sigh.svg" alt="叹息"></button><button data-duel-emote="rematch" title="再来一局"><img src="assets/icons/duel-emotes/rematch.svg" alt="再来一局"></button>
@@ -1147,9 +1264,9 @@
   <div id="settingsOverlay" class="settings-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
     <div class="settings-card">
       <button id="settingsCloseButton" class="deck-close-button" type="button" aria-label="关闭设置">×</button>
-      <p class="deck-eyebrow">试玩包设置</p>
+      <p class="deck-eyebrow">游玩设置</p>
       <h2 id="settingsTitle">设置</h2>
-        <p id="settingsVersion" class="settings-version">当前版本：V0.9.66 蛊斗鸣锋</p>
+        <p id="settingsVersion" class="settings-version">当前版本：V0.9.84 千阶新蛊</p>
       <div class="settings-list">
         <button id="settingsMusicToggle" type="button">音乐：开</button>
         <label class="settings-volume" for="settingsVolume">
@@ -1207,7 +1324,7 @@
     </div>
   </div>
 
-  <!-- V0.9.18 塔中回声：开场序章。首次进开始界面自动弹一次，设置里可「重看序章」。V0.9.19 花纹特效强化。 -->
+  <!-- 塔中回声：序章不再阻断首访，可从设置主动阅读。 -->
   <div id="prologueOverlay" class="prologue-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="prologueTitle">
     <i class="ember-field prologue-embers" aria-hidden="true"></i>
     <div class="prologue-card">
@@ -1237,7 +1354,7 @@
       <h2 id="tutorialTitle">选择蛊修</h2>
       <div id="tutorialBody" class="tutorial-body"></div>
       <div class="tutorial-progress" aria-label="新手说明页数">
-        <span id="tutorialPageText">1 / 4</span>
+        <span id="tutorialPageText">1 / 9</span>
         <i id="tutorialDots"></i>
       </div>
       <div class="tutorial-actions">
